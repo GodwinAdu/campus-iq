@@ -1,0 +1,166 @@
+"use server"
+
+import { revalidatePath } from "next/cache";
+import Account from "../models/account.models";
+import { connectToDB } from "../mongoose";
+import { currentUser } from "../helpers/current-user";
+import { AccountSchema } from "../validators/account.validator";
+
+interface CreateAccountProps {
+    accountName: string;
+    balance: number;
+}
+
+export async function createAccount( values: CreateAccountProps) {
+    try {
+        const { accountName, balance } = values;
+
+        const safeValues = AccountSchema.safeParse({
+            accountName,
+            balance
+        })
+
+        if (!safeValues.success) {
+            throw new Error("Invalid account data");
+        }
+
+        const user = await currentUser();
+        if (!user) throw new Error('user not logged in');
+
+        const schoolId = user.schoolId;
+
+        await connectToDB();
+
+        const existingAccount = await Account.findOne({ accountName: safeValues.data.accountName });
+
+        if (existingAccount) {
+            throw new Error("Account already exists");
+        }
+
+        const account = new Account({
+            schoolId,
+            accountName: safeValues.data.accountName,
+            balance: safeValues.data.balance,
+            createdBy: user?._id,
+            action_type: "created",
+        });
+
+        await account.save();
+
+    } catch (error) {
+        console.error("Error creating account", error);
+        throw error;
+    }
+}
+
+
+export async function getAllAccounts() {
+    try {
+        const user = await currentUser();
+
+        if (!user) throw new Error('You must be logged in')
+
+        const schoolId = user.schoolId;
+
+        await connectToDB();
+
+        const accounts = await Account.find({ schoolId });
+        if (accounts.length === 0) {
+            return []; // or throw an error if you want to handle it differently
+        }
+
+        return JSON.parse(JSON.stringify(accounts));
+
+    } catch (error) {
+        console.log("Something went wrong", error);
+        throw error;
+    }
+}
+
+
+export async function getAccountById(accountId: string) {
+    try {
+        const user = await currentUser();
+
+        if (!user) throw new Error('user not logged in');
+
+        await connectToDB();
+
+        const account = await Account.findById(accountId);
+        if (!account) {
+            throw new Error("Account not found");
+        }
+
+        return JSON.parse(JSON.stringify(account));
+
+    } catch (error) {
+        console.log("Something went wrong", error);
+        throw error;
+    }
+}
+
+export async function updateAccount(accountId: string, values: Partial<CreateAccountProps>, path: string) {
+    try {
+        const user = await currentUser();
+
+        if (!user) throw new Error('user not logged in');
+
+        await connectToDB();
+
+        const newValues = {
+            ...values,
+            mod_flag: true,
+            modifyBy: user?._id,
+            action_type: "updated",
+        }
+
+        const updateAccount = await Account.findByIdAndUpdate(
+            accountId,
+            { $set: newValues },
+            { new: true, runValidators: true }
+        );
+
+        if (!updateAccount) {
+            console.log("Account not found");
+            return null;
+        }
+
+        console.log("Update successful");
+
+        revalidatePath(path)
+
+        return JSON.parse(JSON.stringify(updateAccount));
+    } catch (error) {
+        console.error("Error updating House:", error);
+        throw error;
+    }
+}
+
+
+export async function deleteAccount(accountId: string) {
+    try {
+        await connectToDB();
+        const accountToDelete = await Account.findById(accountId);
+
+        if (!accountToDelete) {
+            throw new Error('Account not found');
+        }
+
+        if (accountToDelete.balance > 0) {
+            throw new Error('Account balance is greater than 0. Cannot delete account.');
+        }
+
+        const value = {
+            del_flag:true
+        }
+
+        await Account.findByIdAndUpdate(
+            accountId,
+            { $set: value },
+            { new: true, runValidators: true }
+        );
+    } catch (error) {
+        console.log("Unable to delete account", error);
+        throw error;
+    }
+}

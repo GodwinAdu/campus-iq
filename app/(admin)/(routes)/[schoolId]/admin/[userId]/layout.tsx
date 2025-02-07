@@ -1,0 +1,38 @@
+
+import {
+    SidebarInset,
+    SidebarProvider,
+} from "@/components/ui/sidebar";
+import { currentUser } from "@/lib/helpers/current-user";
+import { TourProvider } from "@/lib/context/TourContext";
+import TourLayout from "@/provider/TourLayout";
+import AppSidebarMain from "@/components/admin/dashboard/app-sidebar-main";
+import Navbar from "@/components/admin/Navbar";
+
+
+export default async function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    const user = (await currentUser()) ?? null;
+
+    return (
+        <TourProvider>
+            <TourLayout>
+                <SidebarProvider>
+                    <AppSidebarMain />
+                    <SidebarInset>
+                        <Navbar user={user} />
+                        <div className="relative">
+                            <div id="main-content" className="py-4 px-4 overflow-hidden">
+                                {children}
+                                {/* <UseCheckStoreExpired /> */}
+                            </div>
+                        </div>
+                    </SidebarInset>
+                </SidebarProvider>
+            </TourLayout>
+        </TourProvider>
+    );
+}
