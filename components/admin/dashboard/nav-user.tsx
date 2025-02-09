@@ -34,6 +34,7 @@ import Link from "next/link"
 import { PaymentDialog } from "./dialog/paymentDialog"
 import { RatingDialog } from "./dialog/RatingDialog"
 import { useTourControl } from "@/hooks/use-tour-control"
+import { ModeToggle } from "@/components/commons/theme/ModeToggle"
 
 export function NavUser({ store }: { store: IStore }) {
   const { isMobile } = useSidebar()
@@ -89,7 +90,7 @@ export function NavUser({ store }: { store: IStore }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <div className="flex gap-2 items-center">
-                {/* <ModeToggle /> */}
+                <ModeToggle />
                 <p className="font-extrabold">Theme</p>
               </div>
               <Link href={`/${storeId}/dashboard/${branchId}/settings`}>

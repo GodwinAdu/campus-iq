@@ -14,11 +14,14 @@ interface Notification {
 
 interface Subscription {
     period: {
-        name: string;
+        frequency: "monthly" | "3 months" | "6 months" | "yearly" | "term";
         value: number;
+        price: number;
     },
-    subscriptionExpiry: Date;
-    planStatus: 'basic' | 'pro' | 'custom';
+    renewDate: Date;
+    expiryDate: Date;
+    plan: 'basic' | 'pro' | 'custom';
+    currentStudent: number;
 }
 
 interface ISchool extends Document {
@@ -81,7 +84,7 @@ interface IEmployee extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null; // Reference to the employee who modified this record
     deletedBy?: Types.ObjectId | null; // Reference to the employee who deleted this record
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -118,8 +121,9 @@ interface IStudent extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId;
     deletedBy?: Types.ObjectId;
-    action_type?: string;
-    timestamps: boolean;
+    action_type: "create" | "update" | "delete";
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 interface Address {
@@ -165,7 +169,7 @@ interface IAccount extends Document {
     deletedBy?: Types.ObjectId;
     mod_flag?: boolean;
     del_flag?: boolean;
-    action_type?: string;
+    action_type: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -184,7 +188,7 @@ interface IClass extends Document {
     del_flag: boolean;
     modifiedBy?: Types.ObjectId; // Optional reference to Employee
     deletedBy?: Types.ObjectId; // Optional reference to Employee
-    action_type?: string | null; // Optional action type (could be used for actions like delete, modify, etc.)
+    action_type?: "create" | "update" | "delete"; // Optional action type (could be used for actions like delete, modify, etc.)
     createdAt: Date; // Automatically handled by timestamps
     updatedAt: Date; // Automatically handled by timestamps
 }
@@ -200,14 +204,17 @@ interface IOTP {
     del_flag: boolean;
     modifiedBy: Schema.Types.ObjectId;
     deletedBy: Schema.Types.ObjectId;
-    action_type: string | null;
+    action_type: "create" | "update" | "delete";
     createdAt: Date;
+    updatedAt: Date;
     // ... other fields
 }
 
 
 interface IParent extends Document {
-    userName: string;
+    _id?: string;
+    schoolId: Schema.Types.ObjectId;
+    username: string;
     fullName: string;
     email: string;
     phone: string;
@@ -222,7 +229,7 @@ interface IParent extends Document {
     del_flag?: boolean;
     modifiedBy?: Schema.Types.ObjectId | null;
     deletedBy?: Schema.Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
 }
 
 interface ITeacher extends Document {
@@ -258,7 +265,7 @@ interface ITeacher extends Document {
     del_flag?: boolean;
     modifiedBy?: Schema.Types.ObjectId | null;
     deletedBy?: Schema.Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
 }
 
 interface IAward extends Document {
@@ -275,7 +282,7 @@ interface IAward extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -288,7 +295,7 @@ interface IBookFine extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -307,7 +314,7 @@ interface IBookTransaction extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -325,7 +332,7 @@ interface IBook extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -340,7 +347,7 @@ interface IDepartment extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -359,7 +366,7 @@ interface IDeposit extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -373,7 +380,7 @@ interface IDistribution extends Document {
     delete_flag?: boolean;
     modifyBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -386,7 +393,7 @@ interface IEmailCoin extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -421,7 +428,7 @@ interface IExamSchedule extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -443,7 +450,7 @@ interface IExamSetup extends Document {
     del_flag?: boolean; // Deletion flag
     modifiedBy?: Types.ObjectId | null; // Reference to the employee who modified the exam setup
     deletedBy?: Types.ObjectId | null; // Reference to the employee who deleted the exam setup
-    action_type?: string | null; // Action type (create, update, delete)
+    action_type?: "create" | "update" | "delete"; // Action type (create, update, delete)
     createdAt: Date; // Automatically managed timestamp
     updatedAt: Date; // Automatically managed timestamp
 }
@@ -475,7 +482,7 @@ interface ISession extends Document {
     del_flag: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -497,7 +504,7 @@ interface ISubject extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -513,7 +520,7 @@ interface IStudentCategory extends Document {
     del_flag?: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -534,7 +541,7 @@ interface IFeesStructure extends Document {
     del_flag: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -552,7 +559,7 @@ interface IFeesFine extends Document {
     del_flag: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -581,7 +588,7 @@ interface ISalaryStructure extends Document {
     delete_flag: boolean;
     modifyBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -598,7 +605,7 @@ interface ISalaryPayment extends Document {
     del_flag: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -612,7 +619,7 @@ interface ILeaveCategory extends Document {
     del_flag: boolean;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
-    action_type?: 'created' | 'updated';
+    action_type?: "create" | "update" | "delete";
     createdAt: Date;
     updatedAt: Date;
 }
@@ -641,17 +648,17 @@ interface IFeesPayment extends Document {
     del_flag?: boolean;
     modifiedBy?: Schema.Types.ObjectId;
     deletedBy?: Schema.Types.ObjectId;
-    action_type?: string;
+    action_type: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 
 interface IAttendance extends Document {
-    _id?:string;
-    schoolId:Types.ObjectId;
+    _id?: string;
+    schoolId: Types.ObjectId;
     userId: Schema.Types.ObjectId;
-    userType:'student' | 'employee';
+    userType: 'student' | 'employee';
     classId: Schema.Types.ObjectId;
     year: number;
     month: number;
@@ -661,7 +668,7 @@ interface IAttendance extends Document {
     del_flag?: boolean;
     modifiedBy?: Schema.Types.ObjectId;
     deletedBy?: Schema.Types.ObjectId;
-    action_type?: string;
+    action_type: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -680,10 +687,208 @@ interface IExpense extends Document {
     del_flag?: boolean;
     modifiedBy?: Schema.Types.ObjectId | null;
     deletedBy?: Schema.Types.ObjectId | null;
-    action_type?: string | null;
+    action_type?: "create" | "update" | "delete";
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+interface DaySchedule {
+    subject: string;
+    type: string;
+    location: string;
+};
+
+interface TimetableEntry {
+    time: string;
+    monday: DaySchedule;
+    tuesday: DaySchedule;
+    wednesday: DaySchedule;
+    thursday: DaySchedule;
+    friday: DaySchedule;
+};
+
+interface ITimetable {
+    schoolId: Types.ObjectId;
+    classId: Types.ObjectId;
+    timetable: TimetableEntry[];
+    createdBy?: Types.ObjectId | null;
+    mod_flag?: boolean;
+    del_flag?: boolean;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    action_type?: "create" | "update" | "delete";
+    createdAt?: Date;
+    updatedAt?: Date;
+};
+
+// Define the interface for the House document
+interface IHouse extends Document {
+    _id?: string;
+    schoolId: Schema.Types.ObjectId;
+    name: string;
+    roomIds: Schema.Types.ObjectId[];
+    createdBy?: Schema.Types.ObjectId;
+    mod_flag?: boolean;
+    del_flag?: boolean;
+    modifiedBy?: Schema.Types.ObjectId | null;
+    deletedBy?: Schema.Types.ObjectId | null;
+    action_type?: "create" | "update" | "delete";
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+// Define the interface for the Room document
+interface IRoom extends Document {
+    _id?: string;
+    schoolId: Schema.Types.ObjectId;
+    name: string;
+    capacity?: number;
+    studentIds: Schema.Types.ObjectId[];
+    createdBy?: Schema.Types.ObjectId;
+    mod_flag?: boolean;
+    del_flag?: boolean;
+    modifiedBy?: Schema.Types.ObjectId | null;
+    deletedBy?: Schema.Types.ObjectId | null;
+    action_type?: "create" | "update" | "delete";
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface IRoomMaintenance extends Document {
+    schoolId: Types.ObjectId;
+    roomId: Types.ObjectId;
+    issue: string;
+    status: "pending" | "in progress" | "resolved";
+    createdBy: string;
+    modifiedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type: "create" | "update" | "delete";
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface IInventoryCategory extends Document {
+    _id?:string;
+    schoolId: Types.ObjectId;
+    name: string;
+    products: Types.ObjectId[];
+    storeId?: Types.ObjectId;
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+interface IIssueItem {
+    categoryId: Types.ObjectId;
+    productId: Types.ObjectId;
+    quantity: number;
+}
+
+interface IInventoryIssue extends Document {
+    schoolId: Types.ObjectId;
+    role: "Student" | "Employee" | "Parent";
+    saleToId: Types.ObjectId;
+    issueDate: Date;
+    returnDate?: Date;
+    status: string;
+    issuedBy?: Types.ObjectId;
+    issueItems: IIssueItem[];
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+interface IInventoryProduct extends Document {
+    schoolId: Types.ObjectId;
+    name: string;
+    categoryId?: Types.ObjectId;
+    purchasePrice: number;
+    salePrice: number;
+    quantity: number;
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+interface IPurchaseItem {
+    product: Types.ObjectId;
+    quantity: number;
+    discount: number;
+}
+
+interface IInventoryPurchase extends Document {
+    _id?: string;
+    schoolId: Types.ObjectId;
+    supplierId: Types.ObjectId;
+    storeId: Types.ObjectId;
+    status: "Pending" | "Ordered" | "Received" | "Rejected";
+    purchaseDate: Date;
+    purchaseItems: IPurchaseItem[];
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface IInventoryStore extends Document {
+    _id?: string;
+    schoolId: Types.ObjectId;
+    name: string;
+    address: string;
+    contactNumber: string;
+    categories: Types.ObjectId[];
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface IInventorySupplier extends Document {
+    _id?:string;
+    schoolId: Types.ObjectId;
+    name: string;
+    email: string;
+    companyName?: string;
+    contactNumber: string;
+    address: string;
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }
+
+
 
 type UserIdParams = Promise<{ userId: string }>
 type SchoolIdParams = Promise<{ schoolId: string }>

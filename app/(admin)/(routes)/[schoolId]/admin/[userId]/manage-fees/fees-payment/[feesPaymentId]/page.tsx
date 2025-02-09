@@ -7,11 +7,11 @@ import { getAllAccounts } from '@/lib/actions/account.actions'
 
 type Params = Promise<{ schoolId: string, feesPaymentId: string }>
 const page = async ({ params }: { params:Params}) => {
-    const combinedString = params.feesPaymentId as string;
+    const {feesPaymentId} = await params;
     // Extracting A and B
-    const index = combinedString.indexOf('-');
-    const classId = combinedString.substring(0, index);
-    const studentId = combinedString.substring(index + 1);
+    const index = feesPaymentId.indexOf('-');
+    const classId = feesPaymentId.substring(0, index);
+    const studentId = feesPaymentId.substring(index + 1);
 
     const payed = await fetchFeePaymentForStudent(classId, studentId);
 

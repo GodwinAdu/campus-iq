@@ -27,11 +27,11 @@ const page = () => {
             </div>
             <div className="hidden bg-muted lg:block">
                 <Image
-                    src="/sales.jpg"
+                    src="/login.jpg"
                     alt="Image"
                     width="1920"
                     height="1080"
-                    className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                    className="h-screen w-full object-cover"
                 />
             </div>
         </div>

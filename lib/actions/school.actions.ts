@@ -7,10 +7,12 @@ import { connectToDB } from "../mongoose";
 export async function getSchool() {
     try {
         const user = await currentUser();
+        if(!user) throw new Error('user not logged in');
+        const schoolId = user.schoolId
 
         await connectToDB();
 
-        const school = await School.findById(user?.storeId);
+        const school = await School.findById(schoolId);
 
         if (!school) {
             throw new Error("school not found");

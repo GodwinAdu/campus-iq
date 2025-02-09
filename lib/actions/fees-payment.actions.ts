@@ -152,6 +152,7 @@ export async function fetchFeePaymentForStudent(classId: string, studentId: stri
     try {
         const user = await currentUser();
         if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
@@ -164,7 +165,7 @@ export async function fetchFeePaymentForStudent(classId: string, studentId: stri
                 ])
                 .lean()
                 .exec(),
-            FeesPayment.find({ classId }).lean().exec(),
+            FeesPayment.find({schoolId, classId }).lean().exec(),
             FeesStructure.findOne({ classId }).lean().exec(),
             FeesFine.find({ classId }).lean().exec()
         ]);
@@ -206,6 +207,7 @@ export async function fetchFeePaymentForStudent(classId: string, studentId: stri
         if (payments.length === 0) {
             // If no payment records exist, create a new entry
             mergeData = {
+                schoolId,
                 studentId: studentId,
                 invoiceNo: generateInvoiceNumber(),
                 fullName: student.fullName,

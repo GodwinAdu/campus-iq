@@ -6,9 +6,10 @@ import { Button } from "../ui/button";
 import { BarChart4, Package, Users } from "lucide-react";
 import FullScreenButton from "../commons/FullScreenButton";
 import { useTourControl } from "@/hooks/use-tour-control";
+import UserDropdown from "../commons/user-dropdown";
 
 
-const Navbar = () => {
+const Navbar = ({user}:{user:IEmployee}) => {
 
 
     useTourControl([
@@ -46,12 +47,12 @@ const Navbar = () => {
                 </Button>
                 {/* <SettingComponent /> */}
 
-                {/* <UserDropdown
+                <UserDropdown
                     email={user?.email}
                     username={user?.fullName}
-                    avatarUrl={user?.avatarUrl as string}
+                    avatarUrl={user?.imgUrl as string}
                     notificationCount={100}
-                /> */}
+                />
             </div>
         </header>
     );

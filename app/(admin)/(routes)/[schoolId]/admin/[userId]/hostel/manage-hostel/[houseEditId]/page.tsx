@@ -4,26 +4,27 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { currentProfile } from "@/lib/helpers/current-profile";
+import { redirect } from "next/navigation"
 import { EditHouse } from "../_component/EditHouse";
 import { fetchHouseById } from "@/lib/actions/house.actions";
 import Heading from "@/components/commons/Header";
+import { currentUser } from "@/lib/helpers/current-user";
+import { getAllRooms } from "@/lib/actions/room.actions";
 
+type Props = Promise<{ schoolId: string, userId: string, houseEditId: string }>
 const page = async ({
   params,
 }: {
-  params: { adminId: string; houseEditId: string };
+  params: Props
 }) => {
-  const user = await currentProfile();
+  const {schoolId,userId,houseEditId} = await params;
+
+  const user = await currentUser();
 
   if (!user) redirect("/");
 
-  const pathId = params.adminId;
-  const id = params.houseEditId;
-
-  const initialData = (await fetchHouseById({ id })) || {};
-
+  const initialData = await fetchHouseById(houseEditId)
+  const rooms = await getAllRooms()
   return (
     <>
       <div className="flex justify-between items-center">
@@ -32,7 +33,7 @@ const page = async ({
           description="Edit and manage School House details"
         />
         <Link
-          href={`/admin/${pathId}/system-config/manage-house`}
+          href={`/${schoolId}/admin/${userId}/system-config/manage-house`}
           className={cn(buttonVariants())}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -41,7 +42,7 @@ const page = async ({
       </div>
       <Separator />
       <div className="pt-4 w-full">
-        <EditHouse initialData={initialData} />
+        <EditHouse rooms={rooms} initialData={initialData} />
       </div>
     </>
   );

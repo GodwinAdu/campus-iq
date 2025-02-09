@@ -10,6 +10,7 @@ import { connectToDB } from "../mongoose";
 import GradeRange from "../models/grade-range.models";
 import Employee from "../models/employee.models";
 import { currentUser } from "../helpers/current-user";
+import { Types } from "mongoose";
 
 // examId: {
 //     type: Schema.Types.ObjectId,
@@ -42,54 +43,56 @@ import { currentUser } from "../helpers/current-user";
 export async function createMarkEntries(classId: string) {
     try {
         const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
 
-        if (!user) throw new Error('User not logged in');
+        await connectToDB(); // Ensure DB connection is established
 
-        const schoolId = user.schoolId;
-
-        await connectToDB(); // Ensure DB connection first
-
+        // Run queries concurrently
         const [classSubjects, examSchedule, markEntries] = await Promise.all([
-            Subject.find({ schoolId, classId }).select("subjectName"),
-            ExamSchedule.findOne({ classId }).populate("examId", "markDistributions"),
-            Mark.findOne({ classId })
+            Subject.find({ classId }).select("subjectName").lean(),
+            ExamSchedule.findOne({ classId }).populate("examId", "markDistributions").lean(),
+            Mark.findOne({ classId }).populate("studentId", "fullName").lean(),
         ]);
 
         if (!classSubjects.length) throw new Error(`Subjects not found for class ${classId}`);
-        if (!examSchedule) throw new Error(`Exam setup not found for exam`);
+        if (!examSchedule) throw new Error("Exam setup not found");
 
-        if (!markEntries) {
-            // Fetch student only if markEntries don't exist
-            const student = await Student.findOne({ classId }).select("_id");
-            if (!student) throw new Error("No students found");
+        // Return existing mark entries if found
+        if (markEntries) return JSON.parse(JSON.stringify(markEntries));
 
-            const subjectItems = classSubjects.map((subject: { subjectName: string }) => ({
-                subjectName: subject.subjectName,
-                distributionItems: examSchedule.examId.markDistributions.map((dist: { distribution: string }) => ({
-                    distribution: dist,
-                    mark: null
-                })),
-            }));
+        // Fetch student IDs only when mark entries don't exist
+        const student = await Student.findOne({ classId }).select("_id fullName").lean();
+        if (!student) throw new Error("No students found");
 
-            const newMarkEntries = new Mark({
-                schoolId,
-                examId: examSchedule.examId._id,
-                classId,
-                studentId: student._id,
-                subjectItems,
-            });
+        // Prepare subject items structure
+        const subjectItems = classSubjects.map(({ subjectName }: { subjectName: string }) => ({
+            subjectName,
+            distributionItems: examSchedule.examId.markDistributions.map((distribution: { distribution: string }) => ({
+                distribution,
+                mark: null,
+            })),
+        }));
 
-            await newMarkEntries.save();
-            return JSON.parse(JSON.stringify(newMarkEntries));
-        }
+        // Create new mark entry
+        const newMarkEntry = await Mark.create({
+            schoolId: user.schoolId,
+            examId: examSchedule.examId._id,
+            classId,
+            studentId: student._id,
+            subjectItems,
+        });
 
-        return JSON.parse(JSON.stringify(markEntries));
+        // Populate `studentId` before returning
+        const populatedMarkEntry = await Mark.findById(newMarkEntry._id).populate("studentId", "fullName").lean();
+
+        return JSON.parse(JSON.stringify( populatedMarkEntry)); //
 
     } catch (error) {
-        console.error("Error fetching mark entries:", error);
-        throw new Error("Failed to fetch mark entries");
+        console.error("Error creating mark entries:", error);
+        throw new Error("Failed to create mark entries");
     }
 }
+
 
 
 // Function to calculate total marks from distribution items
@@ -109,9 +112,9 @@ export async function saveMarkEntries({
     values: {
         publish: boolean;
         subjectItems: {
-            subjectId: string;
+            subjectName: string;
             totalMark?: number | null | undefined;
-            distributionItems: { distributionId: string; mark: number | null }[];
+            distributionItems: { distribution: string; mark: number | null }[];
         }[]
     };
 }) {

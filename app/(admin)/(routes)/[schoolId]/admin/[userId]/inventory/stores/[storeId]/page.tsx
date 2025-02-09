@@ -17,7 +17,7 @@ const page = async ({ params }: { params: { storeId: string } }) => {
 
             </div>
             <Separator />
-            <div className="">
+            <div className="py-4">
                 <EditStore initialData={data} />
             </div>
         </>

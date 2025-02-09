@@ -1,24 +1,25 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
-import { currentProfile } from "../helpers/current-profile";
 import InventoryCategory from "../models/inventory-category.models";
 import { connectToDB } from "../mongoose";
-import { Store } from "lucide-react";
 import InventoryStore from "../models/inventory-store.models";
+import { currentUser } from "../helpers/current-user";
 
 
 export async function createCategory(values: { name: string, storeId: string }) {
     try {
-        const user = await currentProfile();
+        const { name, storeId } = values;
+        const user = await currentUser();
 
         if (!user) throw new Error(`User not authenticated`);
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
         const [existingCategory, store] = await Promise.all([
-            InventoryCategory.findOne({ name: values.name }),
-            InventoryStore.findById(values.storeId),
+            InventoryCategory.findOne({ schoolId, name }),
+            InventoryStore.findById(storeId),
         ])
 
 
@@ -30,18 +31,18 @@ export async function createCategory(values: { name: string, storeId: string }) 
         if (!store) throw new Error("No such store found");
 
         const newCategory = new InventoryCategory({
-            name: values.name,
-            storeId: values.storeId,
+            schoolId,
+            name,
+            storeId,
             createdBy: user._id,
             action_type: "created",
         });
 
-        await newCategory.save();
         store.categories.push(newCategory._id);
-
-        await store.save();
-
-
+        await Promise.all([
+            newCategory.save(),
+            store.save(),
+        ]);
 
     } catch (error) {
         console.error("Error creating category for category", error);
@@ -53,15 +54,17 @@ export async function createCategory(values: { name: string, storeId: string }) 
 
 export async function fetchCategories() {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
 
         if (!user) {
             throw new Error('User not authenticated');
         };
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const categories = await InventoryCategory.find({});
+        const categories = await InventoryCategory.find({schoolId})
+        .populate('createdBy', 'fullName');
 
         if (categories.length === 0) {
             console.log('Categories don\'t exist');
@@ -86,7 +89,7 @@ export async function fetchCategoryById(id: string) {
         }
 
         return JSON.parse(JSON.stringify(category));
-    } catch (error: any) {
+    } catch (error) {
         console.log("unable to fetch Category", error);
         throw error;
     }
@@ -97,14 +100,14 @@ export async function fetchCategoryById(id: string) {
 
 interface updateCategoryProps {
     name: string;
-    createdBy: string
+   storeId:string;
 }
 
 
 
 export async function updateCategory(categoryId: string, values: updateCategoryProps, path: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
 
         await connectToDB();
 

@@ -7,7 +7,7 @@ import { columns } from './column';
 import { DataTable } from '@/components/table/data-table';
 
 const MarkEntriesGrid = ({ classes }: { classes: IClass[] }) => {
-    const [selectedClass, setSelectedClass] = useState("");
+    const [selectedClass, setSelectedClass] = useState(classes[0]._id);
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [data,setData] = useState([])
 
@@ -15,8 +15,7 @@ const MarkEntriesGrid = ({ classes }: { classes: IClass[] }) => {
         const fetchPayment = async () => {
             try {
                 setIsLoading(true)
-                const classId = classes[0]._id;
-                const data = await fetchStudentsList(classId);
+                const data = await fetchStudentsList(selectedClass as string);
                 const formattedData = data.map((student: IStudent) => ({
                     ...student,
                     examResult: student.examResult ? "Entered" : "Not Entered",
@@ -35,8 +34,6 @@ const MarkEntriesGrid = ({ classes }: { classes: IClass[] }) => {
     return (
         <>
             <div className="border py-1 px-4 flex gap-5 items-center my-1">
-
-
                 <div className="flex gap-4 items-center">
                     <label className="font-bold text-sm hidden lg:block">Select Class</label>
                     <ClassSelection selectedClass={(value) => setSelectedClass(value)} classes={classes} />
@@ -44,7 +41,7 @@ const MarkEntriesGrid = ({ classes }: { classes: IClass[] }) => {
 
             </div>
             <div className="py-4 mt-2 px-2">
-                <DataTable searchKey="fullName" data={data} columns={columns} />
+                <DataTable searchKey="fullName" data={data} columns={columns} isLoading={isLoading} />
             </div>
 
         </>

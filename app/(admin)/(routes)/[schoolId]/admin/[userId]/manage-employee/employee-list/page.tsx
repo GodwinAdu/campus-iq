@@ -1,13 +1,14 @@
 import Heading from '@/components/commons/Header';
-import { currentProfile } from '@/lib/helpers/current-profile';
-import { currentUserRole } from '@/lib/helpers/getUserRole';
+
 import { redirect } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
 import EmployeeListGrid from './_components/EmployeeListGrid';
 import { getAllDepartments } from '@/lib/actions/department.actions';
+import { currentUser } from '@/lib/helpers/current-user';
+import { currentUserRole } from '@/lib/helpers/get-user-role';
 
 const page = async () => {
-    const user = await currentProfile();
+    const user = await currentUser();
 
     if (!user) redirect("/");
 

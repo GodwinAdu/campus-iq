@@ -8,7 +8,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -16,7 +15,6 @@ import {
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -63,7 +61,7 @@ export function StoreModal() {
                 description: "New Store was added successfully...",
             });
             router.refresh();
-        } catch (error: any) {
+        } catch (error) {
             console.log("error happened while creating Store", error);
             toast({
                 title: "Something went wrong",

@@ -4,12 +4,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -36,7 +35,8 @@ export function EditStore({ initialData }: { initialData: IInventoryStore }) {
     const path = usePathname();
     const params = useParams();
 
-    const storeId = params.storeId as string;
+    const { schoolId,userId } = params;
+    const storeId = initialData?._id as string;
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -50,30 +50,28 @@ export function EditStore({ initialData }: { initialData: IInventoryStore }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             await updateStore(storeId, values, path);
-  
+
             toast({
                 title: "Update Successfully",
                 description: "Update Category  successfully...",
             });
             form.reset();
-            router.push(`/admin/${params.adminId}/inventory/stores`);
-        } catch (error: any) {
+            router.push(`/${schoolId}/admin/${userId}/inventory/stores`);
+        } catch (error) {
             console.log("error happened while updating category", error);
-      
+
             toast({
                 title: "Something went wrong",
-                description: `${error.message}`,
+                description: "Please try again later",
                 variant: "destructive",
             });
         }
     }
 
     return (
-        <div className="mx-auto max-w-xl w-[96%]">
-            <Card>
+        <div >
+            <Card className="mx-auto max-w-xl w-[96%] py-6">
                 <CardContent>
-
-
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                             <FormField

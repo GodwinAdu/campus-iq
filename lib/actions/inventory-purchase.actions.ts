@@ -1,11 +1,12 @@
 "use server"
-import { currentProfile } from '../helpers/current-profile';
+
 import InventoryPurchase from '../models/inventory-purchase.models';
 import InventoryProduct from '../models/inventory-product.models';
 import { connectToDB } from '../mongoose';
 import { revalidatePath } from 'next/cache';
 import InventorySupplier from '../models/inventory-supplier.models';
 import InventoryStore from '../models/inventory-store.models';
+import { currentUser } from '../helpers/current-user';
 
 interface ItemsProps {
     products: string;
@@ -23,7 +24,10 @@ interface PurchaseProps {
 
 export async function createPurchase(values: PurchaseProps, path: string) {
     try {
-        const user = await currentProfile();
+        const { supplierId, storeId, status, purchaseDate, purchaseItems } = values;
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
@@ -40,11 +44,12 @@ export async function createPurchase(values: PurchaseProps, path: string) {
 
         // Create new purchase
         const newPurchase = new InventoryPurchase({
-            supplierId: values.supplierId,
-            storeId: values.storeId,
-            status: values?.status,
-            purchaseDate: values.purchaseDate,
-            purchaseItems: values.purchaseItems,
+            schoolId,
+            supplierId,
+            storeId,
+            status,
+            purchaseDate,
+            purchaseItems,
             createdBy: user._id,
             action_type: "created"
         });
@@ -63,12 +68,15 @@ export async function createPurchase(values: PurchaseProps, path: string) {
 
 export async function fetchAllPurchases() {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+
+        if (!user) throw new Error('User not logged in');
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
         // Fetch all purchases and populate the related fields
-        const purchases = await InventoryPurchase.find({})
+        const purchases = await InventoryPurchase.find({schoolId})
             .populate([
                 { path: 'supplierId', model: InventorySupplier, select: 'name' },
                 { path: 'storeId', model: InventoryStore, select: 'name' },
@@ -89,6 +97,9 @@ export async function fetchAllPurchases() {
 
 export async function fetchPurchaseById(id: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
+
         await connectToDB();
 
         const purchase = await InventoryPurchase.findById(id).lean()
@@ -108,7 +119,9 @@ export async function fetchPurchaseById(id: string) {
 
 export async function updatePurchase(purchaseId: string, values: Partial<PurchaseProps>, path: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+
+        if (!user) throw new Error('User not logged in');
 
         await connectToDB();
 
@@ -121,7 +134,7 @@ export async function updatePurchase(purchaseId: string, values: Partial<Purchas
 
         const updatedPurchase = await InventoryPurchase.findByIdAndUpdate(
             purchaseId,
-            { $set: { newValues } },
+            { $set:  newValues  },
             { new: true, runValidators: true }
         );
 
@@ -135,7 +148,6 @@ export async function updatePurchase(purchaseId: string, values: Partial<Purchas
         // Revalidate the path if necessary
         revalidatePath(path);
 
-        return JSON.parse(JSON.stringify(updatedPurchase));
     } catch (error) {
         console.error('Error updating purchase status:', error);
         throw error;

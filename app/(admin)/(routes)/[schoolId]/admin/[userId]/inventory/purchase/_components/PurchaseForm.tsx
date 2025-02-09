@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -44,7 +43,7 @@ const formSchema = z.object({
         message: "Username must be at least 2 characters.",
     }),
     status: z.string().optional(),
-    purchaseDate: z.date(),
+    purchaseDate: z.coerce.date(),
     purchaseItems: z
         .array(
             z.object({
@@ -57,7 +56,7 @@ const formSchema = z.object({
 
 interface PurchaseProps {
     type: "create" | "update";
-    initialData?: any;
+    initialData?: IInventoryPurchase;
     stores: { _id: string, name: string }[];
     suppliers: { _id: string, name: string }[];
     products: { _id: string, name: string, purchasePrice: number }[];
@@ -69,7 +68,9 @@ const PurchaseForm = ({ stores, suppliers, products, type, initialData }: Purcha
     const path = usePathname();
     const params = useParams();
 
-    const purchaseId = initialData?._id
+    const { schoolId, userId } = params;
+
+    const purchaseId = initialData?._id as string;
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -77,7 +78,7 @@ const PurchaseForm = ({ stores, suppliers, products, type, initialData }: Purcha
             supplierId: "",
             storeId: "",
             purchaseDate: new Date(),
-            purchaseItems:[{ products: "", quantity: 1, discount: 0 }],
+            purchaseItems: [{ products: "", quantity: 1, discount: 0 }],
         },
     });
 
@@ -116,15 +117,16 @@ const PurchaseForm = ({ stores, suppliers, products, type, initialData }: Purcha
             if (type === "update") {
                 await updatePurchase(purchaseId, values, path)
             }
-         
+
             form.reset();
-            router.push(`/admin/${params.admin}/inventory/purchase`)
+            router.push(`/${schoolId}/admin/${userId}/inventory/purchase`)
             toast({
                 title: "Purchase updated",
                 description: "Purchase was updated successfully...",
             });
         } catch (error) {
-         
+            console.log(error)
+
             toast({
                 title: "Error",
                 description: "An error occurred while submitting your form. Please try again later.",

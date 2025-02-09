@@ -1,10 +1,10 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
-import { currentProfile } from "../helpers/current-profile"
 import InventoryCategory from "../models/inventory-category.models";
 import InventoryProduct from "../models/inventory-product.models";
 import { connectToDB } from "../mongoose";
+import { currentUser } from "../helpers/current-user";
 
 
 interface ProductProps {
@@ -18,12 +18,14 @@ interface ProductProps {
 export async function createProduct(values: ProductProps, path: string) {
     try {
         const { name, categoryId, purchasePrice, salePrice, quantity } = values
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error("user not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
         const [existingProduct, category] = await Promise.all([
-            InventoryProduct.findOne({ name }),
+            InventoryProduct.findOne({ schoolId, name }),
             InventoryCategory.findById(categoryId)
         ])
 
@@ -38,6 +40,7 @@ export async function createProduct(values: ProductProps, path: string) {
 
 
         const newProduct = new InventoryProduct({
+            schoolId,
             name,
             categoryId,
             purchasePrice,
@@ -47,10 +50,11 @@ export async function createProduct(values: ProductProps, path: string) {
             action_type: "created",
         });
 
-        await newProduct.save();
-
         category.products.push(newProduct._id);
-        category.save();
+        await Promise.all([
+            newProduct.save(),
+            category.save(),
+        ]);
 
         revalidatePath(path)
 
@@ -65,11 +69,13 @@ export async function createProduct(values: ProductProps, path: string) {
 
 export async function fetchAllProducts() {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const products = await InventoryProduct.find({});
+        const products = await InventoryProduct.find({ schoolId });
 
         if (products.length === 0) {
             console.log("No products found");
@@ -87,6 +93,8 @@ export async function fetchAllProducts() {
 
 export async function fetchProductById(productId: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
 
         await connectToDB();
 
@@ -111,15 +119,18 @@ export async function fetchProductById(productId: string) {
 
 export async function fetchProductsByCategory(categoryId: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
-        const products = await InventoryProduct.find({ categoryId });
+        const products = await InventoryProduct.find({ schoolId, categoryId });
         if (!products) {
             console.log("No products found for this category");
             return [];
         }
         return JSON.parse(JSON.stringify(products));
+
     } catch (error) {
         console.error('Error fetching products:', error);
         throw error;
@@ -130,7 +141,9 @@ export async function fetchProductsByCategory(categoryId: string) {
 
 export async function updateProduct(productId: string, values: Partial<ProductProps>, path: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+        
         await connectToDB();
 
         const newValues = {

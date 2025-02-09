@@ -1,9 +1,10 @@
 "use server"
 
-import { currentProfile } from "../helpers/current-profile";
+
 import { connectToDB } from "../mongoose";
 import GradeRange from '../models/grade-range.models';
 import { revalidatePath } from "next/cache";
+import { currentUser } from "../helpers/current-user";
 
 interface GradeRangeProps {
     gradeName: string;
@@ -16,7 +17,9 @@ interface GradeRangeProps {
 export async function createGradeRange(values: GradeRangeProps, path: string) {
     try {
         const { gradeName, gradePoint, minPercentage, maxPercentage, remark } = values;
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
+        const schoolId = user.schoolId;
 
 
         await connectToDB();
@@ -28,6 +31,7 @@ export async function createGradeRange(values: GradeRangeProps, path: string) {
         }
 
         const newGradeRange = new GradeRange({
+            schoolId,
             gradeName,
             gradePoint,
             minPercentage,
@@ -50,12 +54,13 @@ export async function createGradeRange(values: GradeRangeProps, path: string) {
 
 export async function fetchAllGradeRanges() {
     try {
-        const user = await currentProfile();
-
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const gradeRanges = await GradeRange.find({});
+        const gradeRanges = await GradeRange.find({schoolId});
 
         if (!gradeRanges || gradeRanges.length === 0) {
             console.log("No grade ranges found");
@@ -63,6 +68,7 @@ export async function fetchAllGradeRanges() {
         }
 
         return JSON.parse(JSON.stringify(gradeRanges));
+
     } catch (error) {
         console.error("Error fetching grade ranges:", error);
         throw error;
@@ -90,7 +96,8 @@ export async function fetchGradeRangeById(id: string) {
 
 export async function updateGradeRange(gradeId: string, values: Partial<GradeRangeProps>, path: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
 
         await connectToDB();
 

@@ -1,6 +1,6 @@
 import { Model, model, models, Schema } from "mongoose";
 
-const SchoolSchema:Schema<ISchool> = new Schema({
+const SchoolSchema: Schema<ISchool> = new Schema({
     schoolCode: {
         type: String,
         unique: true,
@@ -12,7 +12,7 @@ const SchoolSchema:Schema<ISchool> = new Schema({
     },
     establishedYear: {
         type: Number,
-        default:''
+        default: ''
     },
     affiliation: {
         type: String,
@@ -48,23 +48,23 @@ const SchoolSchema:Schema<ISchool> = new Schema({
         default: '',
     },
     addresses: {
-        schoolAddress:{
+        schoolAddress: {
             type: String,
             default: '',
         },
-        schoolCity:{
+        schoolCity: {
             type: String,
             default: '',
         },
-        schoolState:{
+        schoolState: {
             type: String,
             default: '',
         },
-        schoolZipcode:{
+        schoolZipcode: {
             type: String,
             default: '',
         },
-        schoolCountry:{
+        schoolCountry: {
             type: String,
             default: '',
         },
@@ -75,26 +75,38 @@ const SchoolSchema:Schema<ISchool> = new Schema({
     },
     subscriptionPlan: {
         period: {
-            name: {
+            frequency: {
                 type: String,
-                default: 'Monthly',
+                enum: ["monthly", "yearly", "term"],
+                default: 'monthly',
             },
-            value: {
+            Value:{
                 type: Number,
                 default: 1
+            },
+            price: {
+                type: Number,
+                default: 0
             }
         },
-        subscriptionExpiry: {
+        renewDate: {
             type: Date,
         },
-        planStatus: {
-            type: String,
-            enum:['basic','pro','custom',],
+        expiryDate: {
+            type: Date,
         },
+        plan: {
+            type: String,
+            enum: ['basic', 'pro', 'custom',],
+        },
+        currentStudent: {
+            type: Number,
+            default: 0,
+        }
     },
-    banned:{
+    banned: {
         type: Boolean,
-        default:false
+        default: false
     },
     createdBy: {
         type: Schema.Types.ObjectId,
@@ -128,6 +140,6 @@ const SchoolSchema:Schema<ISchool> = new Schema({
 
 type SchoolModel = Model<ISchool>
 
-const School:SchoolModel = models.School || model<ISchool>("School", SchoolSchema);
+const School: SchoolModel = models.School || model<ISchool>("School", SchoolSchema);
 
 export default School;

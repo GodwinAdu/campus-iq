@@ -1,7 +1,12 @@
 import { Schema, model, models, Model } from "mongoose";
 
 const ParentSchema: Schema<IParent> = new Schema({
-    userName: {
+    schoolId:{
+        type:Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
+    },
+    username: {
         type: String,
         required: true,
         unique: true

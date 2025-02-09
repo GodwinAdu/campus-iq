@@ -1,44 +1,39 @@
+
 import Heading from "@/components/commons/Header";
-import { DataTable } from "@/components/table/data-table";
-import { buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { getAllAdmins } from "@/lib/actions/employee.actions";
-import { currentProfile } from "@/lib/helpers/current-profile";
-import { cn } from "@/lib/utils";
-import { PlusCircle } from "lucide-react";
-import Link from "next/link";
+import { getAllDepartments } from "@/lib/actions/department.actions";
+import { getRolesName } from "@/lib/actions/role.actions";
+import { currentUser } from "@/lib/helpers/current-user";
 import { redirect } from "next/navigation";
-import { columns } from "./_components/column";
+import AdminForm from "./_components/AdminForm";
 
+interface RolenameProps {
+  _id: string;
+  displayName: string;
+}
 
+const page = async ({ params }: { params: { schoolId: string, adminId: string } }) => {
+  const user = await currentUser();
 
-const page = async ({
-  params
-}: {
-  params: { adminId: string }
-}) => {
-  const user = await currentProfile();
+  if (!user) redirect("/");
 
-  if (!user) redirect("/")
+  const roleName = (await getRolesName()) || [];
+  const departments = (await getAllDepartments()) || [];
+  console.log(departments);
 
-  const data = (await getAllAdmins()) || [];
-
+  const id = params.adminId;
 
   return (
     <>
       <div className="flex justify-between items-center">
-        <Heading title="Manage Employees" description="All Users excluding teachers and student will be manage here." />
-        <Link href={`manage-employees/create`} className={cn(buttonVariants())} >
-          <PlusCircle className="w-4 h-4 mr-2" />
-          Add
-        </Link>
+        <Heading title="Create Employee" description="Create new Admins and roles" />
       </div>
       <Separator />
-      <DataTable searchKey="fullName" columns={columns} data={data} />
-
+      <div className="pt-4 w-full">
+        <AdminForm type="admin" departments={departments} rolename={roleName} />
+      </div>
     </>
   );
 };
 
 export default page;
-

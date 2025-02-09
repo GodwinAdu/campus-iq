@@ -2,8 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action";
-import { BadgeAlert, CheckSquare } from "lucide-react";
-import InventoryCategory from '../../../../../../../../lib/models/inventory-category.models';
 
 export const columns: ColumnDef<IInventoryCategory>[] = [
     {
@@ -13,6 +11,11 @@ export const columns: ColumnDef<IInventoryCategory>[] = [
     {
         accessorKey: "createdBy",
         header: "Created By",
+        cell: ({ row }) => (
+            <div className="">
+                {row.original.createdBy.fullName}
+            </div>
+        )
     },
     {
         id: "actions",

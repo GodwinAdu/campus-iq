@@ -25,7 +25,7 @@ const formSchema = z.object({
     publish: z.coerce.boolean(),
     subjectItems: z.array(
         z.object({
-            subjectId: z.string().min(2, {
+            subjectName: z.string().min(2, {
                 message: "Subject ID must be at least 2 characters.",
             }),
             totalMark: z.number().nullable().optional(), // totalMark field
@@ -87,7 +87,7 @@ export function MarkEntriesForm({ mark }: { mark: IMark }) {
                         <CardContent className="flex gap-4 py-4 w-max overflow-x-auto">
                             <FormField
                                 control={form.control}
-                                name={`subjectItems.${index}.subjectId`}
+                                name={`subjectItems.${index}.subjectName`}
                                 render={({ field }) => (
                                     <FormItem className="min-w-[220px] flex-shrink-0">
                                         <FormLabel>Subjects</FormLabel>
@@ -100,7 +100,7 @@ export function MarkEntriesForm({ mark }: { mark: IMark }) {
                             <div className="flex overflow-x-auto gap-2">
                                 {field.distributionItems.map((distribution, distIndex) => (
                                     <Card key={distIndex}>
-                                        <CardDescription className="px-4 py-2 font-bold">{distribution.distributionId}</CardDescription>
+                                        <CardDescription className="px-4 py-2 font-bold">{distribution.distribution}</CardDescription>
                                         <CardContent className="grid grid-cols-1">
                                             <FormField
                                                 control={form.control}
@@ -109,6 +109,7 @@ export function MarkEntriesForm({ mark }: { mark: IMark }) {
                                                     <FormItem className="min-w-[100px] flex-shrink-0">
                                                         <Input
                                                             {...field}
+                                                            type="number"
                                                             value={field.value ?? ""}
                                                             placeholder="Mark"
                                                         />

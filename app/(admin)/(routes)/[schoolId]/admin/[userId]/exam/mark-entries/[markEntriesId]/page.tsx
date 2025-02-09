@@ -5,17 +5,17 @@ import { Separator } from "@/components/ui/separator";
 import CalculatorDropdown from "../_components/CalculatorDropdown";
 import PercentDropdown from "../_components/PercentDropdown";
 
-
-const page = async ({ params }: { params: { markEntriesId: string } }) => {
-    const classId = params.markEntriesId as string;
-    const response = await createMarkEntries(classId);
+type MarkProps = Promise<{markEntriesId:string}>
+const page = async ({ params }: { params: MarkProps }) => {
+    const {markEntriesId} = await params;
+    const response = await createMarkEntries(markEntriesId);
     console.log(response, "MarkEntries")
     return (
         <>
             <div className="flex justify-between items-center">
                 <Heading
-                    title="Enter Marks For Student"
-                    description=" categories list "
+                    title={`Enter ${response?.studentId?.fullName}'s Marks`}
+                    // description=" categories list "
                 />
                 <div className=" flex gap-6 mr-20">
                     <PercentDropdown />

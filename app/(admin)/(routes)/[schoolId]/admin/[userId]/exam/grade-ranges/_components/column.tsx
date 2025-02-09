@@ -2,8 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { CellAction } from "./cell-action";
-import { BadgeAlert, CheckSquare } from "lucide-react";
-import moment from "moment";
+
 
 export const columns: ColumnDef<IGradeRange>[] = [
     {

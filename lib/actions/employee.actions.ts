@@ -399,7 +399,7 @@ export async function getAllEmployees() {
         const schoolId = user.schoolId;
         await connectToDB();
 
-        const admins = await Employee.find({schoolId})
+        const admins = await Employee.find({ schoolId })
             .populate("createdBy", "fullName")
             .exec();
 
@@ -439,11 +439,13 @@ export async function fetchEmployeeByRole(role: string) {
     try {
         console.log(role, "fetching employee by role");
         const user = await currentUser();
+
         if (!user) throw new Error('User not logged in');
 
+        const schoolId = user.schoolId;
         await connectToDB();
 
-        const employees = await Employee.find({ role }, { name: 1, _id: 1 });
+        const employees = await Employee.find({ schoolId, role }, { fullName: 1, _id: 1 });
         if (employees.length === 0) {
             console.log("Employee not found");
             return [];
@@ -462,8 +464,8 @@ export async function fetchEmployeeByRole(role: string) {
 export async function updateEmployee(adminId: string, values: Partial<CreateEmployeeProps>, path?: string) {
     try {
         const user = await currentUser();
-        if(!user) throw new Error('user not logged in');
-    await connectToDB();
+        if (!user) throw new Error('user not logged in');
+        await connectToDB();
 
         const updatedAdmin = await Employee.findByIdAndUpdate(
             adminId,
@@ -517,13 +519,13 @@ export async function totalEmployees() {
     try {
         const user = await currentUser();
 
-        if(!user) throw new Error('user not logged in');
+        if (!user) throw new Error('user not logged in');
 
         const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const totalMembers = await Employee.countDocuments({schoolId});
+        const totalMembers = await Employee.countDocuments({ schoolId });
 
         return totalMembers
 
@@ -551,13 +553,13 @@ export async function deleteAdmin(id: string) {
 export async function fetchEmployeesList(departmentId: string) {
     try {
         const user = await currentUser();
-        if(!user) throw new Error('User not logged in');
+        if (!user) throw new Error('User not logged in');
         const schoolId = user.schoolId;
 
 
         await connectToDB();
 
-        const employees = await Employee.find({ schoolId,departmentId });
+        const employees = await Employee.find({ schoolId, departmentId });
         if (employees.length === 0) {
             return [];
         }

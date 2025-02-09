@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import InventorySupplier from "../models/inventory-supplier.models";
 import { connectToDB } from "../mongoose";
-import { currentProfile } from "../helpers/current-profile";
+import { currentUser } from "../helpers/current-user";
+
 
 interface SupplierProps {
     name: string;
@@ -14,7 +15,9 @@ interface SupplierProps {
 }
 export async function createSupplier(values: SupplierProps, path: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if(!user) throw new Error("user not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
@@ -27,6 +30,7 @@ export async function createSupplier(values: SupplierProps, path: string) {
         }
 
         const newSupplier = new InventorySupplier({
+            schoolId,
             name,
             email,
             contactNumber,
@@ -47,11 +51,13 @@ export async function createSupplier(values: SupplierProps, path: string) {
 
 export async function fetchAllSuppliers() {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if(!user) throw new Error("user not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const suppliers = await InventorySupplier.find({});
+        const suppliers = await InventorySupplier.find({schoolId});
 
         if (suppliers.length === 0) {
             console.log("No suppliers found");
@@ -69,6 +75,8 @@ export async function fetchAllSuppliers() {
 
 export async function fetchSupplierById(id: string) {
     try {
+        const user = await currentUser();
+        if(!user) throw new Error("user not logged in");
         await connectToDB();
 
         const supplier = await InventorySupplier.findById(id);
@@ -91,7 +99,8 @@ export async function fetchSupplierById(id: string) {
 export async function updateSupplier(id: string, values: Partial<SupplierProps>, path: string) {
     try {
 
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
 
         await connectToDB();
 
@@ -127,6 +136,8 @@ export async function updateSupplier(id: string, values: Partial<SupplierProps>,
 
 export async function deleteSupplier(id: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
         await connectToDB();
         const deleteData = await InventorySupplier.findByIdAndDelete(id);
 

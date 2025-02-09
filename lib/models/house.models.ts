@@ -1,13 +1,19 @@
-import { Schema, model, models, Document, Model } from "mongoose";
+import { Schema, model, models, Model } from "mongoose";
 
 const HouseSchema: Schema<IHouse> = new Schema({
+    schoolId:{
+        type: Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
+    },
     name: {
         type: String,
         required: true,
     },
-    students: [{
+    roomIds: [{
         type: Schema.Types.ObjectId,
-        ref: 'Student',
+        ref: 'Room',
+        default:[]
     }],
     createdBy: {
         type: Schema.Types.ObjectId,
@@ -17,11 +23,11 @@ const HouseSchema: Schema<IHouse> = new Schema({
         type: Boolean,
         default: false
     },
-    delete_flag: {
+    del_flag: {
         type: Boolean,
         default: false
     },
-    modifyBy: {
+    modifiedBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
         default: null

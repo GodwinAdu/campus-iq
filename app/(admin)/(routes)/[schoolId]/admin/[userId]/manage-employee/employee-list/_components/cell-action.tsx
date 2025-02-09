@@ -1,106 +1,98 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Edit, Eye, Loader2, MoreHorizontal, Trash } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useState } from "react"
+import { Edit, Loader2, MoreHorizontal, View } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
 
+import { Button } from "@/components/ui/button"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-import Link from "next/link";
-import { IClass } from "@/lib/models/class.models";
-import useClientRole from "@/lib/client-role";
-import { deleteStudent } from "@/lib/actions/student.actions";
-import { toast } from "@/hooks/use-toast";
-import { DeleteDialog } from "@/components/commons/DeleteDialog";
+import Link from "next/link"
+import { toast } from "@/hooks/use-toast"
+import { DeleteDialog } from "@/components/commons/DeleteDialog"
+import useClientRole from "@/lib/helpers/client-role"
+
+
+
 
 interface CellActionProps {
-  data: IClass;
+    data: IInventoryCategory
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const { role, isLoading } = useClientRole();
-  const [loading, setLoading] = useState(false);
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const router = useRouter()
+    const params = useParams()
+    const [loading, setLoading] = useState(false)
+    const { isLoading, role } = useClientRole()
 
-  const router = useRouter();
-  const params = useParams();
+    const {schoolId,userId} = params;
 
-  const id = params.adminId as string;
-  const schoolId = params.schoolId as string;
+    const handleDelete = async (id: string) => {
+        try {
+            setLoading(true)
 
-  const handleDeleteStudent = async (dataId: string) => {
-    try {
-      setLoading(true);
-      await deleteStudent(dataId);
-      toast({
-        title: "Student deleted",
-        description: " Student deleted successfully"
-      })
-
-    } catch (error) {
-      toast({
-        title: "Something Went Wrong",
-        description: "Please try again later",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
+            router.refresh()
+            toast({
+                title: "Deleted successfully",
+                description: "You've deleted the product successfully",
+                // variant: "success",
+            })
+        } catch (error) {
+            console.error("Delete error:", error)
+            toast({
+                title: "Something Went Wrong",
+                description: "Please try again later",
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
     }
-  }
 
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                {isLoading ? (
+                    <DropdownMenuItem className="text-center items-center flex justify-center">
+                        <Loader2 className="animate-spin h-4 w-4" />
+                    </DropdownMenuItem>
+                ) : (
+                    <>
+                        {role?.editClass && (
+                            <DropdownMenuItem asChild>
+                                <Link href={`/${schoolId}/admin/${userId}/inventory/category/${data._id}`}>
+                                    <Edit className="mr-2 h-4 w-4" /> Update
+                                </Link>
+                            </DropdownMenuItem>
+                        )}
+                        {role?.deleteClass && (
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="bg-red-500 hover:bg-red-800">
+                                <DeleteDialog
+                                    id={data?._id as string}
+                                    title="Are you sure you want to delete this Grade?"
+                                    description="This action cannot be undone. Are you sure you want to proceed?"
+                                    onContinue={handleDelete}
+                                    isLoading={loading}
+                                />
+                            </DropdownMenuItem>
+                        )}
+                    </>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
 
-  return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              {role?.editStudent && (
-                <Link href={`/admin/${id}/manage-students/manage-student/${data?._id}`}>
-                  <DropdownMenuItem >
-                    <Edit className="mr-2 h-4 w-4" /> Update
-                  </DropdownMenuItem>
-                </Link>
-              )}
-              {role?.deleteStudent && (
-                <DropdownMenuItem
-                  onClick={(e) => { e.preventDefault(); setDeleteDialogOpen(true) }}
-                  disabled={loading}
-                >
-                  <Trash className="mr-2 h-4 w-4" /> Delete
-                </DropdownMenuItem>
-              )}
-
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      {isDeleteDialogOpen && (
-        <DeleteDialog
-          id={data?._id}
-          isDeleteDialogOpen={isDeleteDialogOpen}
-          title="Are you sure you want to delete this Employee?"
-          description="This action cannot be undone. Are you sure you want to proceed?"
-          onCancel={() => setDeleteDialogOpen(false)}
-          onContinue={handleDeleteStudent}
-        />
-      )}
-    </>
-  );
-};

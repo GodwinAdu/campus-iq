@@ -16,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
 import { useParams, usePathname, useRouter } from "next/navigation"
-import { createProduct, updateProduct } from "@/lib/actions/inventory-product.actions"
 import { createSupplier, updateSupplier } from "@/lib/actions/inventory-supplier.actions"
 import { Card, CardContent } from "@/components/ui/card"
 const formSchema = z.object({
@@ -41,11 +40,13 @@ const SupplierForm = ({
     initialData
 }: {
     type: "create" | "update",
-    initialData?: any,
+    initialData?: IInventorySupplier,
 }) => {
     const router = useRouter();
     const path = usePathname();
     const params = useParams();
+
+    const { schoolId, userId } = params;
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -76,7 +77,7 @@ const SupplierForm = ({
 
             form.reset()
 
-            router.push(`/admin/${params.adminId}/inventory/suppliers`)
+            router.push(`/${schoolId}/admin/${userId}/inventory/suppliers`)
 
             toast({
                 title: `Supplier ${type === "create" ? "Create" : "Update"}`,

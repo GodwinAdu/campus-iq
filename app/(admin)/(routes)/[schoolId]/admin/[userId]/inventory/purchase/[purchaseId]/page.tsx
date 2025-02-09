@@ -5,13 +5,14 @@ import { fetchAllStores } from '@/lib/actions/inventory-store.actions'
 import { fetchAllProducts } from '@/lib/actions/inventory-product.actions'
 import { fetchAllSuppliers } from '@/lib/actions/inventory-supplier.actions'
 import { fetchPurchaseById } from '@/lib/actions/inventory-purchase.actions'
-const page = async ({ params }: { params: { purchaseId: string } }) => {
+const page = async ({ params }: { params:Promise<{purchaseId:string}> }) => {
+    const {purchaseId} = await params;
 
     const stores = await fetchAllStores() || []
     const products = await fetchAllProducts() || []
     const suppliers = await fetchAllSuppliers() || []
 
-    const initialData = await fetchPurchaseById(params.purchaseId as string)
+    const initialData = await fetchPurchaseById(purchaseId)
 
 
     return (

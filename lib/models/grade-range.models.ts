@@ -1,6 +1,11 @@
 import { Document, Schema, Model, model, models } from "mongoose";
 
 const GradeRangeSchema: Schema<IGradeRange> = new Schema({
+    schoolId:{
+        type:Schema.Types.ObjectId,
+        ref: "School",
+        required: true,
+    },
     gradeName: {
         type: String,
         required: true,

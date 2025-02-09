@@ -10,13 +10,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Bell, ChevronDown, Beaker, Receipt, Layout, Settings, Moon, LogOut, User, Send } from 'lucide-react'
+import { Bell, ChevronDown, Beaker, Settings, LogOut, User, Send } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { toast } from '@/hooks/use-toast'
-import { logoutUser } from '@/lib/helpers/logout-user'
 import { useParams, useRouter } from 'next/navigation'
 import { LucideIcon } from 'lucide-react';
 import Link from 'next/link'
+import { logout } from '@/lib/helpers/logout'
 interface UserDropdownProps {
   username: string
   avatarUrl: string
@@ -34,12 +34,12 @@ export default function UserDropdown({ username, avatarUrl, email, notificationC
 
   const handleLogout = async () => {
     try {
-      await logoutUser();
+      await logout();
       router.push('/')
       toast({
         title: 'Logged Out',
         description: 'You have been successfully logged out.',
-        variant: 'success'
+        // variant: 'success'
       })
 
     } catch {

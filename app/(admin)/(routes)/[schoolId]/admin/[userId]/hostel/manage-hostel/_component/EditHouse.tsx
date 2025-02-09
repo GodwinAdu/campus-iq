@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import {
   Form,
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { updateHouse } from "@/lib/actions/house.actions";
+import MultiSelect from "@/components/commons/MultiSelect";
 
 
 
@@ -26,19 +27,17 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "name must be at least 2 characters.",
   }),
-  createdBy: z.string().min(2, {
-    message: "name must be at least 2 characters.",
-  }),
+  roomIds: z.array(z.string()),
 });
 
-export function EditHouse({ initialData }: { initialData: IHouse }) {
+export function EditHouse({ initialData, rooms }: { initialData: IHouse, rooms: IRoom[] }) {
 
   const router = useRouter();
   const path = usePathname();
   const params = useParams();
 
-  const houseId = params.houseEditId as string;
-  const schoolId = params.schoolId as string;
+  const { schoolId, userId } = params;
+  const houseId = initialData?._id as string;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,7 +51,7 @@ export function EditHouse({ initialData }: { initialData: IHouse }) {
     try {
       await updateHouse(houseId, values, path);
 
-      router.push(`/${schoolId}/admin/${params.adminId}/system-config/manage-house`);
+      router.push(`/${schoolId}/admin/${userId}/hostel/manage-hostel`);
 
       form.reset();
 
@@ -60,7 +59,7 @@ export function EditHouse({ initialData }: { initialData: IHouse }) {
         title: "Update Successfully",
         description: "Update house  successfully...",
       });
-    } catch (error: any) {
+    } catch (error) {
 
       console.log("error happened while updating day", error);
 
@@ -91,20 +90,31 @@ export function EditHouse({ initialData }: { initialData: IHouse }) {
           />
           <FormField
             control={form.control}
-            name="createdBy"
+            name="roomIds"
+            defaultValue={[]} // Initialize as an empty array
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Enter Created by</FormLabel>
+                <FormLabel>Add Rooms</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter created By" {...field} />
+                  <MultiSelect
+                    placeholder="Mark Distributions"
+                    data={rooms}
+                    value={field.value || []} // Ensure value is an array
+                    onChange={(room) =>
+                      field.onChange([...field.value, room])
+                    }
+                    onRemove={(idToRemove) =>
+                      field.onChange(field.value.filter(
+                        (roomId) => roomId !== idToRemove
+                      ))
+                    }
+                  />
                 </FormControl>
-                <FormDescription>
-                  You can change to suit your needs...
-                </FormDescription>
-                <FormMessage />
+                <FormMessage className="text-red-1" />
               </FormItem>
             )}
           />
+
           <Button disabled={isSubmitting} type="submit">
             {isSubmitting ? "Updating..." : "Update"}
           </Button>

@@ -1,6 +1,11 @@
-import { Schema, model, models, Document, Model } from "mongoose";
+import { Schema, model, models, Model } from "mongoose";
 
 const InventoryIssueSchema: Schema<IInventoryIssue> = new Schema({
+    schoolId:{
+        type:Schema.Types.ObjectId,
+        ref:"School",
+        required: true,
+    },
     role: {
         type: String,
         required: true,
@@ -50,11 +55,11 @@ const InventoryIssueSchema: Schema<IInventoryIssue> = new Schema({
         type: Boolean,
         default: false
     },
-    delete_flag: {
+    del_flag: {
         type: Boolean,
         default: false
     },
-    modifyBy: {
+    modifiedBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
         default: null

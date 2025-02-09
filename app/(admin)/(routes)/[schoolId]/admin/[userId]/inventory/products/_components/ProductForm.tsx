@@ -50,6 +50,8 @@ const ProductForm = ({
     const router = useRouter();
     const path = usePathname();
     const params = useParams();
+
+    const {schoolId,userId} = params;
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -78,7 +80,7 @@ const ProductForm = ({
                 await updateProduct(productId, values, path)
             }
             form.reset()
-            router.push(`/admin/${params.adminId}/inventory/products`)
+            router.push(`/${schoolId}/admin/${userId}/inventory/products`)
             toast({
                 title: `Product ${type === "create" ? "Create" : "Update"}`,
                 description: `product was ${type === "create" ? "added" : "update"} successfully...`,

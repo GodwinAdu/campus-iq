@@ -1,4 +1,5 @@
 import { Schema, model, models, Model } from "mongoose";
+import School from "./school.models";
 
 
 
@@ -161,6 +162,24 @@ const StudentSchema: Schema<IStudent> = new Schema({
     versionKey: false,
     minimize: false,
 });
+
+// Middleware to increment currentStudent when a new student is added
+StudentSchema.post("save", async function (doc) {
+    await School.findByIdAndUpdate(doc.schoolId, { $inc: { "subscriptionPlan.currentStudent": 1 } });
+});
+
+// Middleware to decrement currentStudent when a student is removed
+StudentSchema.post("findOneAndDelete", async function (doc) {
+    if (doc) {
+        await School.findByIdAndUpdate(doc.schoolId, { $inc: { "subscriptionPlan.currentStudent": -1 } });
+    }
+});
+
+// Ensure student count is accurate
+StudentSchema.statics.updateStudentCount = async function (schoolId) {
+    const count = await this.countDocuments({ schoolId });
+    await School.findByIdAndUpdate(schoolId, { "subscriptionPlan.currentStudent": count });
+};
 
 const Student: StudentModel = models.Student || model<IStudent>("Student", StudentSchema);
 

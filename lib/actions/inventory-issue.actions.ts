@@ -28,15 +28,14 @@ export async function createIssue(values: IssuesProps, path: string) {
         const { role, saleToId, status, classId, issueDate, returnDate, issueItems } = values
         const user = await currentUser();
 
+        if (!user) throw new Error('User not logged in');
+
+        const schoolId = user.schoolId;
+
         // Role check and assignment
-        let roleModel;
-        if (role === "student") {
-            roleModel = "Student";
-        } else if (role === "parent") {
-            roleModel = "Parent";
-        } else {
-            roleModel = "Employee";
-        }
+        // Determine the role model
+        const roleModel = role === "student" ? "Student" : role === "parent" ? "Parent" : "Employee";
+
 
         await connectToDB();
 
@@ -60,6 +59,7 @@ export async function createIssue(values: IssuesProps, path: string) {
         }
 
         const newIssue = new InventoryIssue({
+            schoolId,
             role: roleModel,
             saleToId,
             status,
@@ -68,8 +68,8 @@ export async function createIssue(values: IssuesProps, path: string) {
             returnDate,
             issueItems,
             issuedBy: user?._id,
-           createdBy: user?._id,
-           action_type:"created",
+            createdBy: user?._id,
+            action_type: "created",
         });
 
         await newIssue.save();
@@ -83,11 +83,13 @@ export async function createIssue(values: IssuesProps, path: string) {
 export async function fetchAllInventoryIssues() {
     try {
         const user = await currentUser();
-       
+        if (!user) throw new Error('User not logged in');
+        const schoolId = user.schoolId;
+
         await connectToDB();
 
         // Fetch all inventory issues without populating saleToId initially
-        const issues = await InventoryIssue.find({})
+        const issues = await InventoryIssue.find({schoolId})
             .populate({ path: 'issuedBy', model: 'Employee', select: 'fullName' })
             .exec();
 
@@ -121,6 +123,8 @@ export async function fetchAllInventoryIssues() {
 
 export async function fetchInventoryIssueById(id: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
         await connectToDB();
 
         const issue = await InventoryIssue.findById(id).lean()
@@ -141,6 +145,7 @@ export async function fetchInventoryIssueById(id: string) {
 export async function updateInventoryIssue(issueId: string, values: Partial<IssuesProps>, path: string) {
     try {
         const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
 
         await connectToDB();
 
@@ -153,7 +158,7 @@ export async function updateInventoryIssue(issueId: string, values: Partial<Issu
 
         const updatedIssue = await InventoryIssue.findByIdAndUpdate(
             issueId,
-            { $set: { newValues} },
+            { $set: newValues },
             { new: true, runValidators: true }
         );
 

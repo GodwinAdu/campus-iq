@@ -239,23 +239,22 @@ export async function fetchStudent(id: string) {
 
 export async function fetchStudentsList(classId: string) {
     try {
-        console.log(classId,"class Id")
         const user = await currentUser();
 
         if (!user) throw new Error("user not logged in");
 
-        const schoolId = user.schoolId
+        // const schoolId = user.schoolId
 
         await connectToDB();
 
-        const students = await Student.find({classId });
+        const students = await Student.find({ classId });
 
 
         if (!students || students.length === 0) {
             return [];
         }
 
-        console.log(students,"students")
+        console.log(students, "students")
 
         return JSON.parse(JSON.stringify(students));
 
@@ -296,7 +295,7 @@ export async function fetchStudentByRole(role: string, classId: string) {
 
         await connectToDB();
 
-        const students = await Student.find({ schoolId, role, classId }, { fullName: 1, _id: 1 });
+        const students = await Student.find({schoolId, role, classId }, { fullName: 1, _id: 1 });
         if (students.length === 0) {
             console.log("Student not found");
             return [];

@@ -214,9 +214,9 @@ export function NavMain({ role }: NavMainProps) {
       roleField: "manageTimeTable",
       items: [
         {
-          title: "Expenses Categories",
-          url: `/${schoolId}/admin/${userId}/expenses/expenses-categories`,
-          roleField: "manageExpensesCategory"
+          title: "Manage Timetable",
+          url: `/${schoolId}/admin/${userId}/manage-timetable/timetable`,
+          // roleField: "manageExpensesCategory"
         },
       ],
     },
@@ -365,32 +365,32 @@ export function NavMain({ role }: NavMainProps) {
       items: [
         {
           title: "Stores",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/inventory/stores`,
           // roleField: "manageListAccount"
         },
         {
           title: "Category",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/inventory/category`,
           // roleField: "manageListAccount"
         },
         {
           title: "Products",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/inventory/products`,
           // roleField: "manageListAccount"
         },
         {
           title: "Suppliers",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/inventory/suppliers`,
           // roleField: "manageListAccount"
         },
         {
           title: "Purchase", //
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/inventory/purchase`,
           // roleField: "manageListAccount"
         },
         {
           title: "Issue",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/inventory/issue`,
           // roleField: "manageListAccount"
         },
       ],
@@ -402,25 +402,20 @@ export function NavMain({ role }: NavMainProps) {
       roleField: "hostelManagement",
       items: [
         {
-          title: "Houses",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          title: "Hostel",
+          url: `/${schoolId}/admin/${userId}/hostel/manage-hostel`,
           // roleField: "manageListAccount"
         },
         {
           title: "Rooms",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/hostel/hostel-room`,
           // roleField: "manageListAccount"
         },
         {
           title: "Maintenance",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/admin/${userId}/hostel/maintenance`,
           // roleField: "manageListAccount"
-        },
-        {
-          title: "Billing",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
-          // roleField: "manageListAccount"
-        },
+        }
       ],
     },
     {
@@ -429,11 +424,16 @@ export function NavMain({ role }: NavMainProps) {
       icon:Library,
       roleField: "library",
       items: [
-        {
-          title: "List Accounts",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
-          roleField: "manageListAccount"
-        },
+        // {
+        //   title: "Hostel",
+        //   url: `/${schoolId}/admin/${userId}/hostel/manage-hostel`,
+        //   // roleField: "manageListAccount"
+        // },
+        // {
+        //   title: "",
+        //   url: `/${schoolId}/admin/${userId}/hostel/manage-hostel`,
+        //   // roleField: "manageListAccount"
+        // },
       ],
     },
     {

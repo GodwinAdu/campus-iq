@@ -73,7 +73,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     <>
                         {role?.editClass && (
                             <DropdownMenuItem asChild>
-                                <Link href={`/${schoolId}/admin/${userId}/exam/exam-setup/${data._id}`}>
+                                <Link href={`/${schoolId}/admin/${userId}/exam/mark-entries/${data.classId}`}>
                                     <Edit className="mr-2 h-4 w-4" /> Update
                                 </Link>
                             </DropdownMenuItem>

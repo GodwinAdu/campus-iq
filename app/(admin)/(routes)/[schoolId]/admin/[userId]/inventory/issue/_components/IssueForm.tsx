@@ -35,7 +35,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { createPurchase, updatePurchase } from "@/lib/actions/inventory-purchase.actions";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchStudentByRole } from "@/lib/actions/student.actions";
 import { fetchParentByRole } from "@/lib/actions/parent.actions";
 import { fetchEmployeeByRole } from "@/lib/actions/employee.actions";
@@ -67,8 +67,8 @@ interface IssueProps {
     type: "create" | "update";
     initialData?: any;
     roles: IRole[];
-    categories: any[];
-    classes: any[];
+    categories:IInventoryCategory[];
+    classes: ICass[];
 }
 
 const IssuesForm = ({ roles, categories, classes, type, initialData }: IssueProps) => {

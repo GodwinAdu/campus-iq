@@ -94,10 +94,7 @@ export default function MonthlyAttendanceTable({ people, type, classId }: Monthl
     };
 
     return (
-        <Card className="">
-            <CardHeader>
-                <CardTitle>{type === "Student" ? "Student" : "Employee"} Monthly Attendance</CardTitle>
-            </CardHeader>
+        <Card className="py-4">
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Year & Month Select */}
@@ -129,35 +126,42 @@ export default function MonthlyAttendanceTable({ people, type, classId }: Monthl
                     </div>
 
                     {/* Attendance Table */}
-                    <div className="relative">
-                        <div className="overflow-auto max-w-[65rem]">
-                            <table className="min-w-full border-collapse">
-                                <thead>
-                                    <tr className="bg-gray-100">
-                                        <th className="border px-4 py-2 text-left">Name</th>
-                                        {[...Array(daysInMonth)].map((_, day) => (
-                                            <th key={day} className="border px-2 py-2 text-center min-w-[40px]">{day + 1}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {people.map((person) => (
-                                        <tr key={person._id} className="hover:bg-gray-50">
-                                            <td className="border px-4 py-2 w-20">{person.fullName}</td>
+                    {isLoading ? (
+                        <div className="flex items-center justify-center h-full">
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        </div>
+                    ) : (
+                        <div className="relative">
+                            <div className="overflow-auto max-w-[65rem]">
+                                <table className="min-w-full border-collapse">
+                                    <thead>
+                                        <tr className="bg-gray-100">
+                                            <th className="border px-4 py-2 text-left">Name</th>
                                             {[...Array(daysInMonth)].map((_, day) => (
-                                                <td key={day} className="border px-2 py-2 text-center">
-                                                    <Checkbox
-                                                        checked={attendance[person._id]?.[day + 1] || false}
-                                                        onCheckedChange={(checked) => handleAttendanceChange(person._id, day + 1, checked as boolean)}
-                                                    />
-                                                </td>
+                                                <th key={day} className="border px-2 py-2 text-center min-w-[40px]">{day + 1}</th>
                                             ))}
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                                    </thead>
+                                    <tbody>
+                                        {people.map((person) => (
+                                            <tr key={person._id} className="hover:bg-gray-50">
+                                                <td className="border px-4 py-2 w-20">{person.fullName}</td>
+                                                {[...Array(daysInMonth)].map((_, day) => (
+                                                    <td key={day} className="border px-2 py-2 text-center">
+                                                        <Checkbox
+                                                            checked={attendance[person._id]?.[day + 1] || false}
+                                                            onCheckedChange={(checked) => handleAttendanceChange(person._id, day + 1, checked as boolean)}
+                                                        />
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table >
+                            </div >
+                        </div >
+                    )
+                    }
 
                     {/* Submit Button */}
                     <div className="text-right">
@@ -166,8 +170,8 @@ export default function MonthlyAttendanceTable({ people, type, classId }: Monthl
                             {isLoading ? "Please wait..." : "Mark"}
                         </Button>
                     </div>
-                </form>
-            </CardContent>
-        </Card>
+                </form >
+            </CardContent >
+        </Card >
     );
 }

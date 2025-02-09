@@ -34,7 +34,7 @@ export async function fetchParentByRole(role:string) {
     try {
         console.log(role, "fetch parent by role");
         const user = await currentUser();
-        const schoolId = user?.school.toString()
+        const schoolId = user?.schoolId;
 
         await connectToDB();
 

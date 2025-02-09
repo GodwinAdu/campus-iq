@@ -9,7 +9,7 @@ import Employee from "../models/employee.models";
 import Role from "../models/role.models";
 import School from "../models/school.models";
 import { connectToDB } from "../mongoose";
-import { hashPassword } from "../utils";
+import { getNextMonthDate, hashPassword } from "../utils";
 
 type RegisterProps = {
     confirmPassword: string;
@@ -148,6 +148,7 @@ const defaultRole = {
 };
 export const registerUser = async (values: RegisterProps) => {
     try {
+        const today = new Date();
 
         const { schoolName, schoolAddress, name, email, password, confirmPassword, type, plan } = values;
 
@@ -169,7 +170,11 @@ export const registerUser = async (values: RegisterProps) => {
             schoolAddress,
             schoolName,
             type,
-            plan,
+            subscriptionPlan:{
+                plan,
+                renewDate:today,
+                expiryDate:getNextMonthDate(today)
+            }
         });
 
         const user = new Employee({

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tabs"
 import moment from "moment"
 import { InvoiceTable } from "./InvoiceTable"
-import { numberToWords } from "@/lib/utils"
+// import { numberToWords } from "@/lib/utils"
 import { Printer } from "lucide-react"
 import { useRef } from "react"
 import CollectFeesForm from "./CollectFeesForm"
@@ -161,7 +161,7 @@ export function InvoicePaymentTabs({ data, accounts }: { data: any, school: any,
                     <CardHeader>
                         <CardTitle>Payment history</CardTitle>
                         <CardDescription>
-                            Change your password here. After saving, you'll be logged out.
+                            Change your password here. After saving, you&apos;ll be logged out.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-2">

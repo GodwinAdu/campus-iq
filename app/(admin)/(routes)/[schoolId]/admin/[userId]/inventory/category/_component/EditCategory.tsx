@@ -41,7 +41,6 @@ const formSchema = z.object({
         message: "name must be at least 2 characters.",
     }),
     storeId: z.string(),
-    createdBy: z.string(),
 });
 
 export function EditCategory({
@@ -56,7 +55,9 @@ export function EditCategory({
     const path = usePathname();
     const params = useParams();
 
-    const categoryId = params.categoryId as string;
+    const {schoolId,userId} = params
+
+    const categoryId = initialData?._id;
 
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -75,8 +76,8 @@ export function EditCategory({
                 description: "Update Category  successfully...",
             });
             form.reset();
-            router.push(`/admin/${params.adminId}/inventory/category`);
-        } catch (error: any) {
+            router.push(`/${schoolId}/admin/${userId}/inventory/category`);
+        } catch (error) {
             console.log("error happened while updating category", error);
         
             toast({
@@ -131,22 +132,6 @@ export function EditCategory({
                                 )}
                             />
 
-                            <FormField
-                                control={form.control}
-                                name="createdBy"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Created By</FormLabel>
-                                        <FormControl>
-                                            <Input disabled placeholder="Enter created By" {...field} />
-                                        </FormControl>
-                                        <FormDescription>
-                                            You can change to suit your needs...
-                                        </FormDescription>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
                             <Button disabled={isSubmitting} type="submit">
                                 {isSubmitting ? "Updating..." : "Update"}
                             </Button>

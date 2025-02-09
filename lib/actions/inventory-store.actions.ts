@@ -1,9 +1,9 @@
 "use server"
 
 import { revalidatePath } from "next/cache";
-import { currentProfile } from "../helpers/current-profile";
 import InventoryStore from "../models/inventory-store.models";
 import { connectToDB } from "../mongoose";
+import { currentUser } from "../helpers/current-user";
 
 interface StoreProps {
     name: string;
@@ -14,7 +14,9 @@ export async function createStore(values: StoreProps) {
     try {
         const { name, address, contactNumber } = values;
 
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
@@ -25,6 +27,7 @@ export async function createStore(values: StoreProps) {
         }
 
         const newStore = new InventoryStore({
+            schoolId,
             name,
             address,
             contactNumber,
@@ -44,11 +47,13 @@ export async function createStore(values: StoreProps) {
 
 export async function fetchAllStores() {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const stores = await InventoryStore.find({ });
+        const stores = await InventoryStore.find({schoolId});
 
         if (stores.length === 0) {
             console.log("No stores found");
@@ -66,6 +71,9 @@ export async function fetchAllStores() {
 
 export async function fetchStoreById(id: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
         await connectToDB();
 
         const store = await InventoryStore.findById(id);
@@ -87,7 +95,9 @@ export async function fetchStoreById(id: string) {
 
 export async function updateStore(id: string, values: Partial<StoreProps>,path: string) {
     try {
-        const user = await currentProfile();
+
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
 
         await connectToDB();
 

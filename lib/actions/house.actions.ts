@@ -3,39 +3,54 @@
 import { revalidatePath } from "next/cache";
 import { connectToDB } from "../mongoose"
 import House from "../models/house.models";
-import { currentProfile } from "../helpers/current-profile";
+import { currentUser } from "../helpers/current-user";
 
+type Props = {
+    name: string,
+}
 
-export async function createHouse({ name }: { name: string }) {
+export async function createHouse(values: Props) {
     try {
-        const user = await currentProfile();
-        
+        const { name } = values;
+        const user = await currentUser();
+
+        if (!user) throw new Error('user not logged in');
+
+        const schoolId = user.schoolId;
+
         await connectToDB();
 
         const house = new House({
+            schoolId,
             name,
-            createdBy:user._id,
-            action_type:"created"
+            createdBy: user._id,
+            action_type: "created"
         })
 
         await house.save();
 
-    } catch (error: any) {
+    } catch (error) {
         console.log("unable to create new house", error)
         throw error;
     }
 }
 
-export async function fetchHouseById({ id }: { id: string }) {
-    await connectToDB();
+export async function fetchHouseById(id:string) {
     try {
+        const user = await currentUser();
+
+        if (!user) throw new Error('user not logged in');
+
+        await connectToDB();
+
         const house = await House.findById(id)
 
         if (!house) {
             console.log("House doesn't exist")
         }
         return JSON.parse(JSON.stringify(house));
-    } catch (error: any) {
+        
+    } catch (error) {
         console.log("unable to fetch house", error);
         throw error;
     }
@@ -44,12 +59,15 @@ export async function fetchHouseById({ id }: { id: string }) {
 
 export async function getAllHouses() {
     try {
-        const user = await currentProfile();
-        
+        const user = await currentUser();
+        if (!user) throw new Error('user not logged in');
+        const schoolId = user.schoolId;
+
 
         await connectToDB();
 
-        const houses = await House.find({})
+        const houses = await House.find({ schoolId })
+        .populate("createdBy", "fullName")
 
         if (!houses || houses.length === 0) {
 
@@ -60,7 +78,7 @@ export async function getAllHouses() {
 
         return JSON.parse(JSON.stringify(houses));
 
-    } catch (error: any) {
+    } catch (error) {
         console.error("Error fetching Houses:", error);
         throw error; // throw the error to handle it at a higher Day if needed
     }
@@ -73,18 +91,21 @@ interface UpdateHouseProps {
 
 export async function updateHouse(houseId: string, values: UpdateHouseProps, path: string) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
+
+        if (!user) throw new Error('user not logged in');
+
         const newValues = {
             ...values,
             mod_flag: true,
-            modifyBy:user._id,
+            modifyBy: user._id,
             action_type: "updated"
         }
-    await connectToDB();
+        await connectToDB();
 
         const updatedHouse = await House.findByIdAndUpdate(
             houseId,
-            { $set: values },
+            { $set: newValues },
             { new: true, runValidators: true }
         );
 
@@ -105,8 +126,8 @@ export async function updateHouse(houseId: string, values: UpdateHouseProps, pat
 }
 
 export async function deleteHouse({ id }: { id: string }) {
-    await connectToDB();
     try {
+        await connectToDB();
         const house = await House.findByIdAndDelete(id)
         if (!house) {
             console.log("House don't exist");
@@ -114,7 +135,7 @@ export async function deleteHouse({ id }: { id: string }) {
         }
         console.log("delete successfully")
 
-        return JSON.parse(JSON.stringify(house)); 
+        return JSON.parse(JSON.stringify(house));
 
     } catch (error) {
         console.error("Error deleting House:", error);

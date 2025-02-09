@@ -1,6 +1,7 @@
 "use server"
 
-import { currentProfile } from "../helpers/current-profile";
+
+import { currentUser } from "../helpers/current-user";
 import School from "../models/school.models";
 import { connectToDB } from "../mongoose";
 
@@ -11,7 +12,7 @@ interface Props {
 }
 export async function sendReminderMessage({ selectedStudents, data, values }: Props) {
     try {
-        const user = await currentProfile();
+        const user = await currentUser();
 
         await connectToDB();
 

@@ -22,7 +22,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
 
-  let selected: { _id: string; name: string }[] = [];
+  let selected: { _id?: string; name: string }[] = [];
   if (value?.length > 0 && data) {
     selected = value
       .map((id) => data.find((unit) => unit?._id === id))
