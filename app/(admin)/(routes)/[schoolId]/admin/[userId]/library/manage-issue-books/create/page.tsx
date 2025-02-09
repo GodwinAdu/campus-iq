@@ -1,6 +1,5 @@
 import Heading from '@/components/commons/Header'
 import { Separator } from '@/components/ui/separator'
-import { fetchFinedAmounts } from '@/lib/actions/book-transaction.actions'
 import CreateIssueForm from '../_components/CreateIssueForm';
 import { fetchAllBooks } from '@/lib/actions/book.actions';
 import { getAllClass } from '@/lib/actions/class.actions';

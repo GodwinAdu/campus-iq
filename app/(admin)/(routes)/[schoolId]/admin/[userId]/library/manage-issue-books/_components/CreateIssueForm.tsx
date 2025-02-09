@@ -25,18 +25,14 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { Input } from "@/components/ui/input"
 import { Card, CardContent } from '@/components/ui/card';
 import { useParams, usePathname, useRouter } from "next/navigation"
 import { toast } from "@/hooks/use-toast"
-import { createBook, updateBook } from "@/lib/actions/book.actions"
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { IClass } from "@/lib/models/class.models"
 import { useEffect, useState } from "react"
-import { IStudent } from "@/lib/models/student.models"
 import { fetchStudentByClassId } from "@/lib/actions/student.actions";
 import { createIssueBook } from "@/lib/actions/book-transaction.actions"
 
@@ -191,7 +187,7 @@ const CreateIssueForm = ({ type, initialData, books, classes }: { type: "createB
                                             </FormControl>
                                             <SelectContent>
                                                 {students?.map((student) => (
-                                                    <SelectItem key={student._id} value={student._id}>{`${student.fullName} ${student.lastName} ${student.middleName}`}</SelectItem>
+                                                    <SelectItem key={student._id} value={student._id ?? ""}>{`${student.fullName} ${student.lastName} ${student.middleName}`}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>

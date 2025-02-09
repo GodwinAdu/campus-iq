@@ -1,106 +1,98 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { Edit, Eye, Loader2, MoreHorizontal, Trash } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import React, { useState } from "react"
+import { Loader2, MoreHorizontal, View } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
 
+import { Button } from "@/components/ui/button"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { toast } from "@/hooks/use-toast";
-import useClientRole from "@/lib/client-role";
-import { DeleteDialog } from "@/components/commons/DeleteDialog";
-import { deleteBook } from "@/lib/actions/book.actions";
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
+import Link from "next/link"
+import { toast } from "@/hooks/use-toast"
+import { DeleteDialog } from "@/components/commons/DeleteDialog"
+import useClientRole from "@/lib/helpers/client-role"
+
+
+
 
 interface CellActionProps {
-  data:IBook;
+    data: IDistribution
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { role, isLoading } = useClientRole();
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const router = useRouter()
+    const params = useParams()
+    const [loading, setLoading] = useState(false)
+    const { isLoading, role } = useClientRole()
 
-  const router = useRouter();
-  const params = useParams();
+    const {schoolId,userId} = params;
 
-  const id = params.adminId as string;
+    const handleDelete = async (id: string) => {
+        try {
+            setLoading(true)
 
-
-
-  const handleDeleteAdmin = async (dataId: string) => {
-    try {
-      setLoading(true);
-      await deleteBook(dataId)
-      toast({
-        title: "Deleted Successfully",
-        description: "Please Book was deleted successfully...",
-
-      });
-      router.refresh();
-    } catch (error) {
-      toast({
-        title: "Something Went Wrong",
-        description: "Please try again later",
-        variant: "destructive",
-      });
-    } finally {
-      setOpen(false);
-      setLoading(false);
+            router.refresh()
+            toast({
+                title: "Deleted successfully",
+                description: "You've deleted the product successfully",
+                // variant: "success",
+            })
+        } catch (error) {
+            console.error("Delete error:", error)
+            toast({
+                title: "Something Went Wrong",
+                description: "Please try again later",
+                variant: "destructive",
+            })
+        } finally {
+            setLoading(false)
+        }
     }
-  };
 
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                {isLoading ? (
+                    <DropdownMenuItem className="text-center items-center flex justify-center">
+                        <Loader2 className="animate-spin h-4 w-4" />
+                    </DropdownMenuItem>
+                ) : (
+                    <>
+                        {role?.editClass && (
+                            <DropdownMenuItem asChild>
+                                <Link href={`/${schoolId}/admin/${userId}/exam/distribution/${data._id}`}>
+                                    <View className="mr-2 h-4 w-4" /> Details
+                                </Link>
+                            </DropdownMenuItem>
+                        )}
+                        {role?.deleteClass && (
+                            <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="bg-red-500 hover:bg-red-800">
+                                <DeleteDialog
+                                    id={data?._id as string}
+                                    title="Are you sure you want to delete this Distribution?"
+                                    description="This action cannot be undone. Are you sure you want to proceed?"
+                                    onContinue={handleDelete}
+                                    isLoading={loading}
+                                />
+                            </DropdownMenuItem>
+                        )}
+                    </>
+                )}
+            </DropdownMenuContent>
+        </DropdownMenu>
+    )
+}
 
-
-  return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          {isLoading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <>
-              {role?.editBook && (
-                <Link href={`/admin/${id}/library/manage-books/${data?._id}`}>
-                  <DropdownMenuItem >
-                    <Edit className="mr-2 h-4 w-4" /> Update
-                  </DropdownMenuItem>
-                </Link>
-              )}
-              {role?.deleteBook && (
-                <DropdownMenuItem onClick={(e) => { e.preventDefault(); setDeleteDialogOpen(true) }}>
-                  <Trash className="mr-2 h-4 w-4" /> Delete
-                </DropdownMenuItem>
-              )}
-
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
-      {isDeleteDialogOpen && (
-        <DeleteDialog
-          id={data?._id as string}
-          isDeleteDialogOpen={isDeleteDialogOpen}
-          title="Are you sure you want to delete this Book?"
-          description="This action cannot be undone. Are you sure you want to proceed?"
-          onCancel={() => setDeleteDialogOpen(false)}
-          onContinue={handleDeleteAdmin}
-        />
-      )}
-    </>
-  );
-};
