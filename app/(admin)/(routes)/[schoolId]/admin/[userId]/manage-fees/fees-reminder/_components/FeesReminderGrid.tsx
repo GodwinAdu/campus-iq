@@ -1,14 +1,11 @@
 "use client";
 
-import ClassSelection from '@/components/attendance/ClassSelection';
 import { Button } from '@/components/ui/button';
 import { fetchFeesReminder } from '@/lib/actions/fees-payment.actions';
 import { Loader2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
-import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import CellAction from './cell-action';
+import ClassSelection from '@/components/commons/ClassSelection';
 
 const FeesReminderGrid = ({ classes }: { classes: IClass[] }) => {
     const [selectedClass, setSelectedClass] = useState("");
@@ -69,9 +66,7 @@ const FeesReminderGrid = ({ classes }: { classes: IClass[] }) => {
         setSelectedStudents(selectedData);
     };
 
-    const pagination = true;
-    const paginationPageSize = 200;
-    const paginationPageSizeSelector = [200, 500, 1000];
+  
 
     return (
         <>
@@ -86,21 +81,7 @@ const FeesReminderGrid = ({ classes }: { classes: IClass[] }) => {
                 {selectedStudents.length >= 2 && <CellAction selectedStudents={selectedStudents} />}
             </div>
             <div className="py-4 mt-2 px-2">
-                <div
-                    className="ag-theme-quartz" // applying the grid theme
-                    style={{ height: 500, width: "100%" }} // the grid will fill the size of the parent container
-                >
-                    <AgGridReact
-                        rowData={rowData}
-                        columnDefs={colDefs}
-                        pagination={pagination}
-                        paginationPageSize={paginationPageSize}
-                        paginationPageSizeSelector={paginationPageSizeSelector}
-                        rowSelection="multiple"
-                        onSelectionChanged={onSelectionChanged}
-                       
-                    />
-                </div>
+               
             </div>
         </>
     );
