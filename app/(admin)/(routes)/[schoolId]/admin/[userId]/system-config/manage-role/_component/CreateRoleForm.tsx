@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { createRole, updateRole } from "@/lib/actions/role.actions";
-import { CreateRoleSchema } from "@/lib/validators/role.validator";
+import RoleSchema from "@/lib/validators/role.validator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
 
 
   const defaultValues: Record<string, string | boolean> = Object.fromEntries(
-    Object.keys(CreateRoleSchema.shape).map((key) => {
+    Object.keys(RoleSchema.shape).map((key) => {
       // Check if the key should have a default value of ""
       if (key === 'name' || key === 'displayName' || key === 'description') {
         return [key, ''];
@@ -44,8 +44,8 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
     })
   );
   // 1. Define your form.
-  const form = useForm<z.infer<typeof CreateRoleSchema>>({
-    resolver: zodResolver(CreateRoleSchema),
+  const form = useForm<z.infer<typeof RoleSchema>>({
+    resolver: zodResolver(RoleSchema),
     defaultValues: initialData || defaultValues,
   });
 
@@ -57,7 +57,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
   const submitting = initialData ? "Updating..." : "Creating...";
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof CreateRoleSchema>) {
+  async function onSubmit(values: z.infer<typeof RoleSchema>) {
     try {
       console.log(values)
       if (type === "create") {
@@ -163,23 +163,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                     GLOBAL ACCESS
                   </h1>
                   <div className="flex gap-4 py-3">
-                    <FormField
-                      control={form.control}
-                      name="manageSchool"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>Manage School</FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
+
                     <FormField
                       control={form.control}
                       name="manageAccess"
@@ -374,7 +358,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                     />
                     <FormField
                       control={form.control}
-                      name="account"
+                      name="canteenManagement"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -384,7 +368,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Manage Account</FormLabel>
+                            <FormLabel>Manage Canteen</FormLabel>
                           </div>
                         </FormItem>
                       )}
@@ -436,6 +420,57 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel>View Library management</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="transportManagement"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Transport system</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="feesManagement"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Fees Management</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="hrManagement"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View HR and Payroll</FormLabel>
                           </div>
                         </FormItem>
                       )}
@@ -826,80 +861,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                       )}
                     />
                   </div>
-                  <h1 className="text-white text-xs bg-black/80 p-0.5">
-                    TIME ACCESS
-                  </h1>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
-                    <FormField
-                      control={form.control}
-                      name="addTime"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>Add Time</FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
 
-                    <FormField
-                      control={form.control}
-                      name="editTime"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>View Edit Time</FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="deleteTime"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>View Delete Time</FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="manageTime"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>View Manage Time</FormLabel>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
 
                   {/* CLASS MANAGEMENT */}
 
@@ -1295,8 +1257,84 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                       )}
                     />
                   </div>
+                  {/* manage canteen */}
+                  <h1 className="text-white text-xs bg-black/80 p-0.5">
+                    CANTEEN ACCESS
+                  </h1>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
+                    <FormField
+                      control={form.control}
+                      name="addCanteen"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Add Canteen</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="editCanteen"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Edit Canteen</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="deleteCanteen"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Delete Canteen</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="manageCanteen"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Manage Canteen</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
                   {/* Manage users */}
+
 
                   <h1 className="text-white text-xs bg-black/80 p-0.5">
                     MANAGE STUDENT ACCESS
@@ -1691,12 +1729,12 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                     />
                   </div>
                   <h1 className="text-white text-xs bg-black/80 p-0.5">
-                    TEACHER ATTENDANCE ACCESS
+                    EMPLOYEE ATTENDANCE ACCESS
                   </h1>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
                     <FormField
                       control={form.control}
-                      name="addTeacherAttendance"
+                      name="addEmployeeAttendance"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1706,7 +1744,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Add Teacher Attendance</FormLabel>
+                            <FormLabel>Add Employee Attendance</FormLabel>
                           </div>
                         </FormItem>
                       )}
@@ -1714,7 +1752,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
 
                     <FormField
                       control={form.control}
-                      name="editTeacherAttendance"
+                      name="editEmployeeAttendance"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1724,14 +1762,14 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel> Edit Teacher Attendance</FormLabel>
+                            <FormLabel> Edit Employee Attendance</FormLabel>
                           </div>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="deleteTeacherAttendance"
+                      name="deleteEmployeeAttendance"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1741,14 +1779,14 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel> Delete Teacher Attendance</FormLabel>
+                            <FormLabel> Delete Employee Attendance</FormLabel>
                           </div>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="manageTeacherAttendance"
+                      name="manageEmployeeAttendance"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1758,7 +1796,7 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel> Manage Teacher Attendance</FormLabel>
+                            <FormLabel> Manage Employee Attendance</FormLabel>
                           </div>
                         </FormItem>
                       )}
@@ -1856,13 +1894,13 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                     />
                   </div>
                   <h1 className="text-white text-xs bg-black/80 p-0.5">
-                    EVALUATION REPORT ACCESS
+                    EXAMS HALL ACCESS
                   </h1>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
 
                     <FormField
                       control={form.control}
-                      name="addEvaluationReport"
+                      name="addExamHall"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1872,14 +1910,14 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>Add Evaluation Report</FormLabel>
+                            <FormLabel>Add Exams Hall</FormLabel>
                           </div>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="viewEvaluationReport"
+                      name="viewExamHall"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1889,14 +1927,14 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>View Evaluation Report</FormLabel>
+                            <FormLabel>View Exams Hall</FormLabel>
                           </div>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="editEvaluationReport"
+                      name="editExamHall"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1906,14 +1944,14 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>View Edit Evaluation Report</FormLabel>
+                            <FormLabel>View Edit Exams Hall</FormLabel>
                           </div>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="deleteEvaluationReport"
+                      name="deleteExamHall"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1923,14 +1961,14 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>View Delete Evaluation Report</FormLabel>
+                            <FormLabel>View Delete Exams Hall</FormLabel>
                           </div>
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="manageEvaluationReport"
+                      name="manageExamHall"
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
                           <FormControl>
@@ -1940,7 +1978,278 @@ const CreateRoleForm = ({ type, initialData }: { type: "create" | "update", init
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
-                            <FormLabel>View Manage Evaluation Report</FormLabel>
+                            <FormLabel>View Manage Exams Hall</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <h1 className="text-white text-xs bg-black/80 p-0.5">
+                    EXAMS Distribution ACCESS
+                  </h1>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
+
+                    <FormField
+                      control={form.control}
+                      name="addExamDistribution"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Add Exams Distribution </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="viewExamDistribution"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Exams Distribution </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="editExamDistribution"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Edit Exams Distribution </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="deleteExamDistribution"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Delete Exams Distribution </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="manageExamDistribution"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Manage Exams Distribution </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <h1 className="text-white text-xs bg-black/80 p-0.5">
+                    MANAGE Exam Setup ACCESS
+                  </h1>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
+                    <FormField
+                      control={form.control}
+                      name="addExamSetup"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Add ExamSetup</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="viewExamSetup"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View ExamSetups</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="editExamSetup"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Edit ExamSetup</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="deleteExamSetup"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Delete ExamSetup</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="manageExamSetup"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Manage ExamSetup</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <h1 className="text-white text-xs bg-black/80 p-0.5">
+                    MANAGE Exam Schedule ACCESS
+                  </h1>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 py-3">
+                    <FormField
+                      control={form.control}
+                      name="addTimetable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>Add Timetable</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="viewTimetable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Timetables</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="editTimetable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Edit Timetable</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="deleteTimetable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Delete Timetable</FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="manageTimetable"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0  p-4">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>View Manage Timetable</FormLabel>
                           </div>
                         </FormItem>
                       )}

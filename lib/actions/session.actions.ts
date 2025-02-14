@@ -14,28 +14,31 @@ interface CreateSessionProps {
 export async function createSession(values: CreateSessionProps) {
     try {
         const user = await currentUser();
-        if (!user) throw new Error('user not logged in');
+        if (!user) throw new Error("User not logged in");
+
         const { name, period, present } = values;
         const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const session = new Session({
+        // Set all previous sessions for the same school to `false`
+        await Session.updateMany({ schoolId }, { $set: { present: false } });
+
+       await Session.create({
             schoolId,
             name,
             period,
             present,
             createdBy: user._id,
-            action_type: "create"
-        })
-
-        await session.save();
+            action_type: "create",
+        });
 
     } catch (error) {
-        console.log("unable to create new session", error)
-        throw error;
+        console.error("Error creating session:", error);
+        throw new Error("Unable to create new session");
     }
 }
+
 
 export async function fetchSessionById(id:string){
     try {
@@ -68,9 +71,7 @@ export async function getAllSessions() {
 
         if (!sessions || sessions.length === 0) {
 
-            console.log("sessions don't exist");
-
-            return null; // or throw an error if you want to handle it differently
+            return []; // or throw an error if you want to handle it differently
         }
 
         return JSON.parse(JSON.stringify(sessions));
@@ -165,11 +166,14 @@ export async function updateSession(sessionId: string, values: Partial<CreateSes
 
 export async function updateSessionStatusWithId(sessionId: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error('user not logged in');
+        const schoolId = user.schoolId;
         // Connect to the database
         await connectToDB()
 
         // Set all sessions to `false`
-        await Session.updateMany({}, { $set: { present: false } })
+        await Session.updateMany({schoolId}, { $set: { present: false } })
 
         // Set the specific session to `true`
         await Session.updateOne({ _id: sessionId }, { $set: { present: true } })

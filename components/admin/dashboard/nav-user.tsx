@@ -36,7 +36,7 @@ import { RatingDialog } from "./dialog/RatingDialog"
 import { useTourControl } from "@/hooks/use-tour-control"
 import { ModeToggle } from "@/components/commons/theme/ModeToggle"
 
-export function NavUser({ store }: { store: IStore }) {
+export function NavUser({ school }: { school: ISchool }) {
   const { isMobile } = useSidebar()
   const params = useParams()
 
@@ -44,7 +44,7 @@ export function NavUser({ store }: { store: IStore }) {
   const branchId = params.branchId as string;
   useTourControl([
     {
-      target: '.store-avatar',
+      target: '.school-avatar',
       content: 'tesfksjf sf sfs lfsjflks jfsljfslkfs ',
       disableBeacon: true,
     },
@@ -54,18 +54,18 @@ export function NavUser({ store }: { store: IStore }) {
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger className="store-avatar" asChild>
+          <DropdownMenuTrigger className="school-avatar" asChild>
             <SidebarMenuButton
               size="lg"
               className=" data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src='' alt={store.name} />
-                <AvatarFallback className="rounded-lg">{store.name.toUpperCase().slice(0, 2)}</AvatarFallback>
+                <AvatarImage src='' alt={school.schoolName} />
+                <AvatarFallback className="rounded-lg">{school.schoolName.toUpperCase().slice(0, 2)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{store.name}</span>
-                <span className="truncate text-xs text-red-400 font-extrabold">Expired : {dayLeft(store?.subscriptionPlan?.subscriptionExpiry)} days left</span>
+                <span className="truncate font-semibold">{school.schoolName}</span>
+                <span className="truncate text-xs text-red-400 font-extrabold">Expired : {dayLeft(school?.subscriptionPlan?.expiryDate)} days left</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -79,11 +79,12 @@ export function NavUser({ store }: { store: IStore }) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src='' alt={store.name} />
-                  <AvatarFallback className="rounded-lg">{store.name.toUpperCase().slice(0, 2)}</AvatarFallback>
+                  <AvatarImage src='' alt={school.schoolName} />
+                  <AvatarFallback className="rounded-lg">{school.schoolName.toUpperCase().slice(0, 2)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{store.name}</span>
+                  <span className="truncate font-semibold">{school.schoolName}</span>
+                  <span className="text-primary font-extrabold">{school.subscriptionPlan.plan} plan</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -115,7 +116,7 @@ export function NavUser({ store }: { store: IStore }) {
                   Support
                 </DropdownMenuItem>
               </Link>
-              {/* <PaymentDialog store={store} />
+              {/* <PaymentDialog school={school} />
               <RatingDialog /> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

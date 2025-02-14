@@ -8,7 +8,7 @@ import { DataTable } from '@/components/table/data-table';
 import { columns } from './column';
 
 const FeesPaymentGrid = ({ classes }: { classes: IClass[] }) => {
-    const [selectedClass, setSelectedClass] = useState(classes[0]._id);
+    const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [rowData, setRowData] = useState([]);
 

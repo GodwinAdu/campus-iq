@@ -8,6 +8,7 @@ import { TourProvider } from "@/lib/context/TourContext";
 import TourLayout from "@/provider/TourLayout";
 import AppSidebarMain from "@/components/admin/dashboard/app-sidebar-main";
 import Navbar from "@/components/admin/Navbar";
+import { getAllSessions } from "@/lib/actions/session.actions";
 
 
 export default async function RootLayout({
@@ -16,6 +17,7 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     const user = (await currentUser()) ?? null;
+    const sessions = await getAllSessions() ?? [];
 
     return (
         <TourProvider>
@@ -23,7 +25,7 @@ export default async function RootLayout({
                 <SidebarProvider>
                     <AppSidebarMain />
                     <SidebarInset>
-                        <Navbar user={user} />
+                        <Navbar sessions={sessions} user={user} />
                         <div className="relative">
                             <div id="main-content" className="py-4 px-4 overflow-hidden">
                                 {children}

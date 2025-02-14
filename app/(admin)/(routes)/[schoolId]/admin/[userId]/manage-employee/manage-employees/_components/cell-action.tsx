@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Edit, Loader2, MoreHorizontal, View } from "lucide-react"
+import { Edit, Loader2, MoreHorizontal} from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"

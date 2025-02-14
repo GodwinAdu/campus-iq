@@ -5,7 +5,7 @@ import { ClassType } from '@/lib/timetableData'
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, MapPin } from 'lucide-react'
-import { Class, timetableData } from '@/lib/timetableData'
+import { Class } from '@/lib/timetableData'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -19,7 +19,7 @@ const classTypeColors: Record<ClassType, string> = {
     tutorial: 'bg-yellow-100 text-yellow-800',
 }
 
-export default function Timetable({ data }: { data: ITimetable }) {
+export default function Timetable({ data }: { data: ITimetable[] }) {
     const [currentDay, setCurrentDay] = useState<string>('')
     const [currentTime, setCurrentTime] = useState<string>('')
 
@@ -49,10 +49,10 @@ export default function Timetable({ data }: { data: ITimetable }) {
     const renderClassCell = (classInfo: Class | undefined, day: string) => {
         if (!classInfo) return <td className="p-2 border"></td>
 
-        const isCurrentCell = day === currentDay && isCurrentTimeSlot(timetableData.find(slot => slot[day as keyof typeof slot] === classInfo)?.time || '')
+        const isCurrentCell = day === currentDay && isCurrentTimeSlot(data?.timetable.find(slot => slot[day as keyof typeof slot] === classInfo)?.time || '')
 
         return (
-            <td className={`p-2 border ${isCurrentCell ? 'bg-primary/10' : ''}`}>
+            <td className={`p-2 border ${isCurrentCell ? 'bg-primary/50' : ''}`}>
                 <Card>
                     <CardContent className="p-4">
                         <h3 className="font-bold mb-2">{classInfo.subject}</h3>

@@ -140,3 +140,6 @@ export function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
 
+export function capitalizeFirstLetter(str:string):string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

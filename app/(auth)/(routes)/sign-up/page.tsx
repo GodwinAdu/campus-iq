@@ -10,11 +10,12 @@ import { AdminInfoForm } from "./_components/admin-info-form"
 import { SubscriptionPlanForm } from "./_components/subscription-plan-form"
 import { Confetti } from "./_components/confetti"
 import { registerUser } from "@/lib/actions/register.actions"
+import { useRouter } from "next/navigation"
 
 type RegisterProps = {
   confirmPassword: string;
   email: string;
-  name: string;
+  fullName: string;
   password: string;
   plan: string;
   schoolAddress: string;
@@ -28,6 +29,8 @@ export default function CreateSchoolPage() {
   const [formData, setFormData] = useState<Record<string, unknown>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+
+  const router = useRouter()
 
   const handleNext = (data: Record<string, unknown>) => {
     setFormData((prev) => ({ ...prev, ...data }))
@@ -47,18 +50,17 @@ export default function CreateSchoolPage() {
       }
       setIsSubmitting(true)
       await registerUser(finalData);
+      router.push("/sign-in")
       toast({
         title: "Success!",
         description: "School created successfully. Please check your email for confirmation.",
         // variant: "success",
-      })
-
-console.log(finalData,"final data")
+      });
       setShowConfetti(true)
     } catch (error) {
       console.log(error)
       toast({
-        title: "Error!",
+        title: "Something went wrong!",
         description: "Failed to create school. Please try again later.",
         variant: "destructive",
       })

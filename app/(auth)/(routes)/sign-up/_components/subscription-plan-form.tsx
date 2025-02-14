@@ -8,9 +8,10 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { motion } from "framer-motion"
 import { Loader2 } from "lucide-react"
+import Link from "next/link"
 
 const subscriptionPlanSchema = z.object({
-  plan: z.enum(["basic", "pro", "enterprise"]),
+  plan: z.enum(["basic", "pro", "custom"]),
 })
 
 type SubscriptionPlanFormProps = {
@@ -46,13 +47,13 @@ export function SubscriptionPlanForm({ onSubmit, onBack, isSubmitting }: Subscri
                     {
                       value: "basic",
                       label: "Basic Plan",
-                      price: "Gh10 per user/month",
+                      price: "Gh₵5 per student/month",
 
                     },
                     {
                       value: "pro",
                       label: "Pro Plan",
-                      price: "GH20 per user/month",
+                      price: "Gh₵10 per student/month",
 
                     }
                   ].map((plan) => (
@@ -65,7 +66,9 @@ export function SubscriptionPlanForm({ onSubmit, onBack, isSubmitting }: Subscri
                         whileHover={{ scale: 1.02 }}
                         transition={{ type: "spring", stiffness: 300 }}
                       >
-                        <FormLabel className="font-semibold text-lg">{plan.label}</FormLabel>
+                        <FormLabel className="font-semibold text-lg">{plan.label} {""} {plan.value === "pro" && <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-md">
+                          Recommended
+                        </span>}</FormLabel>
                         <p className="text-sm text-gray-600 mb-2">{plan.price}</p>
                       </motion.div>
                     </FormItem>
@@ -76,6 +79,16 @@ export function SubscriptionPlanForm({ onSubmit, onBack, isSubmitting }: Subscri
             </FormItem>
           )}
         />
+        <p className="text-lg text-foreground font-medium mt-4">
+          Check the{" "}
+          <Link
+            href="/pricing"
+            className="text-blue-400 hover:text-blue-500 font-semibold underline decoration-dashed underline-offset-4 transition-all duration-300"
+          >
+            pricing page
+          </Link>
+        </p>
+
         <div className="flex justify-between">
           <Button type="button" variant="outline" onClick={onBack}>
             Back

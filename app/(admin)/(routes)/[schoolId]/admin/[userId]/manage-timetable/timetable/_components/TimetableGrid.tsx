@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react'
 import Timetable from './Timetable'
 import ClassSelection from '@/components/commons/ClassSelection'
 import { fetchTimetableByClassId } from '@/lib/actions/timetable.actions'
+import { AlertCircle } from 'lucide-react'
 
 const TimetableGrid = ({ classes }: { classes: IClass[] }) => {
-    const [selectedClass, setSelectedClass] = useState(classes[0]._id);
+    const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [rowData, setRowData] = useState<ITimetable | []>([]);
+    const [rowData, setRowData] = useState<ITimetable[] | []>([]);
 
     useEffect(() => {
         const fetchPayment = async () => {
@@ -24,7 +25,7 @@ const TimetableGrid = ({ classes }: { classes: IClass[] }) => {
         }
         fetchPayment()
     }, [selectedClass]);
-    console.log(rowData,"timetable")
+    console.log(rowData, "timetable")
     return (
         <>
             <div className="border py-1 px-4 flex gap-5 items-center my-1">
@@ -36,7 +37,15 @@ const TimetableGrid = ({ classes }: { classes: IClass[] }) => {
 
             </div>
             <div className="py-4 mt-2 px-2">
-                <Timetable data={rowData} />
+                {rowData.length === 0 ? (
+                    <div className="flex flex-col items-center py-10 mt-16">
+                        <AlertCircle className="w-12 h-12 text-gray-500 mb-4" />
+                        <p className="text-lg text-gray-600 mb-2">No Time found found.</p>
+                        <p className="text-md text-gray-500">Please add new timetable to manage them here.</p>
+                    </div>
+                ) : (
+                    <Timetable data={rowData} />
+                )}
             </div>
 
         </>

@@ -4,174 +4,25 @@ import { revalidatePath } from "next/cache";
 import Role from "../models/role.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import RoleSchema from "../validators/role.validator";
+import { z } from "zod";
 
 
-interface CreateRoleProps {
-    name: string;
-    displayName: string;
-    description: string;
-    dashboard?: boolean | undefined;
-    schoolInfo?: boolean | undefined;
-    systemConfig?: boolean | undefined;
-    classManagement?: boolean | undefined;
-    studentManagement?: boolean | undefined;
-    employeeManagement?: boolean | undefined;
-    manageAttendance?: boolean | undefined;
-    homeWork?: boolean | undefined;
-    manageTimeTable?: boolean | undefined;
-    onlineLearning?: boolean | undefined;
-    examsManagement?: boolean | undefined;
-    account?: boolean | undefined;
-    inventory?: boolean | undefined;
-    hostelManagement?: boolean | undefined;
-    library?: boolean | undefined;
-    depositAndExpense?: boolean | undefined;
-    smsAndEmail?: boolean | undefined;
-    report?: boolean | undefined;
-
-    viewChart?: boolean | undefined;
-    viewMemberTab?: boolean | undefined;
-    viewEnquiries?: boolean | undefined;
-    viewExpenses?: boolean | undefined;
-
-    addRole?: boolean | undefined;
-    manageRole?: boolean | undefined;
-    viewRole?: boolean | undefined;
-    editRole?: boolean | undefined;
-    deleteRole?: boolean | undefined;
-
-    addSubject?: boolean | undefined;
-    manageSubject?: boolean | undefined;
-    viewSubject?: boolean | undefined;
-    editSubject?: boolean | undefined;
-    deleteSubject?: boolean | undefined;
-
-    addTerm?: boolean | undefined;
-    manageTerm?: boolean | undefined;
-    viewTerm?: boolean | undefined;
-    editTerm?: boolean | undefined;
-    deleteTerm?: boolean | undefined;
-
-    addSession?: boolean | undefined;
-    manageSession?: boolean | undefined;
-    viewSession?: boolean | undefined;
-    editSession?: boolean | undefined;
-    deleteSession?: boolean | undefined;
-
-    addClass?: boolean | undefined;
-    manageClass?: boolean | undefined;
-    viewClass?: boolean | undefined;
-    editClass?: boolean | undefined;
-    deleteClass?: boolean | undefined;
-
-    addTime?: boolean | undefined;
-    manageTime?: boolean | undefined;
-    viewTime?: boolean | undefined;
-    editTime?: boolean | undefined;
-    deleteTime?: boolean | undefined;
-
-    addClassAllocation?: boolean | undefined;
-    manageClassAllocation?: boolean | undefined;
-    viewClassAllocation?: boolean | undefined;
-    editClassAllocation?: boolean | undefined;
-    deleteClassAllocation?: boolean | undefined;
-
-    addGradingSystem?: boolean | undefined;
-    manageGradingSystem?: boolean | undefined;
-    viewGradingSystem?: boolean | undefined;
-    editGradingSystem?: boolean | undefined;
-    deleteGradingSystem?: boolean | undefined;
-
-    addGpa?: boolean | undefined;
-    manageGpa?: boolean | undefined;
-    viewGpa?: boolean | undefined;
-    editGpa?: boolean | undefined;
-    deleteGpa?: boolean | undefined;
-
-    publishResult?: boolean | undefined;
-
-    addStudent?: boolean | undefined;
-    manageStudent?: boolean | undefined;
-    viewStudent?: boolean | undefined;
-    editStudent?: boolean | undefined;
-    deleteStudent?: boolean | undefined;
-
-    addParent?: boolean | undefined;
-    manageParent?: boolean | undefined;
-    viewParent?: boolean | undefined;
-    editParent?: boolean | undefined;
-    deleteParent?: boolean | undefined;
-
-    addDepartment?: boolean | undefined;
-    manageDepartment?: boolean | undefined;
-    viewDepartment?: boolean | undefined;
-    editDepartment?: boolean | undefined;
-    deleteDepartment?: boolean | undefined;
-
-    manageEmployeeList?: boolean | undefined;
-
-    addEmployee?: boolean | undefined;
-    manageEmployee?: boolean | undefined;
-    viewEmployee?: boolean | undefined;
-    editEmployee?: boolean | undefined;
-    deleteEmployee?: boolean | undefined;
-
-    addBook?: boolean | undefined;
-    manageBook?: boolean | undefined;
-    viewBook?: boolean | undefined;
-    editBook?: boolean | undefined;
-    deleteBook?: boolean | undefined;
-
-    addTeacherAttendance?: boolean | undefined;
-    manageTeacherAttendance?: boolean | undefined;
-    viewTeacherAttendance?: boolean | undefined;
-    editTeacherAttendance?: boolean | undefined;
-    deleteTeacherAttendance?: boolean | undefined;
-
-    addStudentAttendance?: boolean | undefined;
-    manageStudentAttendance?: boolean | undefined;
-    viewStudentAttendance?: boolean | undefined;
-    editStudentAttendance?: boolean | undefined;
-    deleteStudentAttendance?: boolean | undefined;
-
-    addHomework?: boolean | undefined;
-    manageHomework?: boolean | undefined;
-    viewHomework?: boolean | undefined;
-    editHomework?: boolean | undefined;
-    deleteHomework?: boolean | undefined;
-
-    addEvaluationReport?: boolean | undefined;
-    manageEvaluationReport?: boolean | undefined;
-    viewEvaluationReport?: boolean | undefined;
-    editEvaluationReport?: boolean | undefined;
-    deleteEvaluationReport?: boolean | undefined;
-
-    addTimetable?: boolean | undefined;
-    manageTimetable?: boolean | undefined;
-    viewTimetable?: boolean | undefined;
-    editTimetable?: boolean | undefined;
-    deleteTimetable?: boolean | undefined;
-}
+type CreateRoleProps = z.infer<typeof RoleSchema>
 export async function createRole(values: CreateRoleProps, path: string) {
     const {
         name,
         displayName,
         description,
-        ...permissions
-    } = values;
+        permissions
+    } = RoleSchema.parse(values);
 
     try {
         const user = await currentUser();
         const schoolId = user.schoolId
         await connectToDB();
         // Check if any existing role matches the provided name, display name, or description
-        const existingRole = await Role.findOne({
-            $or: [
-                { name },
-                { displayName },
-                { description }
-            ]
-        });
+        const existingRole = await Role.findOne({ schoolId, displayName, name });
 
         // If an existing role is found, throw an error
         if (existingRole) {

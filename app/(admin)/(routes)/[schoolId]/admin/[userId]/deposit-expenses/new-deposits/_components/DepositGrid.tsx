@@ -17,7 +17,7 @@ interface DepositGridProps {
 
 const DepositGrid: React.FC<DepositGridProps> = ({ accounts }) => {
     const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
-    const [selectedAccount, setSelectedAccount] = useState(accounts[0]._id);
+    const [selectedAccount, setSelectedAccount] = useState(accounts[0]?._id);
     const [isLoading, setIsLoading] = useState(false);
     const [rowData, setRowData] = useState([]);
 

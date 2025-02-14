@@ -13,7 +13,7 @@ const ExpensesGrid = ({ accounts }: { accounts: IAccount[] }) => {
 
     const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
 
-    const [selectedAccount, setSelectedAccount] = useState(accounts[0]._id);
+    const [selectedAccount, setSelectedAccount] = useState(accounts[0]?._id);
 
     const [isLoading, setIsLoading] = useState(false);
     

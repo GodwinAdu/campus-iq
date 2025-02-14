@@ -90,7 +90,7 @@ export const AdvancedDemo = () => {
     <section className="py-20 relative overflow-hidden">
       <BackgroundBeams />
       <div className="container mx-auto px-4 relative z-10">
-        <h2 className="text-4xl font-bold mb-8 text-center text-white">Experience EduManage Pro</h2>
+        <h2 className="text-4xl font-bold mb-8 text-center text-white">Experience Campus<span className="text-primary">IQ</span> Pro</h2>
         <p className="text-xl text-gray-300 text-center mb-12">
           Explore our cutting-edge features designed to revolutionize school management
         </p>

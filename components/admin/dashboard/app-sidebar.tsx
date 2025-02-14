@@ -15,23 +15,24 @@ import SideContent from "./sidebar"
 
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  store: {name:string}, // Replace `any` with the specific type if you know it
-  userRole: IRole
+  school: ISchool, // Replace `any` with the specific type if you know it
+  userRole: IRole,
+  user:IEmployee
 }
 
 export function AppSidebar(props: AppSidebarProps) {
-  const { store,  userRole, ...rest } = props;
+  const { school,user,  userRole, ...rest } = props;
 
   return (
     <Sidebar collapsible="icon" {...rest}>
       <SidebarHeader>
-        <TeamSwitcher store={store}  />
+        <TeamSwitcher user={user}  />
       </SidebarHeader>
       <SidebarContent>
-        <SideContent role={userRole} />
+        <SideContent school={school} role={userRole} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser store={store} />
+        <NavUser school={school} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

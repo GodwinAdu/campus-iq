@@ -12,6 +12,7 @@ const navItems = [
   { name: "Demo", link: "/demo" },
   { name: "Pricing", link: "/pricing" },
   { name: "Contact", link: "/contact" },
+  { name: "Download", link: "/download" },
 ]
 
 export default function AdvancedNavbar() {

@@ -51,7 +51,7 @@ export const loginUser = async (values: { identifier: string; password: string; 
         if (!userModel) throw new Error("Invalid role");
 
         const user = await (userModel as Model<IEmployee | IStudent | IParent | ITeacher>).findOne({
-            $or: [{ email: identifier }, { userName: identifier }],
+            $or: [{ email: identifier }, { username: identifier }],
         });
 
 

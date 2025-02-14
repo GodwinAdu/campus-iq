@@ -174,7 +174,7 @@ const TimeTableForm = ({ classes,type,initialData }: Props) => {
                                             <FormItem>
                                                 <FormLabel>Time Slot</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} placeholder="e.g. 9:00 - 10:00 or 13:00 - 13:30" />
+                                                    <Input {...field} placeholder="e.g. 09:00 - 10:00 or 13:00 - 13:30" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

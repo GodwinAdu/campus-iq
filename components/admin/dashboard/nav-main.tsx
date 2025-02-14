@@ -4,16 +4,9 @@ import {
   Users,
   ChevronRight,
   ShoppingBag,
-  Coins,
   HandCoins,
-  SendToBack,
-  Blocks,
-  Banknote,
   PiggyBank,
   Activity,
-  Phone,
-  LayoutDashboard,
-  BoxIcon,
   HardDrive,
   NotebookPen,
   UsersRound,
@@ -25,7 +18,8 @@ import {
   Combine,
   House,
   Library,
-  Mail
+  Mail,
+  Menu
 } from "lucide-react"
 import {
   Collapsible,
@@ -51,38 +45,40 @@ interface NavItem {
   title: string;
   url: string;
   icon?: React.ComponentType;
-  roleField?: keyof any;
+  roleField?: keyof IRole | string;
   isActive?: boolean;
   items?: NavItem[];
 }
 
 
 interface NavMainProps {
-  role: any;
+  role: IRole | undefined;
+  school: ISchool
 }
 
-export function NavMain({ role }: NavMainProps) {
+export function NavMain({ role, school }: NavMainProps) {
 
   const params = useParams();
   const pathname = usePathname();
 
   const [openGroup, setOpenGroup] = useState<string | null>(null)
+  const proPlan = school?.subscriptionPlan?.plan === "pro"
 
-  const isActive = useCallback(
-    (url: string) => pathname.startsWith(url),
-    [pathname]
-  );
 
 
   const { schoolId, userId } = params
 
-  const navMain: NavItem[] = [
+
+
+
+
+  const navMain: (NavItem | false)[] = [
     {
       title: "System Config",
       url: "#",
       icon: HardDrive,
       isActive: true,
-      roleField: "systemConfig",
+      // roleField: "manageSystemConfig",
       items: [
         {
           title: "manage Sessions",
@@ -123,6 +119,25 @@ export function NavMain({ role }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/class/manage-subjects`,
           roleField: "manageSubject"
         },
+      ],
+    },
+    {
+      title: "Canteen Management",
+      url: "#",
+      icon: HandCoins,
+      isActive: true,
+      // roleField: "attendanceManagement",
+      items: [
+        {
+          title: "Manage Attendance",
+          url: `/${schoolId}/admin/${userId}/attendance/manage-attendance`,
+          // roleField: "manageAttendance"
+        },
+        // {
+        //   title: "Manage Absent",
+        //   url: `/${schoolId}/admin/${userId}/attendance/manage-absent`,
+        //   roleField: "manageAbsent"
+        // },
       ],
     },
     {
@@ -185,7 +200,7 @@ export function NavMain({ role }: NavMainProps) {
         {
           title: "Employees",
           url: `/${schoolId}/admin/${userId}/manage-attendance/employees`,
-          roleField: "manageTeacherAttendance",
+          roleField: "manageEmployeeAttendance",
         }
       ],
     },
@@ -211,16 +226,16 @@ export function NavMain({ role }: NavMainProps) {
       title: "Time Table",
       url: "#",
       icon: TimerIcon,
-      roleField: "manageTimeTable",
+      roleField: "timetable",
       items: [
         {
           title: "Manage Timetable",
           url: `/${schoolId}/admin/${userId}/manage-timetable/timetable`,
-          // roleField: "manageExpensesCategory"
+          // roleField: "timetable"
         },
       ],
     },
-    {
+    proPlan && {
       title: "Virtual Learning",
       url: "#",
       icon: TvMinimalPlay,
@@ -233,7 +248,7 @@ export function NavMain({ role }: NavMainProps) {
         },
       ],
     },
-    {
+    proPlan && {
       title: "Exams Management",
       url: "#",
       icon: BookOpenCheckIcon,
@@ -276,7 +291,7 @@ export function NavMain({ role }: NavMainProps) {
         },
       ],
     },
-    {
+    proPlan && {
       title: "Fees Management",
       url: "#",
       icon: HandCoins,
@@ -304,7 +319,7 @@ export function NavMain({ role }: NavMainProps) {
         },
       ],
     },
-    {
+    proPlan && {
       title: "Hr and Payroll",
       url: "#",
       icon: Combine,
@@ -395,7 +410,7 @@ export function NavMain({ role }: NavMainProps) {
         },
       ],
     },
-    {
+    proPlan && {
       title: "Hostel Management",
       url: "#",
       icon: House,
@@ -418,22 +433,22 @@ export function NavMain({ role }: NavMainProps) {
         }
       ],
     },
-    {
+    proPlan && {
       title: "Library Management",
       url: "#",
-      icon:Library,
+      icon: Library,
       roleField: "library",
       items: [
-        // {
-        //   title: "Hostel",
-        //   url: `/${schoolId}/admin/${userId}/hostel/manage-hostel`,
-        //   // roleField: "manageListAccount"
-        // },
-        // {
-        //   title: "",
-        //   url: `/${schoolId}/admin/${userId}/hostel/manage-hostel`,
-        //   // roleField: "manageListAccount"
-        // },
+        {
+          title: "Books",
+          url: `/${schoolId}/admin/${userId}/library/manage-books`,
+          // roleField: "manageListAccount"
+        },
+        {
+          title: "Issue Books",
+          url: `/${schoolId}/admin/${userId}/library/manage-issue-books`,
+          // roleField: "manageListAccount"
+        },
       ],
     },
     {
@@ -469,7 +484,7 @@ export function NavMain({ role }: NavMainProps) {
         },
       ],
     },
-    {
+    proPlan && {
       title: "Messaging",
       url: "#",
       icon: Mail,
@@ -494,11 +509,6 @@ export function NavMain({ role }: NavMainProps) {
           // roleField: "profitLostReport"
         },
         {
-          title: "Fees Report",
-          url: `/${schoolId}/admin/${userId}/report/items-report`,
-          // roleField: "itemsReport"
-        },
-        {
           title: "Financial Reports",
           url: `/${schoolId}/admin/${userId}/report/register-report`,
           // roleField: "registerReport"
@@ -514,24 +524,37 @@ export function NavMain({ role }: NavMainProps) {
         }, {
           title: "Inventory Reports",
           url: `/${schoolId}/admin/${userId}/report/product-purchase-report`,
-          roleField: "productPurchaseReport"
+          // roleField: "productPurchaseReport"
         }, {
           title: "Examination Report",
           url: `/${schoolId}/admin/${userId}/report/sell-return-report`,
-          roleField: "sellReturnReport"
+          // roleField: "sellReturnReport"
         },
       ],
     },
 
   ];
+  const isActive = useCallback(
+    (url: string) => {
+      const dashboardPath = `/${schoolId}/admin/${userId}`;
+
+      if (pathname === dashboardPath || pathname === `${dashboardPath}/`) {
+        return url === pathname; // Only activate when it exactly matches the dashboard
+      }
+
+      return pathname.startsWith(url) && url !== dashboardPath;
+    },
+    [pathname, schoolId, userId]
+  );
+
   // Automatically open collapsible if an item inside is active
   useEffect(() => {
-    navMain.forEach((group) => {
+    navMain.filter((group): group is NavItem => group !== false).forEach((group) => {
       if (group.items?.some((item) => isActive(item.url))) {
         setOpenGroup(group.title);
       }
     });
-  }, [pathname]);
+  }, [pathname,]);
 
 
   return (
@@ -543,19 +566,21 @@ export function NavMain({ role }: NavMainProps) {
           <SidebarMenuSubButton
             asChild
             className={cn(
-              "transition-colors hover:text-primary",
-              isActive(`/${schoolId}/admin/${userId}`) &&
-              "bg-primary/10 text-primary font-medium"
+              "transition-colors hover:bg-primary/10 hover:text-primary",
+              isActive(`/${schoolId}/admin/${userId}`) && "bg-primary text-white font-medium"
             )}
           >
-            <Link href={`/${schoolId}/admin/${userId}`}>
-              <LayoutDashboard />
+            <Link href={`/${schoolId}/admin/${userId}`}
+            >
+              <Menu className="text-white" />
               <span>Dashboard</span>
             </Link>
           </SidebarMenuSubButton>
         </SidebarMenuSubItem>
+
         {navMain
-          .filter(item => !item?.roleField || role[item?.roleField])
+          .filter((item): item is NavItem => item !== false)
+          .filter(item => !item.roleField || (role && role[item.roleField as keyof IRole]))
           .map(item => (
             <Collapsible
               key={item.title}
@@ -571,7 +596,7 @@ export function NavMain({ role }: NavMainProps) {
                     tooltip={item.title}
                     className={cn(
                       "transition-colors hover:bg-primary/10 hover:text-primary",
-                      isActive(item.url) && "bg-primary/10 text-primary font-medium"
+                      item.items?.some(subItem => isActive(subItem.url)) && "bg-primary text-white font-medium"
                     )}
                   >
                     {item.icon && <item.icon />}

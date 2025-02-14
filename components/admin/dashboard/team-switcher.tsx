@@ -1,47 +1,37 @@
 "use client";
 
-import { ChevronsUpDown, School, ShoppingCart } from "lucide-react";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { UserCircle } from "lucide-react";
 import {
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useParams, useRouter } from "next/navigation"; // For dynamic navigation
 import { useTourControl } from "@/hooks/use-tour-control";
+import { capitalizeFirstLetter } from "@/lib/utils";
 
-export function TeamSwitcher({ store }: { store: IStore }) {
-  const { isMobile } = useSidebar();
-  const router = useRouter();
-  const params = useParams();
+export function TeamSwitcher({user}:{user:IEmployee}) {
+  const { open } = useSidebar(); // Detects mobile view
 
   useTourControl([
     {
-      target: '.team-switcher',
-      content: 'Hello this is where to switch between branches ',
+      target: ".team-switcher",
+      content: "Hello, this is where you switch between branches.",
       disableBeacon: true,
     },
   ]);
 
-
-
+  // Hide sidebar on mobile
+  if (!open) return null;
 
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-
-
+    <SidebarMenu className=" shadow-lg rounded-xl p-3">
+      <SidebarMenuItem className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded-lg transition">
+        <UserCircle className="w-8 h-8 text-gray-500" />
+        <div>
+          <h2 className="text-sm font-semibold text-gray-800">{user?.fullName}</h2>
+          <p className="text-xs text-primary">{capitalizeFirstLetter(user?.role)}</p>
+        </div>
       </SidebarMenuItem>
     </SidebarMenu>
   );

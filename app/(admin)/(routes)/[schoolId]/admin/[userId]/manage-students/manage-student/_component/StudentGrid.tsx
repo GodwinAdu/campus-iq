@@ -13,7 +13,7 @@ interface StudentGridProps {
 
 const StudentGrid = ({ classes }: StudentGridProps) => {
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedClass, setSelectedClass] = useState(classes[0]._id);
+    const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [studentList, setStudentList] = useState([])
 
     useEffect(() => {

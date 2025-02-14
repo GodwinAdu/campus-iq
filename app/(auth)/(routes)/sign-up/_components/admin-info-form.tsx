@@ -10,7 +10,7 @@ import { PasswordStrengthMeter } from "./password-strength-meter"
 
 const adminInfoSchema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
+    fullName: z.string().min(2, "Name must be at least 2 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string(),
@@ -29,7 +29,7 @@ export function AdminInfoForm({ onNext, onBack }: AdminInfoFormProps) {
   const form = useForm<z.infer<typeof adminInfoSchema>>({
     resolver: zodResolver(adminInfoSchema),
     defaultValues: {
-      name: "",
+      fullName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -41,10 +41,10 @@ export function AdminInfoForm({ onNext, onBack }: AdminInfoFormProps) {
       <form onSubmit={form.handleSubmit(onNext)} className="space-y-6">
         <FormField
           control={form.control}
-          name="name"
+          name="fullName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Admin Name</FormLabel>
+              <FormLabel>Admin Full Name</FormLabel>
               <FormControl>
                 <Input placeholder="Enter admin name" {...field} />
               </FormControl>

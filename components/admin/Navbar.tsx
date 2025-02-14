@@ -7,9 +7,10 @@ import { BarChart4, Package, Users } from "lucide-react";
 import FullScreenButton from "../commons/FullScreenButton";
 import { useTourControl } from "@/hooks/use-tour-control";
 import UserDropdown from "../commons/user-dropdown";
+import { AcademicDropdown } from "../commons/AcademicDropdown";
 
 
-const Navbar = ({user}:{user:IEmployee}) => {
+const Navbar = ({ user, sessions }: { user: IEmployee, sessions: ISession[] }) => {
 
 
     useTourControl([
@@ -33,19 +34,9 @@ const Navbar = ({user}:{user:IEmployee}) => {
                 <Separator orientation="vertical" className="mr-2 h-4" />
             </div>
 
-            <div className=".dashboard-stats flex gap-4 ml-auto items-center pr-3">
+            <div className=".dashboard-stats flex gap-4 ml-auto items-center pr-10">
+                <AcademicDropdown sessions={sessions} />
                 <FullScreenButton />
-
-                <Button className="button-step" variant="outline" size="icon">
-                    <Users className="h-4 w-4" />
-                </Button>
-                <Button className="button-2" variant="outline" size="icon">
-                    <Package className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon">
-                    <BarChart4 className="h-4 w-4" />
-                </Button>
-                {/* <SettingComponent /> */}
 
                 <UserDropdown
                     email={user?.email}

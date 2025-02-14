@@ -10,15 +10,13 @@ import CTA from "@/components/CTA"
 import AnimatedBackground from "@/components/AnimatedBackground"
 import InteractiveDemo from "@/components/InteractiveDemo"
 import AIAssistant from "@/components/AIAssistant"
-import { AIChatbot } from "@/components/AIChatbot"
-import AdvancedFooter from "@/components/AdvancedFooter"
+
 
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-black text-white overflow-hidden">
       <AnimatedBackground />
-      <AdvancedNavbar />
       <Hero />
       <AnimatedStatsGrid />
       <Features />
@@ -29,8 +27,6 @@ export default function Home() {
       <Pricing />
       <AIAssistant />
       <CTA />
-      <AdvancedFooter />
-      <AIChatbot />
     </main>
   )
 }

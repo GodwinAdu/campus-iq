@@ -7,7 +7,7 @@ import { columns } from './column';
 import { DataTable } from '@/components/table/data-table';
 
 const MarkEntriesGrid = ({ classes }: { classes: IClass[] }) => {
-    const [selectedClass, setSelectedClass] = useState(classes[0]._id);
+    const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [data,setData] = useState([])
 

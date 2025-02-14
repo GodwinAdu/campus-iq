@@ -769,7 +769,7 @@ interface IRoomMaintenance extends Document {
 }
 
 interface IInventoryCategory extends Document {
-    _id?:string;
+    _id?: string;
     schoolId: Types.ObjectId;
     name: string;
     products: Types.ObjectId[];
@@ -871,7 +871,7 @@ interface IInventoryStore extends Document {
 }
 
 interface IInventorySupplier extends Document {
-    _id?:string;
+    _id?: string;
     schoolId: Types.ObjectId;
     name: string;
     email: string;
@@ -886,7 +886,115 @@ interface IInventorySupplier extends Document {
     action_type?: string | null;
     createdAt: Date;
     updatedAt: Date;
-  }
+}
+
+interface IRole extends Document {
+    _id?: string;
+    schoolId: Schema.Types.ObjectId;
+    name: string;
+    displayName: string;
+    description: string;
+    permissions: {
+        dashboard: boolean;
+        schoolInfo: boolean;
+        systemConfig: boolean;
+        classManagement: boolean;
+        studentManagement: boolean;
+        employeeManagement: boolean;
+        manageAttendance: boolean;
+        homeWork: boolean;
+        timetable: boolean;
+        onlineLearning: boolean;
+        examsManagement: boolean;
+        account: boolean;
+        inventory: boolean;
+        hostelManagement: boolean;
+        library: boolean;
+        depositAndExpense: boolean;
+        smsAndEmail: boolean;
+        report: boolean;
+        canteenManagement: boolean;
+        transportManagement: boolean;
+        feesManagement: boolean;
+        hrManagement: boolean;
+        viewChart: boolean;
+        viewMemberTab: boolean;
+        viewEnquiries: boolean;
+        viewExpenses: boolean;
+        addRole: boolean;
+        manageRole: boolean;
+        viewRole: boolean;
+        editRole: boolean;
+        deleteRole: boolean;
+        addSubject: boolean;
+        manageSubject: boolean;
+        viewSubject: boolean;
+        editSubject: boolean;
+        deleteSubject: boolean;
+        addTerm: boolean;
+        manageTerm: boolean;
+        viewTerm: boolean;
+        editTerm: boolean;
+        deleteTerm: boolean;
+        addSession: boolean;
+        manageSession: boolean;
+        viewSession: boolean;
+        editSession: boolean;
+        deleteSession: boolean;
+        addClass: boolean;
+        manageClass: boolean;
+        viewClass: boolean;
+        editClass: boolean;
+        deleteClass: boolean;
+        addStudent: boolean;
+        manageStudent: boolean;
+        viewStudent: boolean;
+        editStudent: boolean;
+        deleteStudent: boolean;
+        addEmployee: boolean;
+        manageEmployee: boolean;
+        viewEmployee: boolean;
+        editEmployee: boolean;
+        deleteEmployee: boolean;
+        addBook: boolean;
+        manageBook: boolean;
+        viewBook: boolean;
+        editBook: boolean;
+        deleteBook: boolean;
+        addTimetable: boolean;
+        manageTimetable: boolean;
+        viewTimetable: boolean;
+        editTimetable: boolean;
+        deleteTimetable: boolean;
+        addHomework: boolean;
+        manageHomework: boolean;
+        viewHomework: boolean;
+        editHomework: boolean;
+        deleteHomework: boolean;
+        addExamMark: boolean;
+        manageExamMark: boolean;
+        viewExamMark: boolean;
+        editExamMark: boolean;
+        deleteExamMark: boolean;
+        generatePosition: boolean;
+        studentReport: boolean;
+        financialReport: boolean;
+        attendanceReport: boolean;
+        hrReport: boolean;
+        inventoryReport: boolean;
+        libraryReport: boolean;
+        transportationReport: boolean;
+        canteenReport: boolean;
+    };
+    createdBy?: Types.ObjectId | null;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
 
 
 
