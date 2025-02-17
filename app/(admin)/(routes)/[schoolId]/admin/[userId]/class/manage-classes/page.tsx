@@ -13,20 +13,20 @@ import { getAllClass } from '@/lib/actions/class.actions'
 const page = async () => {
   const user = await currentUser();
 
-  if(!user) redirect("/");
+  if (!user) redirect("/");
 
   const role = await currentUserRole();
 
   const data = await getAllClass() || [];
   return (
     <>
-    <div className="flex justify-between items-center">
-    <Heading title="Manage Classes" description="Manage,create and edit school Stages" />
-    {role?.addClass && <ClassModal /> }
-    </div>
-    <Separator />
-    <DataTable searchKey="name" columns={columns} data={data} />  
-  </>
+      <div className="flex justify-between items-center">
+        <Heading title="Manage Classes" description="Manage,create and edit school Stages" />
+        {role?.permissions.addClass && <ClassModal />}
+      </div>
+      <Separator />
+      <DataTable searchKey="name" columns={columns} data={data} />
+    </>
   )
 }
 

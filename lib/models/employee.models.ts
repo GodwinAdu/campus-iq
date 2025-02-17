@@ -11,7 +11,7 @@ const EmployeeSchema: Schema<IEmployee> = new Schema({
         required: true,
         unique: true
     },
-    fullName:{
+    fullName: {
         type: String,
         required: true,
         trim: true,
@@ -46,12 +46,37 @@ const EmployeeSchema: Schema<IEmployee> = new Schema({
     religion: {
         type: String,
     },
+    addresses: {
+        street: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        },
+        zipCode: {
+            type: String,
+        },
+        country: {
+            type: String,
+        },
+    },
+    emergencyContact: {
+        type: Object,
+    },
+    currentAddress: {
+        type: String,
+    },
     permanentAddress: {
         type: String,
     },
-    presentAddress: {
-        type: String,
-    },
+    classIds:[{
+        type: Schema.Types.ObjectId,
+        ref: 'Class',
+        default:[]
+    }],
     role: {
         type: String,
         required: true
@@ -93,6 +118,11 @@ const EmployeeSchema: Schema<IEmployee> = new Schema({
         ref: 'Department',
         default: null
     },
+    manageClass: [{
+        type: Schema.Types.ObjectId,
+        ref: "Class",
+        default: []
+    }],
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",

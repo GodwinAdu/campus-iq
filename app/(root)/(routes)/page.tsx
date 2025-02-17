@@ -25,7 +25,7 @@ export default function Home() {
       <SuccessStories />
       <Testimonials />
       <Pricing />
-      <AIAssistant />
+      {/* <AIAssistant /> */}
       <CTA />
     </main>
   )

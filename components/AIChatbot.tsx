@@ -18,7 +18,7 @@ export const AIChatbot = () => {
         setMessages((prev) => [
           ...prev,
           {
-            text: "Thank you for your message. An EduManage Pro representative will get back to you shortly.",
+            text: "Thank you for your message. An CampusIQ representative will get back to you shortly.",
             isUser: false,
           },
         ])
@@ -40,7 +40,7 @@ export const AIChatbot = () => {
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-xl overflow-hidden"
+            className="fixed bottom-4 right-4 w-80 bg-white rounded-lg shadow-xl overflow-hidden z-50"
           >
             <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
               <h3 className="font-semibold">EduManage Pro AI Assistant</h3>

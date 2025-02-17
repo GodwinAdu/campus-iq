@@ -13,19 +13,20 @@ const plans = [
     price: 5,
     color: "from-blue-400 to-blue-600",
     features: [
-      "System Configuration",
-      "Students Information System",
-      "Employees Information System",
-      "Class Management",
-      "Inventory Information",
-      "Deposit and Expenses Tracking",
-      "Time Table Information",
       "Attendance Tracking",
-      "Student Portal",
-      "Parent Portal",
-      "Email Support",
-      "Unlimited Cloud Storage",
+      "Canteen Management",
+      "Class Management",
       "Community Forum Support",
+      "Deposit and Expenses Tracking",
+      "Email Support",
+      "Employees Information System",
+      "Inventory Information",
+      "Parent Portal",
+      "Students Information System",
+      "Student Portal",
+      "System Configuration",
+      "Time Table Information",
+      "Unlimited Cloud Storage",
     ],
   },
   {
@@ -34,13 +35,13 @@ const plans = [
     color: "from-purple-400 to-purple-600",
     features: [
       "All Basic features",
-      "Canteen Management",
-      "Virtual Learning",
-      "Fees Management",
-      "HR & Payroll Management",
       "Exams Management",
-      "Library Management",
+      "Fees Management",
+      "Health Record Management",
       "Hostels Management",
+      "HR & Payroll Management",
+      "Library Management",
+      "Virtual Learning",
       "Transports Management",
       "Advanced API Access",
       "Dedicated Account Manager",
@@ -153,11 +154,11 @@ export default function Pricing() {
                 <SparklesCore
                   id={`sparkles-${index}`}
                   background="transparent"
-                  minSize={0.4}
-                  maxSize={1}
-                  particleDensity={100}
+                  minsize={0.4}
+                  maxsize={1}
+                  particledensity={100}
                   className="w-full h-full"
-                  particleColor="#FFFFFF"
+                  particlecolor="#FFFFFF"
                 />
               </div>
               <div className="relative bg-gray-800 p-8 rounded-lg h-full flex flex-col justify-between">

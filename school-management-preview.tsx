@@ -16,10 +16,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Progress } from "@/components/ui/progress"
-import { useToast } from "@/components/ui/use-toast"
+
 
 // Icons
 import { Trash2, Plus, Loader2 } from "lucide-react"
+import { toast } from "./hooks/use-toast"
 
 // Schemas
 const schoolInfoSchema = z.object({
@@ -441,7 +442,6 @@ export default function CreateSchoolPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
-  const { toast } = useToast()
 
   const handleNext = (data: any) => {
     setFormData((prev) => ({ ...prev, ...data }))

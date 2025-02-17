@@ -6,6 +6,7 @@ import { getRolesName } from "@/lib/actions/role.actions";
 import { currentUser } from "@/lib/helpers/current-user";
 import { redirect } from "next/navigation";
 import AdminForm from "./_components/AdminForm";
+import { getAllClass } from "@/lib/actions/class.actions";
 
 interface RolenameProps {
   _id: string;
@@ -19,9 +20,7 @@ const page = async ({ params }: { params: { schoolId: string, adminId: string } 
 
   const roleName = (await getRolesName()) || [];
   const departments = (await getAllDepartments()) || [];
-  console.log(departments);
-
-  const id = params.adminId;
+  const classes = await  getAllClass()
 
   return (
     <>
@@ -30,7 +29,7 @@ const page = async ({ params }: { params: { schoolId: string, adminId: string } 
       </div>
       <Separator />
       <div className="pt-4 w-full">
-        <AdminForm type="admin" departments={departments} rolename={roleName} />
+        <AdminForm type="create" classes={classes} departments={departments} rolename={roleName} />
       </div>
     </>
   );

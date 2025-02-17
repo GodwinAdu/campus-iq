@@ -32,7 +32,7 @@ export default function AdvancedNavbar() {
           ))}
         </div>
         <div className="hidden md:block">
-          <Link href="/contact">
+          <Link href="/sign-up">
             <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300">
               Get Started
             </button>

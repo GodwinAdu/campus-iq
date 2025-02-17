@@ -1,6 +1,11 @@
 import { Model, model, models, Schema } from "mongoose";
 
 const SchoolSchema: Schema<ISchool> = new Schema({
+    owner:{
+        type: Schema.Types.ObjectId,
+        ref: "Employee",
+        required: true,
+    },
     schoolCode: {
         type: String,
         unique: true,

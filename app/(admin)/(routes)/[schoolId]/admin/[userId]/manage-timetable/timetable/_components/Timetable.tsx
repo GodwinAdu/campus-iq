@@ -53,16 +53,19 @@ export default function Timetable({ data }: { data: ITimetable[] }) {
 
         return (
             <td className={`p-2 border ${isCurrentCell ? 'bg-primary/50' : ''}`}>
-                <Card>
-                    <CardContent className="p-4">
-                        <h3 className="font-bold mb-2">{classInfo.subject}</h3>
-                        <Badge className={classTypeColors[classInfo.type]}>{classInfo.type}</Badge>
-                        <div className="flex items-center mt-2 text-sm text-gray-600">
-                            <MapPin size={14} className="mr-1" />
-                            {classInfo.location}
-                        </div>
-                    </CardContent>
-                </Card>
+                {classInfo?.subject && (
+                    <Card>
+                        <CardContent className="p-4">
+                            <h3 className="font-bold mb-2">{classInfo.subject}</h3>
+                            <Badge className={classTypeColors[classInfo.type]}>{classInfo.type}</Badge>
+                            <div className="flex items-center mt-2 text-sm text-gray-600">
+                                <MapPin size={14} className="mr-1" />
+                                {classInfo.location}
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
             </td>
         )
     }

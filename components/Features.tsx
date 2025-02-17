@@ -74,11 +74,11 @@ export default function Features() {
         <SparklesCore
           id="tsparticlesfullpage"
           background="transparent"
-          minSize={0.6}
-          maxSize={1.4}
-          particleDensity={100}
+          minsize={0.6}
+          maxsize={1.4}
+          particledensity={100}
           className="w-full h-full"
-          particleColor="#FFFFFF"
+          particlecolor="#FFFFFF"
         />
       </div>
       <div className="container mx-auto px-4 relative z-10">
