@@ -21,7 +21,8 @@ import {
   Mail,
   Menu,
   Hospital,
-  HospitalIcon
+  HospitalIcon,
+  CookingPot
 } from "lucide-react"
 import {
   Collapsible,
@@ -121,20 +122,30 @@ export function NavMain({ role, school }: NavMainProps) {
     {
       title: "Canteen Management",
       url: "#",
-      icon: HandCoins,
+      icon:CookingPot,
       isActive: true,
       roleField: "canteenManagement",
       items: [
         {
-          title: "Manage Attendance",
-          url: `/${schoolId}/admin/${userId}/attendance/manage-attendance`,
+          title: "Meal Plan",
+          url: `/${schoolId}/admin/${userId}/canteen/meal-plan`,
           // roleField: "manageAttendance"
         },
-        // {
-        //   title: "Manage Absent",
-        //   url: `/${schoolId}/admin/${userId}/attendance/manage-absent`,
-        //   roleField: "manageAbsent"
-        // },
+        {
+          title: "Meal Schedule",
+          url: `/${schoolId}/admin/${userId}/canteen/meal-schedule`,
+          // roleField: "manageAttendance"
+        },
+        {
+          title: "Meal Timetable",
+          url: `/${schoolId}/admin/${userId}/canteen/meal-timetable`,
+          // roleField: "manageAttendance"
+        },
+        {
+          title: "Payment",
+          url: `/${schoolId}/admin/${userId}/canteen/payment`,
+          // roleField: "manageAttendance"
+        },
       ],
     },
     {

@@ -92,7 +92,7 @@ export const welcomeMail = (fullName: string, rawPassword: string, rawUsername: 
 </body>
 </html>`;
 
-export const welcomeEmail = (fullName: string, rawPassword: string, rawUsername: string, schoolName: string, schoolEmail: string) => `
+export const welcomeRegisterEmail = (fullName: string, rawPassword: string, rawUsername: string, schoolName: string, schoolEmail: string) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>

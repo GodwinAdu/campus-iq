@@ -2,8 +2,6 @@
 
 import { SidebarTrigger } from "../ui/sidebar";
 import { Separator } from "../ui/separator";
-import { Button } from "../ui/button";
-import { BarChart4, Package, Users } from "lucide-react";
 import FullScreenButton from "../commons/FullScreenButton";
 import { useTourControl } from "@/hooks/use-tour-control";
 import UserDropdown from "../commons/user-dropdown";
@@ -39,9 +37,9 @@ const Navbar = ({ user, sessions }: { user: IEmployee, sessions: ISession[] }) =
                 <FullScreenButton />
 
                 <UserDropdown
-                    email={user?.email}
-                    username={user?.fullName}
-                    avatarUrl={user?.imgUrl as string}
+                    email={user?.personalInfo.email}
+                    username={user?.personalInfo.fullName}
+                    avatarUrl={user?.personalInfo.imgUrl as string}
                     notificationCount={100}
                 />
             </div>

@@ -3,19 +3,15 @@
 
 import School from "../models/school.models";
 import { connectToDB } from "../mongoose";
-import { generateSchoolCode } from "../helpers/generateSchoolUniqueName";
 import { hash } from "bcryptjs";
 import { generateUniqueUsername } from "../helpers/generateUsername";
-import Role from "../models/role.models";
-import { currentProfile } from "../helpers/current-profile";
 import { revalidatePath } from "next/cache";
 import { generatePassword } from "../helpers/generatePassword";
 import { wrappedSendMail } from "../nodemailer";
-import { welcomeEmail, welcomeMail } from "../mail-massages";
+import { welcomeRegisterEmail } from "../mail-massages";
 import Employee from '../models/employee.models';
 import Department from "../models/department.models";
 import { generateUniqueStaffId } from "../helpers/generateStaffId";
-import EmailCoin from "../models/email-coins.models";
 import { currentUser } from "../helpers/current-user";
 
 export const getEmployeeById = async (id: string) => {
@@ -36,360 +32,84 @@ export const getEmployeeById = async (id: string) => {
 }
 
 
-interface AdminProps {
-    fullName: string;
-    email: string;
-    dob: Date;
-    gender: string;
-    phone: string;
-}
 
-export async function SignupAdministrator(formData: AdminProps, path: string) {
-    const {
-        fullName,
-        email,
-        dob,
-        gender,
-        phone,
-    } = formData;
-
+export async function createEmployee(values: employeeSchema, path: string) {
     try {
+        // Extract necessary data
+        const { personalInfo, role, identification, employment, professionalDetails, medicalHistory } = values;
+        const { fullName, email } = personalInfo;
+
+        // Start parallel execution for user, school, and email check
         await connectToDB();
-
-        const rawUsername = generateUniqueUsername(fullName);
-        const rawPassword = generatePassword();
-        const hashedPassword = await hash(rawPassword, 10);
-
-        const existingAdmin = await Employee.findOne({ email })
-
-
-        if (existingAdmin) {
-            throw new Error("Admin already exists");
-        }
-
-
-        const newAdmin = new Employee({
-            userName: rawUsername,
-            staffId: generateUniqueStaffId(),
-            fullName,
-            email,
-            password: hashedPassword,
-            dob,
-            gender,
-            phone,
-            role: "admin",
-            action_type: "create"
-        });
-
-        const coin = new EmailCoin({
-            coins: 500,
-            createdBy: newAdmin._id,
-            action_type: "create"
-        });
-
-        const newDepartment = new Department({
-            name: "Administration Department",
-            employees: [newAdmin._id],
-            createdBy: newAdmin._id,
-            action_type: "create"
-        });
-
-        const newRole = new Role({
-            name: "Administrator",
-            displayName: "admin",
-            description: `The administrator`,
-            dashboard: true,
-            schoolInfo: true,
-            systemConfig: true,
-            classManagement: true,
-            studentManagement: true,
-            employeeManagement: true,
-            manageAttendance: true,
-            homeWork: true,
-            manageTimeTable: true,
-            onlineLearning: true,
-            examsManagement: true,
-            account: true,
-            inventory: true,
-            hostelManagement: true,
-            library: true,
-            depositAndExpense: true,
-            smsAndEmail: true,
-            report: true,
-            viewChart: true,
-            viewMemberTab: true,
-            viewEnquiries: true,
-            viewExpenses: true,
-            addRole: true,
-            manageRole: true,
-            viewRole: true,
-            editRole: true,
-            deleteRole: true,
-            addSubject: true,
-            manageSubject: true,
-            viewSubject: true,
-            editSubject: true,
-            deleteSubject: true,
-            addTerm: true,
-            manageTerm: true,
-            viewTerm: true,
-            editTerm: true,
-            deleteTerm: true,
-            addSession: true,
-            manageSession: true,
-            viewSession: true,
-            editSession: true,
-            deleteSession: true,
-            addClass: true,
-            manageClass: true,
-            viewClass: true,
-            editClass: true,
-            deleteClass: true,
-            addTime: true,
-            manageTime: true,
-            viewTime: true,
-            editTime: true,
-            deleteTime: true,
-            addClassAllocation: true,
-            manageClassAllocation: true,
-            viewClassAllocation: true,
-            editClassAllocation: true,
-            deleteClassAllocation: true,
-            addGradingSystem: true,
-            manageGradingSystem: true,
-            viewGradingSystem: true,
-            editGradingSystem: true,
-            deleteGradingSystem: true,
-            addGpa: true,
-            manageGpa: true,
-            viewGpa: true,
-            editGpa: true,
-            deleteGpa: true,
-            publishResult: true,
-            addStudent: true,
-            manageStudent: true,
-            viewStudent: true,
-            editStudent: true,
-            deleteStudent: true,
-            addParent: true,
-            manageParent: true,
-            viewParent: true,
-            editParent: true,
-            deleteParent: true,
-            addDepartment: true,
-            manageDepartment: true,
-            viewDepartment: true,
-            editDepartment: true,
-            deleteDepartment: true,
-            manageEmployeeList: true,
-            addEmployee: true,
-            manageEmployee: true,
-            viewEmployee: true,
-            editEmployee: true,
-            deleteEmployee: true,
-            addBook: true,
-            manageBook: true,
-            viewBook: true,
-            editBook: true,
-            deleteBook: true,
-            addTeacherAttendance: true,
-            manageTeacherAttendance: true,
-            viewTeacherAttendance: true,
-            editTeacherAttendance: true,
-            deleteTeacherAttendance: true,
-            addStudentAttendance: true,
-            manageStudentAttendance: true,
-            viewStudentAttendance: true,
-            editStudentAttendance: true,
-            deleteStudentAttendance: true,
-            addHomework: true,
-            manageHomework: true,
-            viewHomework: true,
-            editHomework: true,
-            deleteHomework: true,
-            addEvaluationReport: true,
-            manageEvaluationReport: true,
-            viewEvaluationReport: true,
-            editEvaluationReport: true,
-            deleteEvaluationReport: true,
-            addTimetable: true,
-            manageTimetable: true,
-            viewTimetable: true,
-            editTimetable: true,
-            deleteTimetable: true,
-            createdBy: newAdmin?._id,
-            action_type: "create"
-        });
-
-        await Promise.all([
-            newAdmin.save(),
-            coin.save(),
-            newDepartment.save(),
-            newRole.save(),
+        const [user, existingEmployeeWithEmail] = await Promise.all([
+            currentUser(),
+            Employee.findOne({ email })
         ]);
 
-        newAdmin.departmentId = newDepartment._id;
-        await newAdmin.save();
+        if (!user) throw new Error("User not logged in");
+        if (existingEmployeeWithEmail) throw new Error("Employee already exists");
 
-        const mailOptions = {
-            to: email,
-            subject: 'EduXcel Registration',
-            html: welcomeMail(fullName, rawPassword, rawUsername),
-        };
-
-        if (coin) {
-            if (coin) {
-                coin.coins -= 1;
-            }
-        }
-        await wrappedSendMail(mailOptions);
-        await coin.save();
-
-        revalidatePath(path);
-
-        return JSON.parse(JSON.stringify(newAdmin))
-    } catch (error) {
-        console.error("Error creating new admin:", error);
-        throw error;
-    }
-}
-
-
-
-/**
- * Represents the properties for creating a new admin user.
- */
-interface CreateEmployeeProps {
-
-    fullName: string;
-    dob?: Date;
-    email: string;
-    gender: string;
-    phone: string;
-    religion?: string;
-    permanentAddress?: string;
-    presentAddress?: string;
-    role: string;
-    department?: string;
-    joinedDate?: Date;
-    qualification?: string;
-    experience?: string;
-    totalExperience?: string;
-    idCardType?: string;
-    idCard?: string;
-    accountType?: string;
-    accountName?: string;
-    accountNumber?: string;
-}
-
-
-export async function createEmployee(formData: CreateEmployeeProps, path: string) {
-    try {
-
-        const {
-            fullName,
-            dob,
-            email,
-            gender,
-            phone,
-            religion,
-            permanentAddress,
-            presentAddress,
-            role,
-            department,
-            joinedDate,
-            qualification,
-            experience,
-            totalExperience,
-            idCardType,
-            idCard,
-            accountType,
-            accountName,
-            accountNumber,
-        } = formData;
-
-        await connectToDB();
-        const user = await currentUser();
-        if (!user) throw new Error('User not logged in');
         const schoolId = user.schoolId;
 
-        const coin = await EmailCoin.findOne({ schoolId: schoolId });
+        // Fetch current school data
+        const currentSchool = await School.findById(schoolId, "schoolName schoolEmail");
+        if (!currentSchool) throw new Error("School not found");
 
-        const currentSchool = await School.findById(schoolId);
-        const schoolName = currentSchool?.schoolName;
-        const schoolEmail = currentSchool?.schoolEmail;
-        // const schoolId = currentSchool?.uniqueName;
+        const { schoolName, schoolEmail } = currentSchool;
 
-        const rawPassword = generatePassword();
+        // Generate credentials
+        const [rawPassword, hashedPassword, rawUsername, rawStaffId] = await Promise.all([
+            generatePassword(),
+            hash(generatePassword(), 10),
+            generateUniqueUsername(fullName),
+            generateUniqueStaffId()
+        ]);
+
         console.log("Generated Password:", rawPassword);
-
-        const hashedPassword = await hash(rawPassword, 10);
         console.log("Hashed Password:", hashedPassword);
 
-        const rawUsername = generateUniqueUsername(fullName);
-
-        // const mailOptions = {
-        //     to: email,
-        //     subject: 'Register As Employee',
-        //     html: welcomeEmail(schoolName, schoolEmail, schoolId, fullName, rawPassword, rawUsername)
-        // }
-
-
-
-
-        const existingEmployeeWithEmail = await Employee.findOne({ email });
-        if (existingEmployeeWithEmail) {
-            throw new Error("Employee already exists")
-        }
-
-        const assignDepartment = await Department.findById(department);
-
-        if (!assignDepartment) throw new Error("Department not found");
-
-        const newEmployee = new Employee({
-            schoolId,
-            userName: rawUsername,
-            staffId: generateUniqueStaffId(),
-            fullName,
-            dob,
-            email,
-            gender,
-            phone,
-            religion,
-            permanentAddress,
-            presentAddress,
-            role,
-            joinedDate,
-            qualification,
-            experience,
-            totalExperience,
-            idCardType,
-            idCard,
-            accountType,
-            accountName,
-            accountNumber,
-            departmentId: department,
-            password: hashedPassword,
+        // Send welcome email
+        await wrappedSendMail({
+            to: email,
+            subject: "Registration Successful",
+            html: welcomeRegisterEmail(fullName, rawPassword, rawUsername, schoolName, schoolEmail),
         });
 
-        const userData = await newEmployee.save();
-        if (!assignDepartment.employees) {
-            assignDepartment.employees = [];
-        }
-        assignDepartment.employees.push(userData._id);
-        await assignDepartment.save();
+        // Fetch department details
+        const assignDepartment = await Department.findById(employment.departmentId);
+        if (!assignDepartment) throw new Error("Department not found");
 
-        coin.coins -= 1;
-        // await wrappedSendMail(mailOptions);
-        await coin.save();
+        // Create Employee
+        const newEmployee = new Employee({
+            schoolId,
+            personalInfo: { ...personalInfo, password: hashedPassword, username: rawUsername },
+            role,
+            employment: { ...employment, employeeID: rawStaffId },
+            identification,
+            professionalDetails,
+            medicalHistory,
+            createdBy: user._id,
+            action_type: "create",
+        });
 
+        // Save employee and update department in parallel
+        await Promise.all([
+            newEmployee.save(),
+            Department.updateOne(
+                { _id: employment.departmentId },
+                { $push: { employees: newEmployee._id } }
+            )
+        ]);
+
+        // Revalidate path
         revalidatePath(path);
-        return
+
     } catch (error) {
-        console.log("something went wrong while creating new Employee", error);
-        throw error;
+        console.error("Error creating employee:", error);
+        throw new Error("Failed to create employee. Please try again.");
     }
 }
+
 
 
 export async function getAllEmployees() {
@@ -461,16 +181,31 @@ export async function fetchEmployeeByRole(role: string) {
 
 
 
-export async function updateEmployee(adminId: string, values: Partial<CreateEmployeeProps>, path?: string) {
+export async function updateEmployee(adminId: string, values: Partial<any>, path?: string) {
     try {
+        console.log(values);
         const user = await currentUser();
-        if (!user) throw new Error('user not logged in');
+        if (!user) throw new Error('User not logged in');
         await connectToDB();
 
-        const updatedAdmin = await Employee.findByIdAndUpdate(
-            adminId,
-            { $set: values },
-            { new: true, runValidators: true, upsert: true, setDefaultsOnInsert: true }
+        // Fetch existing employee first to ensure required fields are not missing
+        const existingEmployee = await Employee.findById(adminId);
+        if (!existingEmployee) throw new Error("Employee not found");
+
+        // Merge existing fields to avoid validation errors on required fields
+        const updatedValues = {
+            ...existingEmployee.toObject(), // Preserve existing data
+            ...values, // Apply updates
+            mod_flag: true,
+            modifiedBy: user._id,
+            action_type: "update"
+        };
+
+        // Perform update
+        const updatedAdmin = await Employee.findOneAndUpdate(
+            { _id: adminId },
+            { $set: updatedValues },
+            { new: true, runValidators: true, setDefaultsOnInsert: true } // Ensure validation
         );
 
         if (!updatedAdmin) {
@@ -480,13 +215,13 @@ export async function updateEmployee(adminId: string, values: Partial<CreateEmpl
 
         console.log("Update successful");
         if (path) {
-            revalidatePath(path as string)
+            revalidatePath(path);
         }
 
         return JSON.parse(JSON.stringify(updatedAdmin));
     } catch (error) {
         console.error("Error updating admin:", error);
-        throw error;
+        throw new Error("Failed to update employee. Please check your data.");
     }
 }
 
@@ -559,7 +294,7 @@ export async function fetchEmployeesList(departmentId: string) {
 
         await connectToDB();
 
-        const employees = await Employee.find({ schoolId, departmentId });
+        const employees = await Employee.find({ schoolId,"employment.departmentId": departmentId });
         if (employees.length === 0) {
             return [];
         }

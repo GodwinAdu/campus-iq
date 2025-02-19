@@ -26,6 +26,7 @@ interface Subscription {
 
 interface ISchool extends Document {
     _id?: Types.ObjectId;
+    owner:Types.ObjectId;
     schoolCode: string; // Unique identifier for each school
     schoolLogo?: string; // URL for the school's logo
     establishedYear?: number; // Year the school was established
@@ -52,42 +53,85 @@ interface ISchool extends Document {
 
 // employes types checks
 interface IEmployee extends Document {
-    _id?: Types.ObjectId;
-    schoolId: Types.ObjectId; // Reference to the school
-    username: string; // Unique username for the employee
-    fullName: string; // Full name of the employee
-    staffId: string; // Unique staff ID
-    imgUrl?: string; // Profile image URL
-    name: string;
-    dob?: Date; // Date of birth
-    email: string; // Unique email
-    gender: string;
-    phone: string;
-    password: string; // Encrypted password
-    religion?: string;
-    permanentAddress?: string;
-    presentAddress?: string;
-    role: string; // Employee's role in the school
-    joinedDate?: Date;
-    qualification?: string;
-    experience?: string;
-    totalExperience?: string;
-    idCardType?: string;
-    idCard?: string;
-    accountType?: string;
-    accountName?: string;
-    accountNumber?: string;
-    salaryId?: Types.ObjectId | null; // Reference to Salary Structure
-    departmentId?: Types.ObjectId | null; // Reference to Department
-    createdBy?: Types.ObjectId | null; // Reference to the employee who created this record
+    _id?:string;
+    schoolId: Schema.Types.ObjectId;
+    personalInfo: {
+        username: string;
+        fullName: string;
+        imgUrl?: string;
+        dob?: Date;
+        email: string;
+        gender?: string;
+        phone?: string;
+        password: string;
+        religion?: string;
+        maritalStatus?: string;
+        addresses?: Address;
+        emergencyContact?: EmergencyContact; // Can be an object structure
+        currentAddress?: string;
+        permanentAddress?: string;
+    };
+    role: string;
+    identification?: {
+        idCardType?: string;
+        idCard?: string;
+        socialSecurityNumber?: string;
+        taxIdentificationNumber?: string;
+        workPermit?: string;
+        bankDetails?: {
+            accountName: string;
+            accountNumber: string;
+            bankName: string;
+        };
+    };
+    employment: {
+        employeeID: string;
+        dateOfJoining: Date;
+        jobTitle: string;
+        departmentId: Schema.Types.ObjectId;
+        classIds: Schema.Types.ObjectId[];
+        workSchedule: "Full-time" | "Part-time";
+    };
+    professionalDetails?: {
+        highestDegree: {
+            degree: string;
+            institution: string;
+            year: number;
+        };
+        certifications?: string[];
+        specialization: string[];
+        experienceYears: number;
+        previousEmployment?: {
+            school?: string;
+            position?: string;
+            duration?: string;
+        }[];
+        references?: {
+            name?: string;
+            contact?: string;
+            relationship?: string;
+        }[];
+        backgroundCheck?: {
+            criminalRecord?: boolean;
+            details?: string;
+        };
+        additionalInfo?: {
+            extracurricularActivities?: string[];
+            specialSkills?: string[];
+            notes?: string;
+        };
+    };
+    medicalHistory?: MedicalHistory;
+    salaryId?: Schema.Types.ObjectId;
+    createdBy?: Schema.Types.ObjectId;
     mod_flag?: boolean;
     del_flag?: boolean;
-    modifiedBy?: Types.ObjectId | null; // Reference to the employee who modified this record
-    deletedBy?: Types.ObjectId | null; // Reference to the employee who deleted this record
-    action_type?: "create" | "update" | "delete";
-    createdAt?: Date;
-    updatedAt?: Date;
+    modifiedBy?: Schema.Types.ObjectId;
+    deletedBy?: Schema.Types.ObjectId;
+    action_type?: string;
 }
+
+
 
 // students type check
 interface IStudent extends Document {
@@ -210,28 +254,46 @@ interface IOTP {
     // ... other fields
 }
 
-
-interface IParent extends Document {
-    _id?: string;
-    schoolId: Schema.Types.ObjectId;
-    username: string;
-    fullName: string;
-    email: string;
-    phone: string;
-    relationship: string;
-    occupation: string;
-    address: string;
-    password: string;
-    role: string;
-    children: Schema.Types.ObjectId[];
-    createdBy?: Schema.Types.ObjectId | null;
-    mod_flag?: boolean;
-    del_flag?: boolean;
-    modifiedBy?: Schema.Types.ObjectId | null;
-    deletedBy?: Schema.Types.ObjectId | null;
-    action_type?: "create" | "update" | "delete";
+interface IIdentification {
+    idCardType?: string;
+    idCard?: string;
+    socialSecurityNumber?: string;
+    taxIdentificationNumber?: string;
 }
 
+interface IPersonalInfo {
+    username: string;
+    fullName: string;
+    imgUrl?: string;
+    dob?: Date;
+    email: string;
+    gender?: "Male" | "Female" | "Other";
+    phone?: string;
+    password: string;
+    religion?: string;
+    maritalStatus?: "Single" | "Married" | "Divorced" | "Widowed";
+    addresses?: Address;
+    emergencyContact?: EmergencyContact;
+    currentAddress?: string;
+    permanentAddress?: string;
+}
+
+interface IParent extends Document {
+    schoolId: Types.ObjectId;
+    personalInfo: IPersonalInfo;
+    children: Types.ObjectId[]; // References to Student IDs
+    occupation?: string;
+    workplace?: string;
+    identification?: IIdentification;
+    createdBy?: Types.ObjectId;
+    mod_flag?: boolean;
+    del_flag?: boolean;
+    modifiedBy?: Types.ObjectId;
+    deletedBy?: Types.ObjectId;
+    action_type?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}
 interface ITeacher extends Document {
     _id: string;
     username: string;

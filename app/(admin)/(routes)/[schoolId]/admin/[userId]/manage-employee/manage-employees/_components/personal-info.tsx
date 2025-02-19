@@ -20,7 +20,7 @@ const PersonalInfoStep = () => {
     const { control } = useFormContext()
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "emergencyContacts",
+        name: "personalInfo.emergencyContacts",
     })
 
 
@@ -29,7 +29,7 @@ const PersonalInfoStep = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                     control={control}
-                    name="fullName"
+                    name="personalInfo.fullName"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Full Name</FormLabel>
@@ -42,7 +42,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="email"
+                    name="personalInfo.email"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Email Address</FormLabel>
@@ -55,7 +55,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="phone"
+                    name="personalInfo.phone"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Phone Number</FormLabel>
@@ -68,7 +68,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="gender"
+                    name="personalInfo.gender"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Gender</FormLabel>
@@ -79,9 +79,9 @@ const PersonalInfoStep = () => {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    <SelectItem value="not defined">Not defined</SelectItem>
-                                    <SelectItem value="female">Female</SelectItem>
-                                    <SelectItem value="male">Male</SelectItem>
+                                    <SelectItem value="Male">Male</SelectItem>
+                                    <SelectItem value="Female">Female</SelectItem>
+                                    <SelectItem value="Other">Other</SelectItem>
                                 </SelectContent>
                             </Select>
                             <FormMessage />
@@ -90,7 +90,29 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="addresses.state"
+                    name="personalInfo.maritalStatus"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Marital Status</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select marital status" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {["Single", "Married", "Divorced", "Widowed"].map((value: string) => (
+                                        <SelectItem key={value} value={value}>{value}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="personalInfo.addresses.state"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>State</FormLabel>
@@ -103,7 +125,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="addresses.city"
+                    name="personalInfo.addresses.city"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>City</FormLabel>
@@ -116,7 +138,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="addresses.street"
+                    name="personalInfo.addresses.street"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Street</FormLabel>
@@ -129,7 +151,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="addresses.country"
+                    name="personalInfo.addresses.country"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Country</FormLabel>
@@ -142,7 +164,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="addresses.zipCode"
+                    name="personalInfo.addresses.zipCode"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Zip Code</FormLabel>
@@ -155,46 +177,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="currentAddress"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Current Address</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter current address" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={control}
-                    name="religion"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Religion (Optional)</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter current address" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={control}
-                    name="permanentAddress"
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Permanent Address</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Enter permanent address (Optional)" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={control}
-                    name="dob"
+                    name="personalInfo.dob"
                     render={({ field }) => (
                         <FormItem className="flex flex-col">
                             <FormLabel>Date of birth</FormLabel>
@@ -250,6 +233,46 @@ const PersonalInfoStep = () => {
                         </FormItem>
                     )}
                 />
+                <FormField
+                    control={control}
+                    name="personalInfo.currentAddress"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Current Address</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter current address" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="personalInfo.religion"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Religion (Optional)</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter religion" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={control}
+                    name="personalInfo.permanentAddress"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Permanent Address</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Enter permanent address (Optional)" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
             </div>
             <Card>
                 <CardHeader>
@@ -261,7 +284,7 @@ const PersonalInfoStep = () => {
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg shadow-sm">
                             <FormField
                                 control={control}
-                                name={`emergencyContacts.${index}.name`}
+                                name={`personalInfo.emergencyContacts.${index}.name`}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-sm font-medium">Name</FormLabel>
@@ -275,7 +298,7 @@ const PersonalInfoStep = () => {
 
                             <FormField
                                 control={control}
-                                name={`emergencyContacts.${index}.relationship`}
+                                name={`personalInfo.emergencyContacts.${index}.relationship`}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-sm font-medium">Relationship</FormLabel>
@@ -289,7 +312,7 @@ const PersonalInfoStep = () => {
                             <div className="flex items-center gap-3 w-full">
                                 <FormField
                                     control={control}
-                                    name={`emergencyContacts.${index}.phone`}
+                                    name={`personalInfo.emergencyContacts.${index}.phone`}
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-sm font-medium">Phone Number</FormLabel>
@@ -301,13 +324,13 @@ const PersonalInfoStep = () => {
                                     )}
                                 />
 
-                                <Button type="button" variant="outline" size="icon" className="mt-2" onClick={() => remove(index)}>
+                                <Button type="button" variant="destructive" size="icon" className="mt-2" onClick={() => remove(index)}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
                             </div>
                         </div>
                     ))}
-                    <Button type="button" variant="outline" onClick={() => append({ name: "", relationship: "", phone: "" })}>
+                    <Button type="button" onClick={() => append({ name: "", relationship: "", phone: "" })}>
                         Add Emergency Contact
                     </Button>
                 </CardContent>

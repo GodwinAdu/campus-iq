@@ -23,6 +23,7 @@ import {
 import { useRouter } from "next/navigation";
 import { toast } from '@/hooks/use-toast';
 import { loginUser } from "@/lib/actions/login.action";
+import { loginEmployee } from "@/lib/actions/employee-login.actions";
 
 // Define a schema that allows either a username or an email
 const formSchema = z.object({
@@ -52,7 +53,7 @@ const LoginForm = () => {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            const user = await loginUser(values);
+            const user = await loginEmployee(values);
 
             if (!user) {
                 throw new Error("Invalid credentials");

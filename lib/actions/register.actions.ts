@@ -210,13 +210,19 @@ export const registerUser = async (values: RegisterProps) => {
         });
 
         const user = new Employee({
-            fullName,
-            email,
-            password: hPassword,
+            personalInfo: {
+                fullName,
+                email,
+                password: hPassword,
+                username: rawUsername,
+            },
             schoolId: newSchool._id,
             role: 'admin',
-            username: rawUsername,
-            staffId: rawStaffId,
+            employment: {
+                employeeID: rawStaffId,
+                dateOfJoining: new Date(Date.now()),
+            },
+            action_type: 'create'
         });
 
         const newRole = new Role({
@@ -237,12 +243,15 @@ export const registerUser = async (values: RegisterProps) => {
             employees: [user._id],
             createdBy: user._id,
             action_type: "create"
-        })
+        });
 
-        user.departmentId = newDepartment._id;
+        newSchool.owner = user._id
+        user.employment.departmentId = newDepartment._id;
+
         await Promise.all([
             newDepartment.save(),
             user.save(),
+            newSchool.save(),
         ]);
 
         const mailOptions = {
@@ -254,7 +263,6 @@ export const registerUser = async (values: RegisterProps) => {
         await wrappedSendMail(mailOptions);
 
         return JSON.parse(JSON.stringify(user))
-
 
     } catch (error) {
         console.log('Error registering user', error);

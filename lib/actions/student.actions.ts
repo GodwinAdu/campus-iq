@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { generateStudentID } from "../helpers/generateStudentId";
 import { generateUniqueUsername } from "../helpers/generateUsername";
 import { generatePassword } from "../helpers/generatePassword";
-import { welcomeCombinedEmail, welcomeEmail } from "../mail-massages";
+import { welcomeCombinedEmail, welcomeRegisterEmail } from "../mail-massages";
 import Class from "../models/class.models";
 import { wrappedSendMail } from "../nodemailer";
 import Parent from "../models/parent.models";
@@ -181,7 +181,7 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
             emailPromises.push(wrappedSendMail({
                 to: email,
                 subject: 'New Student Registration',
-                html: welcomeEmail(fullName, rawPassword, rawUsername, schoolName, schoolEmail)
+                html: welcomeRegisterEmail(fullName, rawPassword, rawUsername, schoolName, schoolEmail)
             }));
         } else {
             if (formData.email === formData.guardianEmail) {
@@ -194,12 +194,12 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
                 emailPromises.push(wrappedSendMail({
                     to: formData.email,
                     subject: 'New Student Registration',
-                    html: welcomeEmail(formData.fullName, rawPassword, rawUsername, schoolName, schoolEmail)
+                    html: welcomeRegisterEmail(formData.fullName, rawPassword, rawUsername, schoolName, schoolEmail)
                 }));
                 emailPromises.push(wrappedSendMail({
                     to: formData.guardianEmail,
                     subject: 'New Parent Registration',
-                    html: welcomeEmail(formData.guardianName!, parentPassword, parentUsername, schoolName, schoolEmail)
+                    html: welcomeRegisterEmail(formData.guardianName!, parentPassword, parentUsername, schoolName, schoolEmail)
                 }));
             }
         }
