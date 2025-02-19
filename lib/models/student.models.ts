@@ -128,6 +128,24 @@ const StudentSchema: Schema<IStudent> = new Schema({
             type: String,
         }
     },
+    account:{
+        balance:{
+            type: Number,
+            default: 0,
+        },
+        payClasses:{
+            type:Boolean,
+            default: false,
+        },
+        payCanteen:{
+            type: Boolean,
+            default: false,
+        },
+        payTransportation:{
+            type: Boolean,
+            default: false,
+        },
+    },
     studentStatus: {
         type: String,
         default: "Active",

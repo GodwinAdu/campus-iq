@@ -1,5 +1,4 @@
 import { Separator } from "@/components/ui/separator";
-import { getAllTerms } from "@/lib/actions/term.actions";
 import { redirect } from "next/navigation";
 import Heading from "@/components/commons/Header";
 import { currentUser } from "@/lib/helpers/current-user";
@@ -7,6 +6,19 @@ import { currentUserRole } from "@/lib/helpers/get-user-role";
 import { PlanModal } from "./_components/PlanModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
+import { fetchAllPlans } from "@/lib/actions/meal-plan.actions";
+
+interface MealPlan {
+    _id: string;
+    name: string;
+    description: string;
+    price: number;
+}
+
+const colors = [
+    "bg-red-100", "bg-blue-100", "bg-green-100", "bg-yellow-100", 
+    "bg-purple-100", "bg-pink-100", "bg-orange-100", "bg-teal-100"
+];
 
 
 const page = async () => {
@@ -20,7 +32,7 @@ const page = async () => {
     const role = await currentUserRole();
 
     // Fetch all terms, defaulting to an empty array if none are found
-    const data = [];
+    const data = await fetchAllPlans() ?? [];
 
     return (
         <>
@@ -42,14 +54,14 @@ const page = async () => {
                     </div>
                 ) : (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {data?.map((plan) => (
-                            <Card key={plan._id}>
+                        {data?.map((plan: MealPlan,index:number) => (
+                            <Card key={plan._id} className={`shadow-lg ${colors[index % colors.length]}`}>
                                 <CardHeader>
                                     <CardTitle>{plan.name}</CardTitle>
                                 </CardHeader>
                                 <CardContent>
                                     <p>{plan.description}</p>
-                                    <p className="font-bold mt-2">Price: ${plan.price.toFixed(2)}</p>
+                                    <p className="font-bold mt-2">Price: GHS{plan.price.toFixed(2)}</p>
                                 </CardContent>
                             </Card>
                         ))}

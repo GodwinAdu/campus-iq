@@ -16,7 +16,6 @@ import {
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -24,18 +23,17 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { PlusCircle } from "lucide-react";
-import { createTerm } from "@/lib/actions/term.actions";
+import { Loader2, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { createMealPlan } from "@/lib/actions/meal-plan.actions";
 
 const formSchema = z.object({
     name: z.string().min(2, {
         message: "name must be at least 2 characters.",
     }),
-    description:z.string().min(5, {
+    description: z.string().min(5, {
         message: "description must be at least 5 characters.",
     }),
     price: z.coerce.number()
@@ -48,7 +46,8 @@ export function PlanModal() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: "",
-
+            description: "",
+            price: 0
         },
     });
 
@@ -57,15 +56,12 @@ export function PlanModal() {
     // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            await createTerm({
-                name: values.name,
-                present: values.present
-            })
+            await createMealPlan(values)
             router.refresh();
             form.reset();
             toast({
-                title: "New term created",
-                description: "New term was added successfully...",
+                title: "New Meal plan created",
+                description: "New plan was added successfully...",
             });
         } catch (error) {
             console.log("error happened while creating term", error)
@@ -104,7 +100,6 @@ export function PlanModal() {
                                         <FormControl>
                                             <Input disabled={isSubmitting} placeholder="Eg. standard plan" {...field} />
                                         </FormControl>
-                                       
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -127,7 +122,7 @@ export function PlanModal() {
                                 name="price"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Price</FormLabel>
+                                        <FormLabel>Price (GHS)</FormLabel>
                                         <FormControl>
                                             <Input disabled={isSubmitting} placeholder="Eg. Gh5" {...field} />
                                         </FormControl>
@@ -135,8 +130,8 @@ export function PlanModal() {
                                     </FormItem>
                                 )}
                             />
-                           
                             <Button disabled={isSubmitting} type="submit">
+                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                                 {isSubmitting ? "Creating..." : "Create"}
                             </Button>
                         </form>

@@ -27,9 +27,9 @@ const MealTimetableSchema = new Schema({
         ref: "MealTimetable",
         required: true,
     },
-    calories: [{
+    nutritionInfo: [{
         name: String,
-        value: Number,
+        quantity: String,
     }],
     feedbacks: [{
         userId: { type: Schema.Types.ObjectId, },
@@ -37,7 +37,7 @@ const MealTimetableSchema = new Schema({
             type: String,
             enum: ["Student", "Parent", "Employee"],
         },
-        comment: { type: String, required: true },
+        comment: { type: String },
         rating: { type: Number, min: 1, max: 5 }, // Optional rating (1-5)
         createdAt: { type: Date, default: Date.now },
         default:[], //

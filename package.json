@@ -40,6 +40,7 @@
     "framer-motion": "^12.4.2",
     "geoip-lite": "^1.4.10",
     "html-to-image": "^1.11.11",
+    "jose": "^5.10.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",

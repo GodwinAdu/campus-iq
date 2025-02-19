@@ -159,6 +159,12 @@ interface IStudent extends Document {
     previousSchool?: string;
     section?: string;
     medicalHistory?: MedicalHistory;
+    account:{
+        balance:number;
+        payClasses:boolean;
+        payCanteen:boolean;
+        payTransportation:boolean;
+    },
     studentStatus: string;
     createdBy?: Types.ObjectId;
     mod_flag?: boolean;

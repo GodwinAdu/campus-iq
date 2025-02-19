@@ -7,15 +7,8 @@ const MealPaymentSchema = new Schema({
         required: true
     },
     payerId: {
-        userId: {
-            type: Schema.Types.ObjectId,
-            ref: "Student",
-            required: true,
-        },
-    },
-    mealScheduleId: {
         type: Schema.Types.ObjectId,
-        ref: "MealSchedule",
+        ref: "Student",
         required: true,
     },
     amount: { type: Number, required: true }, // Total amount paid

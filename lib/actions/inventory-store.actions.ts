@@ -14,7 +14,7 @@ export async function createStore(values: StoreProps) {
     try {
         const { name, address, contactNumber } = values;
 
-        const user = await currentUser();
+        const user: { schoolId: string; _id: string } | null = await currentUser();
         if (!user) throw new Error("User not logged in");
         const schoolId = user.schoolId;
 
