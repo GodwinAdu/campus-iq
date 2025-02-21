@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import {UAParser} from "ua-parser-js";
+import { UAParser } from "ua-parser-js";
 import { Reader } from "@maxmind/geoip2-node";
 import fs from "fs";
 import path from "path";
@@ -9,7 +9,7 @@ import UserLogin from "../models/login-history.models";
 const dbPath = path.join(process.cwd(), "GeoLite2-City.mmdb"); // Ensure this file is downloaded
 const geoReader = fs.existsSync(dbPath) ? Reader.open(dbPath) : null;
 
-export async function trackUserLogin(userId: string, userType: "Student" | "Parent" | "Employee",schoolId) {
+export async function trackUserLogin(userId: string, userType: "Student" | "Parent" | "Employee", schoolId: string) {
     try {
         // Get headers in Next.js App Router
         const header = await headers();

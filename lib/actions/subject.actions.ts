@@ -118,13 +118,13 @@ export async function fetchSubjectById(id: string) {
     }
 }
 
-export async function fetchSubjectByClassId(id: string) {
+export async function fetchSubjectByClassId(classId: string) {
     try {
         const user = await currentUser();
         if (!user) throw new Error('user not logged in');
         const schoolId = user.schoolId;
         await connectToDB();
-        const subject = await Subject.find({schoolId, classId: id });
+        const subject = await Subject.find({schoolId, classId});
         if (!subject) throw new Error("subject not found");
 
         return JSON.parse(JSON.stringify(subject));

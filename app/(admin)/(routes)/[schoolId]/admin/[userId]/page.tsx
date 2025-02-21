@@ -14,10 +14,20 @@ import TopSellingProducts from '@/components/commons/dashboard/top-selling-produ
 import DailySalesTrend from '@/components/commons/dashboard/daily-sales-trend';
 import EmployeePerformance from '@/components/commons/dashboard/employee-performance';
 import { Calendar, House, UserCheck, Users } from 'lucide-react';
+import { totalStudents } from '@/lib/actions/student.actions';
+import { countEmployeesExcludingTeachers, totalTeachers } from '@/lib/actions/employee.actions';
+import { totalClass } from '@/lib/actions/class.actions';
+import { fetchMonthlyRevenues } from '@/lib/actions/revenue-summary.actions';
 
 
 const page = async () => {
-  const user = await currentUser()
+  const user = await currentUser();
+  const teachers = await totalTeachers() ?? 0 ;
+  const students = await totalStudents()?? 0 ;
+  const employees = await countEmployeesExcludingTeachers() ?? 0
+  const classes = await totalClass() ?? 0
+
+  const monthlyRevenues = await fetchMonthlyRevenues()
 
   return (
     <>
@@ -37,7 +47,7 @@ const page = async () => {
           </CardHeader>
           <CardContent className="flex justify-between items-center">
             <Users className="w-10 h-10 text-blue-500" />
-            <span className="text-2xl font-bold">0</span>
+            <span className="text-2xl font-bold">{employees}</span>
           </CardContent>
         </Card>
 
@@ -49,7 +59,7 @@ const page = async () => {
           </CardHeader>
           <CardContent className="flex justify-between items-center">
             <UserCheck className="w-10 h-10 text-purple-500" />
-            <span className="text-2xl font-bold">0</span>
+            <span className="text-2xl font-bold">{teachers}</span>
           </CardContent>
         </Card>
         <Card className="shadow-lg">
@@ -57,8 +67,8 @@ const page = async () => {
             <CardTitle>Students</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between items-center">
-            <Users className="w-10 h-10 text-blue-500" />
-            <span className="text-2xl font-bold">0</span>
+            <Users className="w-10 h-10 text-green-500" />
+            <span className="text-2xl font-bold">{students}</span>
           </CardContent>
         </Card>
 
@@ -68,7 +78,7 @@ const page = async () => {
           </CardHeader>
           <CardContent className="flex justify-between items-center">
             <House className="w-10 h-10 text-red-500" />
-            <span className="text-2xl font-bold">0</span>
+            <span className="text-2xl font-bold">{classes}</span>
           </CardContent>
         </Card>
 
@@ -109,7 +119,7 @@ const page = async () => {
       <Separator />
       <div className="space-y-4">
         <MetricsGrid />
-        <MonthlySales />
+        <MonthlySales monthlyRevenues={monthlyRevenues}  />
         {/* <RealTimeUpdates /> */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <TodayTransactions />

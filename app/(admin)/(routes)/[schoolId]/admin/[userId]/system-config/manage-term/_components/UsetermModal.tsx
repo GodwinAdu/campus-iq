@@ -34,7 +34,7 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "name must be at least 2 characters.",
   }),
-  present: z.boolean().optional(),
+  isCurrent: z.boolean().optional(),
 });
 
 export function ModalTerm() {
@@ -44,7 +44,7 @@ export function ModalTerm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      present: false
+      isCurrent: false
     },
   });
 
@@ -55,7 +55,7 @@ export function ModalTerm() {
     try {
       await createTerm({
         name: values.name,
-        present: values.present
+        isCurrent: values.isCurrent
       })
       router.refresh();
       form.reset();
@@ -109,7 +109,7 @@ export function ModalTerm() {
               />
               <FormField
                 control={form.control}
-                name="present"
+                name="isCurrent"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>

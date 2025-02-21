@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { getEmployeeById } from "../actions/employee.actions";
+import Student from "../models/student.models";
 
 
 // Fetch current user based on token
@@ -26,16 +27,11 @@ export async function currentUser() {
         const { id, role } = decoded;
         let user;
 
-        console.log(id,"id")
-        console.log(role,"role")
 
         // Switch based on role to fetch the user from the correct collection/model
         switch (role) {
-            case "teacher":
-                // user = await getEmployeeById(id); // For Employee role
-                break;
             case "student":
-                // user = await Student.findById(id); // For Student role
+                user = await Student.findById(id); // For Student role
                 break;
             case "parent":
                 // user = await Parent.findById(id); // For Parent role

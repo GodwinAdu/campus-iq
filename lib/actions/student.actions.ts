@@ -14,6 +14,9 @@ import Parent from "../models/parent.models";
 import mongoose from "mongoose";
 import { currentUser } from "../helpers/current-user";
 import School from "../models/school.models";
+import MealPayment from "../models/meal-payment.models";
+import MealPlan from "../models/meal-plan.models";
+import { hashSync } from "bcryptjs";
 
 /**
  * Interface for creating a new student.
@@ -38,6 +41,9 @@ interface CreateStudentProps {
     guardianAddress?: string | undefined;
     guardianRelationship?: string | undefined;
     classId: string;
+    canteen?: {
+        planId: string;
+    };
     studentCategory: string;
     enrollmentDate: Date;
 }
@@ -111,14 +117,15 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
             throw new Error("School not found");
         }
 
-        const [rawUsername, parentUsername, rawPassword, parentPassword, hashedPassword, parentHashedPassword] = await Promise.all([
+        const [rawUsername, parentUsername, rawPassword, parentPassword] = await Promise.all([
             generateUniqueUsername(fullName),
             generateUniqueUsername(guardianName as string),
             generatePassword(),
             generatePassword(),
-            hash(generatePassword(), 10),
-            hash(generatePassword(), 10)
         ]);
+
+        const hashedPassword = hash(rawPassword, 10);
+        const parentHashedPassword = hash(parentPassword, 10)
 
         let parent;
 
@@ -129,14 +136,16 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
             }
         } else {
             parent = new Parent({
-                userName: parentUsername,
-                fullName: guardianName,
-                email: guardianEmail,
-                phone: guardianPhone,
-                relationship: guardianRelationship,
+                personalInfo: {
+                    username: parentUsername,
+                    fullName: guardianName,
+                    email: guardianEmail,
+                    phone: guardianPhone,
+                    relationship: guardianRelationship,
+                    address: guardianAddress,
+                    password: parentHashedPassword,
+                },
                 occupation: guardianOccupation,
-                address: guardianAddress,
-                password: parentHashedPassword,
                 schoolId,
                 createdBy: user._id,
                 action_type: "created"
@@ -243,11 +252,11 @@ export async function fetchStudentsList(classId: string) {
 
         if (!user) throw new Error("user not logged in");
 
-        // const schoolId = user.schoolId
+        const schoolId = user.schoolId
 
         await connectToDB();
 
-        const students = await Student.find({ classId });
+        const students = await Student.find({ schoolId, classId });
 
 
         if (!students || students.length === 0) {
@@ -295,7 +304,7 @@ export async function fetchStudentByRole(role: string, classId: string) {
 
         await connectToDB();
 
-        const students = await Student.find({schoolId, role, classId }, { fullName: 1, _id: 1 });
+        const students = await Student.find({ schoolId, role, classId }, { fullName: 1, _id: 1 });
         if (students.length === 0) {
             console.log("Student not found");
             return [];
@@ -310,7 +319,7 @@ export async function fetchStudentByRole(role: string, classId: string) {
 }
 
 
-export async function updateStudent(studentId: string, values: Partial<CreateStudentProps>, path: string) {
+export async function updateStudent(studentId: string, values: Partial<CreateStudentProps>, path?: string) {
     await connectToDB();
 
     try {
@@ -327,7 +336,9 @@ export async function updateStudent(studentId: string, values: Partial<CreateStu
 
         console.log("Update successful");
 
-        revalidatePath(path)
+        if (path) {
+            revalidatePath(path);
+        }
 
         return JSON.parse(JSON.stringify(updatedStudent));
     } catch (error) {
@@ -349,16 +360,124 @@ export async function fetchStudentByClassId(id: string) {
     }
 }
 
+export async function uploadBulkStudents(classId: string, students: any[]) {
+    try {
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
+        const schoolId = user.schoolId;
+        const [school, existingClass] = await Promise.all([
+            School.findById(schoolId),
+            Class.findById(classId)
+        ]);
+
+        if (!school) throw new Error("Unable to find school with provided schoolId");
+        if (!existingClass) throw new Error("Unable to find class with provided classId");
+        if (!Array.isArray(students) || students.length === 0) throw new Error("No students provided for upload");
+
+        const processedStudents = students.map(student => {
+            const plainPassword = generatePassword();
+            return {
+                ...student,
+                classId,
+                username: generateUniqueUsername(student.fullName),
+                password: hashSync(plainPassword, 10), // Store hashed password
+                fullName: student.fullName,
+                dob: new Date(student.dob),
+                email: student.email,
+                studentID: generateStudentID(),
+                schoolId,
+                createdBy: user._id,
+                plainPassword, // Temporarily store plain password for email
+            };
+        });
+
+        await Student.insertMany(processedStudents);
+        // Count students and update school's student count
+        const studentCount = await Student.countDocuments({ schoolId });
+        await School.findByIdAndUpdate(schoolId, { "subscriptionPlan.currentStudent": studentCount });
+
+        await Promise.all(processedStudents.map(({ email, fullName, username, plainPassword }) =>
+            wrappedSendMail({
+                to: email,
+                subject: "New Student Registration",
+                html: welcomeRegisterEmail(fullName, plainPassword, username, school.schoolName, school.schoolEmail),
+            })
+        ));
+
+        return { message: "Students uploaded and emails sent successfully" };
+    } catch (error) {
+        console.error("Error uploading bulk students:", error);
+        throw new Error("Failed to upload students. Please try again.");
+    }
+}
+
 
 export async function totalStudents() {
-    await connectToDB();
     try {
-        const totalMembers = await Student.countDocuments({});
+        const user = await currentUser();
+        if (!user) throw new Error("user not logged in");
+        const schoolId = user.schoolId
+        await connectToDB();
+        const totalMembers = await Student.countDocuments({ schoolId });
 
         return totalMembers
 
     } catch (error) {
         console.log("unable to count Students", error);
+        throw error;
+    }
+}
+
+
+export async function fetchStudentsForCanteenList(classId: string) {
+    try {
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
+        const schoolId = user.schoolId;
+        await connectToDB();
+
+        // Fetch students from the specified class and school with populated MealPlan
+        const students = await Student.find({ schoolId, classId })
+            .populate([{ path: "canteen.planId", model: MealPlan }])
+            .exec();
+
+        if (!students || students.length === 0) {
+            return [];
+        }
+
+        // Fetch meal payments for these students with today's date
+        const studentIds = students.map(student => student._id);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const paidStudents = await MealPayment.find({
+            schoolId,
+            payerId: { $in: studentIds },
+            status: "Completed",
+            createdAt: { $gte: today }
+        }).select("payerId");
+
+        const paidStudentIds = new Set(paidStudents.map(payment => payment.payerId.toString()));
+
+        // Add "payed" field to student objects and handle null planId
+        const updatedStudents = students.map(student => {
+            const studentObj = student.toObject();
+            return {
+                ...studentObj,
+                payed: paidStudentIds.has(studentObj._id.toString()),
+                canteen: {
+                    ...studentObj.canteen,
+                    planId: studentObj.canteen?.planId ?? null  // Avoid deep references
+                }
+            };
+        });
+
+
+        return JSON.parse(JSON.stringify(updatedStudents));
+    } catch (error) {
+        console.log("Something went wrong", error);
         throw error;
     }
 }

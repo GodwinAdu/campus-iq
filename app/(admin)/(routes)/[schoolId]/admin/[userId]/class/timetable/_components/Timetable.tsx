@@ -103,7 +103,7 @@ export default function Timetable({ data }: { data: ITimetable[] }) {
                             </>
                         ))}
                         <div className="mt-2">
-                            <Link href={`/${schoolId}/admin/${userId}/manage-timetable/timetable/${data._id}`} className={cn(buttonVariants())}>
+                            <Link href={`/${schoolId}/admin/${userId}/class/timetable/${data?._id}`} className={cn(buttonVariants())}>
                                 Edit
                             </Link>
                         </div>

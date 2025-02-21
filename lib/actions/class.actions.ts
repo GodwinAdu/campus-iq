@@ -127,7 +127,7 @@ export async function deleteClass(id: string) {
         if (!user) throw new Error('user not logged in');
 
         await connectToDB();
-        
+
         const value = await Class.findByIdAndDelete(id)
         if (!value) {
             console.log("Class don't exist");
@@ -143,3 +143,19 @@ export async function deleteClass(id: string) {
 
 }
 
+export async function totalClass(){
+    try {
+        const user = await currentUser();
+        if (!user) throw new Error('user not logged in');
+        const schoolId = user.schoolId;
+        await connectToDB();
+
+        const classData = await Class.countDocuments({ schoolId })
+
+        return classData;
+
+    } catch (error) {
+        console.error("Error fetching Class:", error);
+        throw error; // throw the error to handle it at a higher level if needed
+    }
+}

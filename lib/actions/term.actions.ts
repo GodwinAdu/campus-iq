@@ -10,7 +10,7 @@ import { currentUser } from "../helpers/current-user";
  */
 interface CreateTermProps {
     name: string;
-    present: boolean | undefined;
+    isCurrent: boolean | undefined;
 }
 
 /**
@@ -18,10 +18,10 @@ interface CreateTermProps {
  *
  * @param {CreateTermProps} props - The term properties.
  * @param {string} props.name - The name of the term.
- * @param {boolean | undefined} props.present - Indicates if the term is the current term.
+ * @param {boolean | undefined} props.isCurrent - Indicates if the term is the current term.
  * @throws Will throw an error if unable to create a new term.
  */
-export async function createTerm({ name, present }: CreateTermProps) {
+export async function createTerm({ name, isCurrent }: CreateTermProps) {
     try {
         const user = await currentUser();
         if (!user) throw new Error("User not logged in");
@@ -32,7 +32,7 @@ export async function createTerm({ name, present }: CreateTermProps) {
         const term = new Term({
             schoolId,
             name,
-            present,
+            isCurrent,
             createdBy: user._id,
             action_type: "create"
         });
@@ -106,7 +106,7 @@ export async function getCurrentTerms() {
         const schoolId = user.schoolId;
         await connectToDB();
 
-        const currentTerm = await Term.find({ schoolId, present: true })
+        const currentTerm = await Term.find({ schoolId, isCurrent: true })
             .populate("createdBy", "fullName");
 
         if (!currentTerm) {
@@ -126,7 +126,7 @@ export async function getCurrentTerm() {
         const schoolId = user.schoolId;
         await connectToDB();
 
-        const currentTerm = await Term.findOne({ schoolId, present: true })
+        const currentTerm = await Term.findOne({ schoolId, isCurrent: true })
             .populate("createdBy");
 
         if (!currentTerm) {

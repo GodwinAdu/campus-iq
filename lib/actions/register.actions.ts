@@ -260,7 +260,7 @@ export const registerUser = async (values: RegisterProps) => {
             html: welcomeMail(fullName, password, rawUsername),
         };
 
-        await wrappedSendMail(mailOptions);
+       await wrappedSendMail(mailOptions); 
 
         return JSON.parse(JSON.stringify(user))
 

@@ -1,8 +1,6 @@
 import { Schema, model, models, Model } from "mongoose";
 import School from "./school.models";
 
-
-
 type StudentModel = Model<IStudent>;
 
 const StudentSchema: Schema<IStudent> = new Schema({
@@ -15,6 +13,11 @@ const StudentSchema: Schema<IStudent> = new Schema({
         type: String,
         required: true,
         unique: true,
+    },
+    studentType: {
+        type: Schema.Types.ObjectId,
+        ref: "StudentCategory",
+        default: null
     },
     fullName: {
         type: String,
@@ -69,20 +72,21 @@ const StudentSchema: Schema<IStudent> = new Schema({
     emergencyContact: {
         type: Object,
     },
-    currentAddress:{
+    currentAddress: {
         type: String,
     },
-    permanentAddress:{
+    permanentAddress: {
         type: String,
     },
     classId: {
         type: Schema.Types.ObjectId,
         ref: "Class",
-        required: true,
+        default: null,
     },
     studentID: {
         type: String,
         required: true,
+        unique: true,
     },
     roomId: {
         type: Schema.Types.ObjectId,
@@ -92,6 +96,7 @@ const StudentSchema: Schema<IStudent> = new Schema({
     parentId: {
         type: Schema.Types.ObjectId,
         ref: "Parent",
+        default: null,
     },
     examResult: {
         type: Boolean,
@@ -128,20 +133,27 @@ const StudentSchema: Schema<IStudent> = new Schema({
             type: String,
         }
     },
-    account:{
-        balance:{
+    canteen: {
+        planId: {
+            type: Schema.Types.ObjectId,
+            ref: "MealPlan",
+            default: null,
+        }
+    },
+    account: {
+        balance: {
             type: Number,
             default: 0,
         },
-        payClasses:{
-            type:Boolean,
-            default: false,
-        },
-        payCanteen:{
+        payClasses: {
             type: Boolean,
             default: false,
         },
-        payTransportation:{
+        payCanteen: {
+            type: Boolean,
+            default: false,
+        },
+        payTransportation: {
             type: Boolean,
             default: false,
         },
@@ -166,10 +178,12 @@ const StudentSchema: Schema<IStudent> = new Schema({
     modifiedBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
+        default: null,
     },
     deletedBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
+        default:null,
     },
     action_type: {
         type: String,

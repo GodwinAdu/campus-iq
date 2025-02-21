@@ -15,7 +15,7 @@ const SessionSchema: Schema<ISession> = new Schema({
         type: String,
         required: true
     },
-    present: {
+    isCurrent: {
         type: Boolean,
         default: false
     },

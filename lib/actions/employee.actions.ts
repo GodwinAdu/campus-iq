@@ -250,7 +250,7 @@ export async function updateEmployee(adminId: string, values: Partial<any>, path
  * }
  * ```
  */
-export async function totalEmployees() {
+export async function totalTeachers() {
     try {
         const user = await currentUser();
 
@@ -260,7 +260,7 @@ export async function totalEmployees() {
 
         await connectToDB();
 
-        const totalMembers = await Employee.countDocuments({ schoolId });
+        const totalMembers = await Employee.countDocuments({ schoolId, role: "teacher" });
 
         return totalMembers
 
@@ -269,6 +269,25 @@ export async function totalEmployees() {
         throw error;
     }
 }
+
+export const countEmployeesExcludingTeachers = async () => {
+    try {
+        const user = await currentUser();
+
+        if (!user) throw new Error('user not logged in');
+
+        const schoolId = user.schoolId;
+
+        await connectToDB();
+
+        const count = await Employee.countDocuments({ schoolId, role: { $ne: "teacher" } });
+       
+        return count;
+    } catch (error) {
+        console.error("Error counting employees:", error);
+        throw error;
+    }
+};
 
 
 export async function deleteAdmin(id: string) {
@@ -294,7 +313,7 @@ export async function fetchEmployeesList(departmentId: string) {
 
         await connectToDB();
 
-        const employees = await Employee.find({ schoolId,"employment.departmentId": departmentId });
+        const employees = await Employee.find({ schoolId, "employment.departmentId": departmentId });
         if (employees.length === 0) {
             return [];
         }

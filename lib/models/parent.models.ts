@@ -34,6 +34,7 @@ const ParentSchema = new Schema<IParent>(
 
         occupation: { type: String },
         workplace: { type: String },
+        relationship: { type: String },
 
         identification: {
             idCardType: { type: String },

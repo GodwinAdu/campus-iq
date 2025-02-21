@@ -8,7 +8,7 @@ import { currentUser } from "../helpers/current-user";
 interface CreateSessionProps {
     name: string;
     period: string;
-    present: boolean
+    isCurrent: boolean
 }
 
 export async function createSession(values: CreateSessionProps) {
@@ -16,19 +16,19 @@ export async function createSession(values: CreateSessionProps) {
         const user = await currentUser();
         if (!user) throw new Error("User not logged in");
 
-        const { name, period, present } = values;
+        const { name, period, isCurrent } = values;
         const schoolId = user.schoolId;
 
         await connectToDB();
 
         // Set all previous sessions for the same school to `false`
-        await Session.updateMany({ schoolId }, { $set: { present: false } });
+        await Session.updateMany({ schoolId }, { $set: { isCurrent: false } });
 
        await Session.create({
             schoolId,
             name,
             period,
-            present,
+            isCurrent,
             createdBy: user._id,
             action_type: "create",
         });
@@ -90,7 +90,7 @@ export async function getCurrentSessions() {
 
         await connectToDB();
 
-        const sessions = await Session.find({ schoolId, present: true })
+        const sessions = await Session.find({ schoolId, isCurrent: true })
 
         if (!sessions || sessions.length === 0) {
 
@@ -113,7 +113,7 @@ export async function getCurrentSession() {
         if (!user) throw new Error('user not logged in');
         const schoolId = user.schoolId;
 
-        const currentSession = await Session.findOne({schoolId, present: true });
+        const currentSession = await Session.findOne({schoolId, isCurrent: true });
         if (!currentSession) {
             return null
         };
@@ -173,10 +173,10 @@ export async function updateSessionStatusWithId(sessionId: string) {
         await connectToDB()
 
         // Set all sessions to `false`
-        await Session.updateMany({schoolId}, { $set: { present: false } })
+        await Session.updateMany({schoolId}, { $set: { isCurrent: false } })
 
         // Set the specific session to `true`
-        await Session.updateOne({ _id: sessionId }, { $set: { present: true } })
+        await Session.updateOne({ _id: sessionId }, { $set: { isCurrent: true } })
 
 
         return JSON.parse(JSON.stringify(await Session.findById(sessionId)));

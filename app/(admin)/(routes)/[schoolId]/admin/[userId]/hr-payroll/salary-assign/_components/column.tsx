@@ -7,7 +7,7 @@ import { ArrowUpDown } from "lucide-react";
 import { CellAction } from "./cell-action";
 
 
-export const columns: ColumnDef<IFeesFine>[] = [
+export const columns: ColumnDef<IEmployee>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -33,6 +33,9 @@ export const columns: ColumnDef<IFeesFine>[] = [
     {
         accessorKey: "fullName",
         header: "Full Name",
+        cell: ({ row }) => (
+            <div className="capitalize">{row.original.personalInfo.fullName}</div>
+        ),
     },
     {
         accessorKey: "role",
@@ -51,7 +54,7 @@ export const columns: ColumnDef<IFeesFine>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+        cell: ({ row }) => <div className="lowercase">{row.original.personalInfo.email}</div>,
     },
     {
         id: "actions",

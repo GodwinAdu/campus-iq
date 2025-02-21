@@ -124,9 +124,9 @@ export const attendanceRecords: AttendanceRecord[] = [];
 export function addAttendanceRecord(newRecord: AttendanceRecord) {
   const existingRecordIndex = attendanceRecords.findIndex(
     record => record.year === newRecord.year &&
-    record.month === newRecord.month &&
-    record.personId === newRecord.personId &&
-    record.type === newRecord.type
+      record.month === newRecord.month &&
+      record.personId === newRecord.personId &&
+      record.type === newRecord.type
   );
 
   if (existingRecordIndex !== -1) {
@@ -140,6 +140,20 @@ export function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate();
 }
 
-export function capitalizeFirstLetter(str:string):string {
+export function capitalizeFirstLetter(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+
+export const downloadCSV = (data: string[][], filename: string) => {
+  const csvContent = data.map(row => row.join(",")).join("\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+
+  link.setAttribute("href", url);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};

@@ -26,7 +26,7 @@ interface Subscription {
 
 interface ISchool extends Document {
     _id?: Types.ObjectId;
-    owner:Types.ObjectId;
+    owner: Types.ObjectId;
     schoolCode: string; // Unique identifier for each school
     schoolLogo?: string; // URL for the school's logo
     establishedYear?: number; // Year the school was established
@@ -53,7 +53,7 @@ interface ISchool extends Document {
 
 // employes types checks
 interface IEmployee extends Document {
-    _id?:string;
+    _id?: string;
     schoolId: Schema.Types.ObjectId;
     personalInfo: {
         username: string;
@@ -150,6 +150,7 @@ interface IStudent extends Document {
     currentAddress: string;
     permanentAddress?: string;
     classId: Types.ObjectId;
+    studentType:Types.ObjectId;
     studentID: string;
     roomId?: Types.ObjectId;
     parentId?: Types.ObjectId;
@@ -159,11 +160,13 @@ interface IStudent extends Document {
     previousSchool?: string;
     section?: string;
     medicalHistory?: MedicalHistory;
-    account:{
-        balance:number;
-        payClasses:boolean;
-        payCanteen:boolean;
-        payTransportation:boolean;
+    account: {
+        balance: number;
+        payClasses: boolean;
+        payTransportation: boolean;
+    },
+    canteen: {
+        planId: Schema.Types.ObjectId,
     },
     studentStatus: string;
     createdBy?: Types.ObjectId;
@@ -544,7 +547,7 @@ interface ISession extends Document {
     schoolId: Types.ObjectId;
     name: string;
     period: string;
-    present: boolean;
+    isCurrent: boolean;
     createdBy?: Types.ObjectId | null;
     mod_flag: boolean;
     del_flag: boolean;
@@ -743,6 +746,8 @@ interface IAttendance extends Document {
 
 interface IExpense extends Document {
     schoolId: Schema.Types.ObjectId;
+    sessionId: Schema.Types.ObjectId;
+    termId: Schema.Types.ObjectId;
     accountId: Schema.Types.ObjectId;
     expenseName: string;
     expenseAmount: number;

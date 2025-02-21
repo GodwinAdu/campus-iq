@@ -98,15 +98,25 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
           roleField: "manageTerm"
         },
+        {
+          title: "Audit Logs",
+          url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
+          roleField: "manageTerm"
+        },
       ],
     },
     {
-      title: "Class Management",
+      title: "Academics & Learning",
       url: "#",
       icon: NotebookPen,
       isActive: true,
       roleField: "classManagement",
       items: [
+        {
+          title: "Assignments",
+          url: `/${schoolId}/admin/${userId}/class/assignment`,
+          roleField: "manageClass"
+        },
         {
           title: "Classes",
           url: `/${schoolId}/admin/${userId}/class/manage-classes`,
@@ -117,15 +127,35 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/class/manage-subjects`,
           roleField: "manageSubject"
         },
+        {
+          title: "Timetable",
+          url: `/${schoolId}/admin/${userId}/class/timetable`,
+          roleField: "manageSubject"
+        },
+        {
+          title: "Daily Class Fees",
+          url: `/${schoolId}/admin/${userId}/class/class-fees`,
+          roleField: "manageClass"
+        },
+        {
+          title: "Promote Student",
+          url: `/${schoolId}/admin/${userId}/class/promotion`,
+          roleField: "manageSubject"
+        },
       ],
     },
     {
       title: "Canteen Management",
       url: "#",
-      icon:CookingPot,
+      icon: CookingPot,
       isActive: true,
       roleField: "canteenManagement",
       items: [
+        {
+          title: "Assign Meal",
+          url: `/${schoolId}/admin/${userId}/canteen/assign-meal`,
+          // roleField: "manageAttendance"
+        },
         {
           title: "Meal Plan",
           url: `/${schoolId}/admin/${userId}/canteen/meal-plan`,
@@ -154,6 +184,11 @@ export function NavMain({ role, school }: NavMainProps) {
       icon: Users,
       roleField: "studentManagement",
       items: [
+        {
+          title: "Add Bulk Students",
+          url: `/${schoolId}/admin/${userId}/manage-students/bulk-students`,
+          roleField: "manageStudent"
+        },
         {
           title: "Student Type",
           url: `/${schoolId}/admin/${userId}/manage-students/student-type`,
@@ -322,6 +357,11 @@ export function NavMain({ role, school }: NavMainProps) {
         },
         {
           title: "Fees Reminder",
+          url: `/${schoolId}/admin/${userId}/manage-fees/fees-reminder`,
+          roleField: "manageFees"
+        },
+        {
+          title: "Invoice",
           url: `/${schoolId}/admin/${userId}/manage-fees/fees-reminder`,
           roleField: "manageFees"
         },
@@ -530,30 +570,40 @@ export function NavMain({ role, school }: NavMainProps) {
       roleField: "report",
       items: [
         {
+          title: "Balance Sheet",
+          url: `/${schoolId}/admin/${userId}/reports/balance-sheet`,
+          roleField: "studentReport"
+        },
+        {
+          title: "Trial Balance",
+          url: `/${schoolId}/admin/${userId}/reports/trial-balance`,
+          roleField: "studentReport"
+        },
+        {
           title: "Student Report",
-          url: `/${schoolId}/admin/${userId}/report/profit-lost-report`,
+          url: `/${schoolId}/admin/${userId}/reports/profit-lost-report`,
           roleField: "studentReport"
         },
         {
           title: "Financial Reports",
-          url: `/${schoolId}/admin/${userId}/report/register-report`,
+          url: `/${schoolId}/admin/${userId}/reports/register-report`,
           // roleField: "registerReport"
         },
         {
           title: "Attendance Reports",
-          url: `/${schoolId}/admin/${userId}report//expenses-report`,
+          url: `/${schoolId}/admin/${userId}reports/expenses-report`,
           // roleField: "expensesReport"
         }, {
           title: "Hr and payroll Reports",
-          url: `/${schoolId}/admin/${userId}/report/product-sell-report`,
+          url: `/${schoolId}/admin/${userId}/reports/product-sell-report`,
           // roleField: "productSellReport"
         }, {
           title: "Inventory Reports",
-          url: `/${schoolId}/admin/${userId}/report/product-purchase-report`,
+          url: `/${schoolId}/admin/${userId}/reports/product-purchase-report`,
           // roleField: "productPurchaseReport"
         }, {
           title: "Examination Report",
-          url: `/${schoolId}/admin/${userId}/report/sell-return-report`,
+          url: `/${schoolId}/admin/${userId}/reports/sell-return-report`,
           // roleField: "sellReturnReport"
         },
       ],

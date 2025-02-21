@@ -17,11 +17,6 @@ const MealPaymentSchema = new Schema({
         enum: ["Cash", "Mobile Money", "Card", "Bank Transfer"],
         required: true
     },
-    paymentFrequency: {
-        type: String,
-        enum: ["daily", "weekly", "monthly"],
-        default: "daily",
-    },
     transactionId: { type: String, unique: true }, // For tracking digital payments
     status: {
         type: String,

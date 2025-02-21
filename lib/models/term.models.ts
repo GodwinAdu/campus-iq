@@ -13,7 +13,7 @@ const TermSchema: Schema<ITerm> = new Schema({
         type: String,
         required: true,
     },
-    present: {
+    isCurrent: {
         type: Boolean,
         default: false
     },

@@ -90,3 +90,8 @@ interface employeeSchema {
     professionalDetails?: ProfessionalDetails;
     medicalHistory: MedicalHistory;
 }
+
+
+interface StudentCanteen extends IStudent {
+    payed: boolean;
+}

@@ -1,8 +1,9 @@
 import { Schema, Model, model, models } from "mongoose";
+import RevenueSummary from "./revenue-summary.models";
 
 const FeesPaymentSchema: Schema<IFeesPayment> = new Schema({
-    schoolId:{
-        type:Schema.Types.ObjectId,
+    schoolId: {
+        type: Schema.Types.ObjectId,
         ref: "School",
         required: true,
     },
@@ -85,6 +86,68 @@ const FeesPaymentSchema: Schema<IFeesPayment> = new Schema({
     versionKey: false, // Removing version key.
     minimize: false, // Enabling full document update.
 });
+
+FeesPaymentSchema.post("save", async function (doc) {
+    try {
+        const { schoolId, sessionId, termId, createdAt } = doc;
+        const startOfMonth = new Date(createdAt?.getFullYear(), createdAt?.getMonth(), 1);
+
+        // Calculate total paid amount
+        const totalPaid = doc.fees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+
+        await RevenueSummary.updateOne(
+            { schoolId, sessionId, termId, date: startOfMonth },
+            { $inc: { totalRevenue: totalPaid } },
+            { upsert: true }
+        );
+    } catch (error) {
+        console.error("Error updating revenue summary:", error);
+    }
+});
+
+
+FeesPaymentSchema.post("findOneAndUpdate", async function (doc) {
+    try {
+        if (!doc) return;
+
+        const { schoolId, sessionId, termId, createdAt } = doc;
+        const update = this.getUpdate();
+        const updatedFees = update?.$set?.fees || doc.fees;
+        const updatedPaidAmount = updatedFees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+        const originalPaidAmount = doc.fees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+        const difference = updatedPaidAmount - originalPaidAmount;
+
+        if (difference !== 0) {
+            const startOfMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 1);
+
+            await RevenueSummary.updateOne(
+                { schoolId, sessionId, termId, date: startOfMonth },
+                { $inc: { totalRevenue: difference } }
+            );
+        }
+    } catch (error) {
+        console.error("Error updating revenue summary on edit:", error);
+    }
+});
+
+
+FeesPaymentSchema.post("findOneAndDelete", async function (doc) {
+    try {
+        if (!doc) return;
+
+        const { schoolId, sessionId, termId, createdAt } = doc;
+        const totalPaid = doc.fees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+        const startOfMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 1);
+
+        await RevenueSummary.updateOne(
+            { schoolId, sessionId, termId, date: startOfMonth },
+            { $inc: { totalRevenue: -totalPaid } }
+        );
+    } catch (error) {
+        console.error("Error updating revenue summary on delete:", error);
+    }
+});
+
 
 // Define the model type
 type FeesPaymentModel = Model<IFeesPayment>;

@@ -9,7 +9,16 @@ if (!SECRET_KEY) {
 
 const encoder = new TextEncoder().encode(SECRET_KEY);
 
-const publicRoutes = ['/sign-in', '/sign-up', '/']; // Define public routes
+const publicRoutes = [
+    '/sign-in',
+    '/sign-up',
+    '/',
+    '/demo',
+    '/contact',
+    '/download',
+    '/pricing',
+    '/features',
+];
 
 // Function to verify JWT and extract payload
 async function verifyToken(token: string): Promise<JWTPayload | null> {

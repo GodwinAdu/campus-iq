@@ -93,7 +93,7 @@ const TimeTableForm = ({ classes,type,initialData }: Props) => {
                 await updateTimetable(id, values, path)
             }
 
-            router.push(`/${schoolId}/admin/${userId}/manage-timetable/timetable`)
+            router.push(`/${schoolId}/admin/${userId}/class/timetable`)
             toast({
                 title: "Create Successfully",
                 description: "Timetable created successfully...",

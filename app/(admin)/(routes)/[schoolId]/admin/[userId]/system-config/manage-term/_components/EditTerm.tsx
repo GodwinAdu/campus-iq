@@ -27,7 +27,7 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "name must be at least 2 characters.",
   }),
-  present: z.boolean().optional(),
+  isCurrent: z.boolean().optional(),
   createdBy: z.string().min(2, {
     message: "name must be at least 2 characters.",
   }),
@@ -111,7 +111,7 @@ export function EditTerm({ initialData }:EditTermProps) {
           />
           <FormField
             control={form.control}
-            name="present"
+            name="isCurrent"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                 <FormControl>
@@ -121,7 +121,7 @@ export function EditTerm({ initialData }:EditTermProps) {
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
-                  <FormLabel>Present</FormLabel>
+                  <FormLabel>isCurrent</FormLabel>
                 </div>
               </FormItem>
             )}

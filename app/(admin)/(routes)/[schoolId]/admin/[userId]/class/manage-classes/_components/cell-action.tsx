@@ -71,14 +71,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     </DropdownMenuItem>
                 ) : (
                     <>
-                        {role?.editClass && (
+                        {role?.permissions.editClass && (
                             <DropdownMenuItem asChild>
                                 <Link href={`/${schoolId}/admin/${userId}/class/manage-classes/${data._id}`}>
                                     <View className="mr-2 h-4 w-4" /> Details
                                 </Link>
                             </DropdownMenuItem>
                         )}
-                        {role?.deleteClass && (
+                        {role?.permissions.deleteClass && (
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="bg-red-500 hover:bg-red-800">
                                 <DeleteDialog
                                     id={data?._id as string}

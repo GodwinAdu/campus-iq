@@ -9,15 +9,12 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
-import { updateTerm } from "@/lib/actions/term.actions";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { updateSession } from "@/lib/actions/session.actions";
@@ -30,7 +27,7 @@ const formSchema = z.object({
   period: z.string().min(2, {
     message: "Period is required.",
   }),
-  present: z.boolean().optional(),
+  isCurrent: z.boolean().optional(),
 });
 
 export function EditSession({ initialData }: { initialData: ISession }) {
@@ -40,7 +37,7 @@ export function EditSession({ initialData }: { initialData: ISession }) {
   const params = useParams();
 
   const sessionId = params.sessionEditId as string;
-  const schoolId = params.schoolId as string;
+  const { schoolId, userId } = params
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -54,7 +51,7 @@ export function EditSession({ initialData }: { initialData: ISession }) {
     try {
       await updateSession(sessionId, values, path);
 
-      router.push(`/admin/${params.adminId}/system-config/manage-sessions`);
+      router.push(`/${schoolId}/admin/${userId}/system-config/manage-sessions`);
 
       form.reset();
 
@@ -104,7 +101,7 @@ export function EditSession({ initialData }: { initialData: ISession }) {
           />
           <FormField
             control={form.control}
-            name="present"
+            name="isCurrent"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                 <FormControl>

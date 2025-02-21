@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import Link from 'next/link'
 import StudentGrid from './_component/StudentGrid'
-import { currentUserRole } from '@/lib/helpers/get-user-role'
 import { currentUser } from '@/lib/helpers/current-user'
 
 const page = async () => {

@@ -37,7 +37,7 @@ const formSchema = z.object({
   period: z.string().min(2, {
     message: "Period is required.",
   }),
-  present: z.boolean(),
+  isCurrent: z.boolean(),
 });
 
 export function SessionModal() {
@@ -48,7 +48,7 @@ export function SessionModal() {
     defaultValues: {
       name: "",
       period:"",
-      present:false,
+      isCurrent:false,
     },
   });
 
@@ -120,7 +120,7 @@ export function SessionModal() {
               />
               <FormField
                 control={form.control}
-                name="present"
+                name="isCurrent"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                     <FormControl>
