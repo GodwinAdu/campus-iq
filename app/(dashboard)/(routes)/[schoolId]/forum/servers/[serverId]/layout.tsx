@@ -1,34 +1,35 @@
 
 import React from 'react';
-import { ServerSidebar } from "@/components/group-discussion/server/server-sidebar";
+import { ServerSidebar } from "@/components/forums/server/server-sidebar";
 import { findServerWithMembersByProfileId } from "@/lib/actions/server.actions";
-import { current_user } from "@/lib/helpers/current-user";
 import { redirect } from "next/navigation";
+import { currentUser } from '@/lib/helpers/current-user';
 
-
+type ServerProps = Promise<{ serverId: string, schoolId: string }>
 const ServerIdLayout = async ({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { serverId: string };
+  params: ServerProps;
 }) => {
-  const user = await current_user();
-  console.log(params.serverId, "params serverId")
+  const { schoolId, serverId } = await params;
+  const user = await currentUser();
+  console.log(serverId, "params serverId")
 
 
-  const server = await findServerWithMembersByProfileId(params.serverId, user?._id)
+  const server = await findServerWithMembersByProfileId(serverId, user?._id)
 
 
   if (!server) {
-    return redirect("/group_discussion");
+    return redirect(`/${schoolId}/forum`);
   }
 
   return (
     <div className="h-screen">
       <div
         className="hidden md:flex h-full w-60 z-20 flex-col fixed inset-y-0">
-        <ServerSidebar serverId={params.serverId} />
+        <ServerSidebar serverId={serverId} />
       </div>
       <main className="h-full md:pl-60">
         {children}

@@ -1,4 +1,4 @@
-import { ModalProvider } from "@/components/group-discussion/providers/modal-provider";
+import { ModalProvider } from "@/components/forums/providers/modal-provider";
 import React from "react";
 
 

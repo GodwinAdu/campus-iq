@@ -1,11 +1,10 @@
 "use server"
 
 import Channel from "../models/channel.models";
-import { parseStringify } from "../utils";
 import { connectToDB } from '../mongoose';
-import { current_user } from "../helpers/current-user";
 import Server from "../models/server.model";
 import Member from "../models/member.models";
+import { currentUser } from "../helpers/current-user";
 
 
 
@@ -18,7 +17,7 @@ export const findChannelById = async (channelId: string) => {
       return null;
     }
 
-    return parseStringify(channel);
+    return JSON.parse(JSON.stringify(channel));
   } catch (error) {
     console.error("Error fetching channel:", error);
     throw new Error("Internal Error");
@@ -29,7 +28,8 @@ export const findChannelById = async (channelId: string) => {
 
 export async function createChannel(values: { name: string, type: string }, serverId: string) {
   try {
-    const user = await current_user();
+    const user = await currentUser();
+    if (!user) throw new Error("Unauthorized user");
     const { name, type } = values;
 
     console.log(serverId, "serverId")
@@ -78,7 +78,7 @@ export async function updateChannel(
     }
 
     // Ensure the user is authenticated
-    const user = await current_user();
+    const user = await currentUser();
     if (!user) throw new Error("Unauthorized user");
 
     // Ensure the necessary IDs are provided
@@ -120,7 +120,7 @@ export async function updateChannel(
     await channelToUpdate.save();
 
     // Return the updated server information
-    return parseStringify(server);
+    return JSON.parse(JSON.stringify(server));
 
   } catch (error) {
     console.error("Unable to update channel:", error);
@@ -130,7 +130,7 @@ export async function updateChannel(
 
 export async function deleteChannel(serverId: string, channelId: string) {
   try {
-    const user = await current_user();
+    const user = await currentUser();
 
     if (!user) throw new Error('Unauthorized user');
     await connectToDB()
@@ -180,7 +180,7 @@ export async function deleteChannel(serverId: string, channelId: string) {
       ])
       .exec()
 
-    return parseStringify(updatedServer)
+    return JSON.parse(JSON.stringify(updatedServer));
 
 
   } catch (error) {

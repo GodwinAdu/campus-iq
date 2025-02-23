@@ -18,6 +18,7 @@ const publicRoutes = [
     '/download',
     '/pricing',
     '/features',
+    '/api/uploadthing'
 ];
 
 // Function to verify JWT and extract payload

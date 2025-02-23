@@ -1,5 +1,5 @@
 
-import { NavigationSidebar } from "@/components/group-discussion/navigation/navigation-sidebar";
+import { NavigationSidebar } from "@/components/forums/navigation/navigation-sidebar";
 import React from "react";
 
 

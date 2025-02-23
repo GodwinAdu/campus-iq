@@ -1,18 +1,15 @@
-import { ChatHeader } from '@/components/group-discussion/chat/chat-header';
-import { ChatInput } from '@/components/group-discussion/chat/chat-input';
-import { ChatMessages } from '@/components/group-discussion/chat/chat-message';
-import { MediaRoom } from '@/components/group-discussion/media-room';
+import { ChatHeader } from '@/components/forums/chat/chat-header';
+import { ChatInput } from '@/components/forums/chat/chat-input';
+import { ChatMessages } from '@/components/forums/chat/chat-message';
+import { MediaRoom } from '@/components/forums/media-room';
 import { getOrCreateConversation } from '@/lib/actions/file.actions';
 import { currentMemberInServer } from '@/lib/actions/member.action';
-import { current_user } from '@/lib/helpers/current-user';
+import { currentUser } from '@/lib/helpers/current-user';
 import { redirect } from 'next/navigation';
 import React from 'react'
 
 interface MemberIdPageProps {
-    params: {
-        memberId: string;
-        serverId: string;
-    },
+    params: Promise<{schoolId:string,serverId:string,memberId:string}>,
     searchParams: {
         video?: boolean;
     }
@@ -21,18 +18,19 @@ const page = async ({
     params,
     searchParams,
 }: MemberIdPageProps) => {
-    const profile = await current_user();
+    const {schoolId,serverId,memberId} = await params;
+    const profile = await currentUser();
 
-    const currentMember = await currentMemberInServer(params.serverId, profile._id)
+    const currentMember = await currentMemberInServer(serverId, profile._id)
 
     if (!currentMember) {
         return redirect("/group_discussion");
     }
 
-    const conversation = await getOrCreateConversation(currentMember._id, params.memberId);
+    const conversation = await getOrCreateConversation(currentMember._id,memberId);
 
     if (!conversation) {
-        return redirect(`/group_discussion/servers/${params.serverId}`);
+        return redirect(`/${schoolId}/forum/servers/${serverId}`);
     }
 
     const { memberOne, memberTwo } = conversation;
@@ -47,7 +45,7 @@ const page = async ({
             <ChatHeader
                 imageUrl={otherMember.userId.imageUrl}
                 name={otherMember.userId.fullName}
-                serverId={params.serverId}
+                serverId={serverId}
                 type="conversation"
             />
             {searchParams.video && (

@@ -83,6 +83,27 @@ export function NavMain({ role, school }: NavMainProps) {
 
     },
     {
+      title: "Admission Portal",
+      url: `/${schoolId}/admin/${userId}/admissions`,
+      icon: Menu,
+      isActive: false,
+
+    },
+    {
+      title: "Front Desk",
+      url: "#",
+      icon: HardDrive,
+      isActive: true,
+      roleField: "systemConfig",
+      items: [
+        {
+          title: "manage Sessions",
+          url: `/${schoolId}/admin/${userId}/system-config/manage-sessions`,
+          roleField: "manageSession"
+        },
+      ],
+    },
+    {
       title: "System Config",
       url: "#",
       icon: HardDrive,
@@ -181,6 +202,34 @@ export function NavMain({ role, school }: NavMainProps) {
           title: "Payment",
           url: `/${schoolId}/admin/${userId}/canteen/payment`,
           // roleField: "manageAttendance"
+        },
+      ],
+    },
+    {
+      title: "Student Wellbeing",
+      url: "#",
+      icon: Users,
+      roleField: "studentManagement",
+      items: [
+        {
+          title: "Add Bulk Students",
+          url: `/${schoolId}/admin/${userId}/manage-students/bulk-students`,
+          roleField: "manageStudent"
+        },
+        {
+          title: "Student Type",
+          url: `/${schoolId}/admin/${userId}/manage-students/student-type`,
+          roleField: "manageStudent"
+        },
+        {
+          title: "Manage Student",
+          url: `/${schoolId}/admin/${userId}/manage-students/manage-student`,
+          roleField: "manageStudent"
+        },
+        {
+          title: "Manage Parent",
+          url: `/${schoolId}/admin/${userId}/manage-students/manage-parent`,
+          roleField: "manageStudent"
         },
       ],
     },

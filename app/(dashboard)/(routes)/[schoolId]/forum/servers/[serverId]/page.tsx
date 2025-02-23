@@ -1,23 +1,23 @@
 import { findServersWithChannelByProfileId } from "@/lib/actions/server.actions";
-import { current_user } from "@/lib/helpers/current-user";
+import { currentUser } from "@/lib/helpers/current-user";
 import { redirect } from "next/navigation";
 
 
 
-interface ServerIdPageProps {
-  params: {
-    serverId: string;
-  }
-};
+type ServerIdPageProps = Promise<{ schoolId: string, serverId: string }>
 
 const ServerPage = async ({
   params
-}: ServerIdPageProps) => {
-  const profile = await current_user();
-  
+}: { 
+  params: ServerIdPageProps,
+}) => {
+  const { schoolId, serverId } = await params;
+
+  const profile = await currentUser();
+
   const server = await findServersWithChannelByProfileId(profile?._id)
 
-  if(!server) redirect('/group_discussion')
+  if (!server) redirect(`/${schoolId}}/forum`)
 
 
   const initialChannel = server[0]?.channels[0];
@@ -27,7 +27,7 @@ const ServerPage = async ({
     return null;
   }
 
-  return redirect(`/group_discussion/servers/${params.serverId}/channels/${initialChannel?._id}`)
+  return redirect(`/${schoolId}/forum/servers/${serverId}/channels/${initialChannel?._id}`)
 }
 
 

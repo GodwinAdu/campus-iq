@@ -5,14 +5,11 @@ import { v4 as uuidv4 } from 'uuid';
 import Channel from "../models/channel.models";
 import Member from "../models/member.models";
 
-import User from "../models/user.models";
 import Server from "../models/server.model";
-import { current_user } from "../helpers/current-user";
-import { parseStringify } from "../utils";
 import mongoose from "mongoose";
-import GroupMessage from "../models/group-message.models";
-import CoinTransaction from "../models/coin-transaction.models";
-import Coin from "../models/coin.models";
+import { currentUser } from "../helpers/current-user";
+import Message from "../models/message.models";
+
 
 
 
@@ -26,7 +23,7 @@ export async function findServersByProfileId(userId: string) {
 
         const server = await Server.findOne({ members: { $in: memberIds } });
 
-        return parseStringify(server);
+        return JSON.parse(JSON.stringify(server));
 
     } catch (error) {
         console.error('Error finding servers:', error);
@@ -41,40 +38,33 @@ export async function findServerWithChannelAndMember(serverId: string) {
         const server = await Server.findById(serverId)
             .populate([
                 {
-                    path: "owner",
-                    model: User,
-                    select: "_id fullName imageUrl email" // Ensure only required fields are selected
+                    path: "owner", // No `model` since it's dynamic (Student/Employee)
+                    select: "_id fullName imgUrl email"
                 },
                 {
                     path: "channels",
                     model: Channel,
                     populate: {
                         path: "userId",
-                        model: User,
-                        select: "_id fullName imageUrl email"
+                        select: "_id fullName imgUrl email"
                     }
                 },
                 {
-                    path: "members",
-                    model: Member,
-                    populate: {
-                        path: "userId",
-                        model: User,
-                        select: "_id fullName imageUrl email"
-                    }
-                },
+                    path: "members", // No `model` since it's dynamic (Student/Employee/Parent)
+                    select: "_id fullName imgUrl email"
+                }
             ])
-            .lean()  // Convert the result into plain JS objects
+            .lean()
             .exec();
 
         if (!server) {
-            return null
+            return null;
         }
 
-        return parseStringify(server);
+        return server; // No need for `parseStringify`
 
     } catch (error) {
-        console.error('Error finding servers:', error);
+        console.error('Error finding server:', error);
         throw error;
     }
 }
@@ -92,16 +82,14 @@ export async function findServersWithChannelByProfileId(userId: string) {
             .populate([
                 {
                     path: "owner",
-                    model: User,
-                    select: "_id fullName imageUrl email" // Ensure only required fields are selected
+                    select: "_id fullName imgUrl email" // Ensure only required fields are selected
                 },
                 {
                     path: "channels",
                     model: Channel,
                     populate: {
                         path: "userId",
-                        model: User,
-                        select: "_id fullName imageUrl email"
+                        select: "_id fullName imgUrl email"
                     }
                 },
                 {
@@ -109,8 +97,7 @@ export async function findServersWithChannelByProfileId(userId: string) {
                     model: Member,
                     populate: {
                         path: "userId",
-                        model: User,
-                        select: "_id fullName imageUrl email"
+                        select: "_id fullName imgUrl email"
                     }
                 },
             ])
@@ -137,7 +124,7 @@ export async function findAllServersByProfileId(userId: string) {
         const memberIds = members.map(member => member._id);
         const servers = await Server.find({ members: { $in: memberIds } });
 
-        return parseStringify(servers);
+        return JSON.parse(JSON.stringify(servers));
     } catch (error) {
         console.error('Error finding servers:', error);
         throw error;
@@ -161,7 +148,7 @@ export const findServerWithMembersByProfileId = async (serverId: string, userId:
             return null
         }
 
-        return parseStringify(server);
+        return JSON.parse(JSON.stringify(server));;
     } catch (error) {
         console.error("Error fetching server and members:", error);
         throw new Error("Internal Error");
@@ -185,7 +172,7 @@ interface createServerProps {
 export async function createNewServer({ name, imageUrl }: createServerProps) {
     try {
         await connectToDB();  // Connect to MongoDB
-        const profile = await current_user();
+        const profile = await currentUser();
 
         if (!profile) {
             throw new Error("Unauthorized");
@@ -194,6 +181,7 @@ export async function createNewServer({ name, imageUrl }: createServerProps) {
         // Create the default channel
         const defaultChannel = await Channel.create({
             name: "general",
+            userType: profile.role === "student" ? "Student" : "Employee",
             userId: profile._id
         });
 
@@ -203,8 +191,10 @@ export async function createNewServer({ name, imageUrl }: createServerProps) {
             imageUrl,
             invitedCode: uuidv4(),
             channels: [defaultChannel._id],
+            ownerType: profile.role.toLowerCase() === "student" ? "Student" : "Employee", // Fix case sensitivity
             owner: profile._id
         });
+
 
         // Create the default member (admin) and reference the server
         const adminMember = await Member.create({
@@ -212,29 +202,16 @@ export async function createNewServer({ name, imageUrl }: createServerProps) {
             role: 'ADMIN',
             server: server._id  // Reference the server in the member
         });
-        const coin = await Coin.findOne({userId:profile._id})
-        if(!coin || coin.coin <= 0) throw new Error("Invalid coin amount");
-
-        coin.coin -= 10;
-
-        const coinTransaction = new CoinTransaction({
-            userId: profile._id,
-            action: "DEDUCT",
-            amount: 10,
-            details: `Deducted for creating ${name} server`
-        })
-
+       
         // Associate the member with the server
         server.members.push(adminMember._id);
 
         await Promise.all([
-            coin.save(),
-            coinTransaction.save(),
             server.save()
         ]);
 
 
-        return parseStringify(server);
+        return JSON.parse(JSON.stringify(server));
     } catch (error) {
         console.log("[SERVERS_POST]", error);
         throw new Error("Internal Error");
@@ -309,7 +286,7 @@ export async function deleteServer(serverId: string) {
         await Promise.all([
             Member.deleteMany({ server: serverId }),
             Channel.deleteMany({ _id: { $in: channelIds } }),
-            GroupMessage.deleteMany({ channelId: { $in: channelIds } }),
+            Message.deleteMany({ channelId: { $in: channelIds } }),
             Server.findByIdAndDelete(serverId)
         ]);
 
@@ -345,7 +322,7 @@ export async function updateServer(values: { name: string, imageUrl: string }, s
 export async function leaveServer(serverId: string) {
     try {
         await connectToDB();
-        const user = await current_user();
+        const user = await currentUser();
 
         if (!user) {
             throw new Error("Unauthorized");

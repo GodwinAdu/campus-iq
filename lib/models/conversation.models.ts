@@ -7,7 +7,7 @@ interface IConversation extends Document {
   directMessages: Types.ObjectId[];  // Array of DirectMessage IDs
 }
 
-const GroupConversationSchema = new Schema<IConversation>(
+const ConversationSchema = new Schema<IConversation>(
   {
     memberOne: {
       type: Schema.Types.ObjectId,
@@ -30,10 +30,10 @@ const GroupConversationSchema = new Schema<IConversation>(
 );
 
 // Adding unique index for memberOne and memberTwo to ensure unique conversation
-GroupConversationSchema.index({ memberOne: 1, memberTwo: 1 }, { unique: true });
+ConversationSchema.index({ memberOne: 1, memberTwo: 1 }, { unique: true });
 
 // Indexing memberTwo for optimized queries
-GroupConversationSchema.index({ memberTwo: 1 });
+ConversationSchema.index({ memberTwo: 1 });
 
-const GroupConversation = models.GroupConversation || model<IConversation>("GroupConversation", GroupConversationSchema);
-export default GroupConversation;
+const Conversation = models.Conversation || model<IConversation>("Conversation", ConversationSchema);
+export default Conversation;

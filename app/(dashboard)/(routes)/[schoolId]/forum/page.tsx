@@ -1,21 +1,24 @@
 
-import { InitialModal } from "@/components/group-discussion/modals/InitialModal";
+import { InitialModal } from "@/components/forums/modals/InitialModal";
 import { findServersByProfileId } from "@/lib/actions/server.actions";
-import { current_user } from "@/lib/helpers/current-user";
+import { currentUser } from "@/lib/helpers/current-user";
 import { redirect } from "next/navigation"
 
+type Props = Promise<{ schoolId: string }>
 
-const SetupPage = async () => {
+const SetupPage = async ({ params }: { params: Props }) => {
 
-  const user = await current_user();
+  const { schoolId } = await params;
+
+  const user = await currentUser();
 
 
   const server = await findServersByProfileId(user._id)
 
-  if(server){
-    return redirect(`/group_discussion/servers/${server?._id}`)
+  if (server) {
+    return redirect(`/forum/servers/${server?._id}`)
   }
-  
+
   return <InitialModal />
 }
 

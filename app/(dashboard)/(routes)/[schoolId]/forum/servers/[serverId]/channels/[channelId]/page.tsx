@@ -1,44 +1,42 @@
 
 import React from "react"
-import { current_user } from "@/lib/helpers/current-user";
 import { findChannelById } from '@/lib/actions/channel.actions';
 import { redirect } from "next/navigation";
-import { ChatHeader } from "@/components/group-discussion/chat/chat-header";
-import { ChannelType } from "@/lib/models/channel.models";
-import { ChatInput } from "@/components/group-discussion/chat/chat-input";
-import { ChatMessages } from "@/components/group-discussion/chat/chat-message";
-import { MediaRoom } from "@/components/group-discussion/media-room";
+import { ChatHeader } from "@/components/forums/chat/chat-header";
+import { ChatInput } from "@/components/forums/chat/chat-input";
+import { ChatMessages } from "@/components/forums/chat/chat-message";
+import { MediaRoom } from "@/components/forums/media-room";
 import { findMembersByServerAndProfile } from "@/lib/actions/member.action";
+import { currentUser } from "@/lib/helpers/current-user";
+import { ChannelType } from "@/lib/models/channel.models";
 
 
 interface ChannelIdPageProps {
-  params: {
-    serverId: string;
-    channelId: string;
-  }
+  params: Promise<{schoolId:string,channelId:string,serverId:string}>
 }
 
 
 const ChannelIdPage = async ({
   params
 }: ChannelIdPageProps) => {
-  const profile = await current_user();
+  const {schoolId,channelId,serverId} = await params;
+  const profile = await currentUser();
 
 
-  const channel = await findChannelById(params.channelId)
+  const channel = await findChannelById(channelId)
 
-  const member = await findMembersByServerAndProfile(params.serverId, profile?._id)
+  const member = await findMembersByServerAndProfile(serverId, profile?._id)
 
 
   if (!channel || !member) {
-    redirect("/group_discussion");
+    redirect(`/${schoolId}/forum`);
   }
 
   return (
     <div className="bg-white dark:bg-[#313338] flex flex-col h-full">
       <ChatHeader
         name={channel.name}
-        serverId={params.serverId}
+        serverId={serverId}
         type="channel"
       />
       {channel.type === ChannelType.TEXT && (
