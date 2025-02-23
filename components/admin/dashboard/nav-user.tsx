@@ -3,7 +3,6 @@
 import {
   ChevronsUpDown,
   DockIcon,
-  House,
   Settings,
 } from "lucide-react"
 
@@ -31,17 +30,17 @@ import { useParams } from "next/navigation"
 import { dayLeft } from "@/lib/utils"
 import Link from "next/link"
 
-import { PaymentDialog } from "./dialog/paymentDialog"
-import { RatingDialog } from "./dialog/RatingDialog"
 import { useTourControl } from "@/hooks/use-tour-control"
 import { ModeToggle } from "@/components/commons/theme/ModeToggle"
+import { RatingDialog } from "./dialog/RatingDialog"
+import { PaymentDialog } from "./dialog/paymentDialog"
+
 
 export function NavUser({ school }: { school: ISchool }) {
   const { isMobile } = useSidebar()
   const params = useParams()
 
-  const storeId = params.storeId as string;
-  const branchId = params.branchId as string;
+  const {schoolId,userId} = params;
   useTourControl([
     {
       target: '.school-avatar',
@@ -94,30 +93,18 @@ export function NavUser({ school }: { school: ISchool }) {
                 <ModeToggle />
                 <p className="font-extrabold">Theme</p>
               </div>
-              <Link href={`/${storeId}/dashboard/${branchId}/settings`}>
+              <Link href={`/${schoolId}/admin/${userId}/school-settings`}>
                 <DropdownMenuItem>
                   <Settings />
-                  Store Settings
+                  School Settings
                 </DropdownMenuItem>
               </Link>
 
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <Link href={`/${storeId}/dashboard/${branchId}/branches`}>
-                <DropdownMenuItem>
-                  <House />
-                  Branch Settings
-                </DropdownMenuItem>
-              </Link>
-              <Link href={`/${storeId}/dashboard/${branchId}/support`}>
-                <DropdownMenuItem>
-                  <DockIcon />
-                  Support
-                </DropdownMenuItem>
-              </Link>
-              {/* <PaymentDialog school={school} />
-              <RatingDialog /> */}
+              <PaymentDialog school={school} />
+              <RatingDialog />
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
           </DropdownMenuContent>

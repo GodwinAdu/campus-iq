@@ -12,7 +12,7 @@ export default function Hero() {
     <section className="h-screen flex flex-col items-center justify-center relative overflow-hidden">
       <div className="absolute inset-0 w-full h-full">
         <video autoPlay loop muted playsInline className="w-full h-full object-cover">
-          <source src="/hero1.mp4" type="video/mp4" />
+          <source src="/" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-black bg-opacity-50" />
@@ -20,7 +20,7 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }} 
+        transition={{ duration: 0.5 }}
         className="text-center relative z-10"
       >
         <h1 className="text-6xl font-bold mb-4 text-white">Campus<span className="text-blue-500">IQ</span></h1>

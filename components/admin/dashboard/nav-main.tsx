@@ -11,18 +11,17 @@ import {
   NotebookPen,
   UsersRound,
   BookOpenCheck,
-  Notebook,
-  TimerIcon,
   TvMinimalPlay,
   BookOpenCheckIcon,
   Combine,
   House,
   Library,
   Mail,
-  Menu,
-  Hospital,
   HospitalIcon,
-  CookingPot
+  CookingPot,
+  Menu,
+  HistoryIcon,
+  Trash
 } from "lucide-react"
 import {
   Collapsible,
@@ -76,6 +75,13 @@ export function NavMain({ role, school }: NavMainProps) {
 
 
   const navMain: (NavItem | false)[] = [
+    {
+      title: "Dashboard",
+      url: `/${schoolId}/admin/${userId}`,
+      icon: Menu,
+      isActive: false,
+
+    },
     {
       title: "System Config",
       url: "#",
@@ -245,37 +251,6 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/manage-attendance/employees`,
           roleField: "manageEmployeeAttendance",
         }
-      ],
-    },
-    {
-      title: "Home Work",
-      url: "#",
-      icon: Notebook,
-      roleField: "homeWork",
-      items: [
-        {
-          title: "List Stock Adjustments",
-          url: `/${schoolId}/admin/${userId}/stock-adjustment/list-stock-adjustments`,
-          roleField: "listStockAdjustment"
-        },
-        {
-          title: "Add Stock Adjustment",
-          url: `/${schoolId}/admin/${userId}/stock-adjustment/add-stock-adjustment`,
-          roleField: "manageStockAdjustment"
-        }
-      ],
-    },
-    {
-      title: "Time Table",
-      url: "#",
-      icon: TimerIcon,
-      roleField: "timetable",
-      items: [
-        {
-          title: "Manage Timetable",
-          url: `/${schoolId}/admin/${userId}/manage-timetable/timetable`,
-          roleField: "manageTimetable",
-        },
       ],
     },
     proPlan && {
@@ -550,19 +525,6 @@ export function NavMain({ role, school }: NavMainProps) {
         },
       ],
     },
-    proPlan && {
-      title: "Messaging",
-      url: "#",
-      icon: Mail,
-      roleField: "message",
-      items: [
-        {
-          title: "List Accounts",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
-          // roleField: "manageListAccount"
-        },
-      ],
-    },
     {
       title: "Reports",
       url: "#",
@@ -581,7 +543,7 @@ export function NavMain({ role, school }: NavMainProps) {
         },
         {
           title: "Student Report",
-          url: `/${schoolId}/admin/${userId}/reports/profit-lost-report`,
+          url: `/${schoolId}/admin/${userId}/reports/student-report`,
           roleField: "studentReport"
         },
         {
@@ -608,6 +570,24 @@ export function NavMain({ role, school }: NavMainProps) {
         },
       ],
     },
+    proPlan && {
+      title: "Email Messages",
+      url: `/${schoolId}/admin/${userId}/messaging/email`,
+      icon: Mail,
+      roleField: "message",
+    },
+    {
+      title: "History",
+      url: `/${schoolId}/admin/${userId}/history`,
+      icon: HistoryIcon,
+      isActive: false,
+    },
+    {
+      title: "Trash",
+      url: `/${schoolId}/admin/${userId}/trash`,
+      icon: Trash,
+      isActive: false,
+    }
 
   ];
   const isActive = useCallback(
@@ -638,73 +618,74 @@ export function NavMain({ role, school }: NavMainProps) {
     <SidebarGroup>
       <SidebarGroupLabel>Nav links</SidebarGroupLabel>
       <SidebarMenu>
-        <SidebarMenuSubItem>
-          <SidebarMenuSubButton
-            asChild
-            className={cn(
-              "transition-colors hover:bg-primary/10 hover:text-primary",
-              isActive(`/${schoolId}/admin/${userId}`) && "bg-primary text-white font-medium"
-            )}
-          >
-            <Link href={`/${schoolId}/admin/${userId}`}
-            >
-              <Menu className="text-white" />
-              <span>Dashboard</span>
-            </Link>
-          </SidebarMenuSubButton>
-        </SidebarMenuSubItem>
-
         {navMain
           .filter((item): item is NavItem => item !== false)
-          .filter(item => !item.roleField || (role && role[item.roleField as keyof IRole]))
-          .map(item => (
-            <Collapsible
-              key={item.title}
-              open={openGroup === item.title}
-              onOpenChange={() =>
-                setOpenGroup(prev => (prev === item.title ? null : item.title))
-              }
-              className="group/collapsible"
-            >
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    className={cn(
-                      "transition-colors hover:bg-primary/10 hover:text-primary",
-                      item.items?.some(subItem => isActive(subItem.url)) && "bg-primary text-white font-medium"
-                    )}
-                  >
+          .filter((item) => !item.roleField || (role && role[item.roleField as keyof IRole]))
+          .map((item) =>
+            item.items ? (
+              <Collapsible
+                key={item.title}
+                open={openGroup === item.title}
+                onOpenChange={() => setOpenGroup((prev) => (prev === item.title ? null : item.title))}
+                className="group/collapsible"
+              >
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                      tooltip={item.title}
+                      className={cn(
+                        "transition-colors hover:bg-primary/10 hover:text-primary",
+                        item.items?.some((subItem) => isActive(subItem.url)) && "bg-primary text-white font-medium",
+                      )}
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                      <ChevronRight
+                        className={`ml-auto shrink-0 transition-transform duration-200 ${openGroup === item.title ? "rotate-90" : ""}`}
+                      />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      {item.items
+                        ?.filter((subItem) => !subItem?.roleField || (role && role[subItem?.roleField as keyof IRole]))
+                        .map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              className={cn(
+                                "transition-colors hover:text-primary",
+                                isActive(subItem.url) && "bg-primary/10 text-primary font-medium",
+                              )}
+                            >
+                              <Link href={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            ) : (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  className={cn(
+                    "transition-colors hover:bg-primary/10 hover:text-primary",
+                    isActive(item.url) && "bg-primary text-white font-medium",
+                  )}
+                >
+                  <Link href={item.url}>
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
-                    <ChevronRight className={`ml-auto shrink-0 transition-transform duration-200 ${openGroup === item.title ? "rotate-90" : ""}`} />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    {item.items
-                      ?.filter(subItem => !subItem?.roleField || (role && role[subItem?.roleField as keyof IRole]))
-                      .map(subItem => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            asChild
-                            className={cn(
-                              "transition-colors hover:text-primary",
-                              isActive(subItem.url) &&
-                              "bg-primary/10 text-primary font-medium"
-                            )}
-                          >
-                            <Link href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
-            </Collapsible>
-          ))}
+            ),
+          )}
       </SidebarMenu>
     </SidebarGroup>
 

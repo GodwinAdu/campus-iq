@@ -62,7 +62,7 @@ export function AcademicDropdown({ sessions }: { sessions: ISession[] }) {
                     sessions.map((session) => (
                         <DropdownMenuCheckboxItem
                             key={session._id}
-                            checked={selectedSession === session._id || session.present === true}
+                            checked={selectedSession === session._id || session.isCurrent === true}
                             onCheckedChange={() => {
                                 updateSessionStatus(session?._id as string) // Update database and UI
                             }}

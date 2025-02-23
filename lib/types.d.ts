@@ -131,6 +131,10 @@ interface IEmployee extends Document {
     action_type?: string;
 }
 
+type StudentPermissions = {
+    createCommunity:boolean;
+    accessAI:boolean;
+}
 
 
 // students type check
@@ -162,12 +166,11 @@ interface IStudent extends Document {
     medicalHistory?: MedicalHistory;
     account: {
         balance: number;
-        payClasses: boolean;
-        payTransportation: boolean;
     },
     canteen: {
         planId: Schema.Types.ObjectId,
     },
+    permissions:StudentPermissions;
     studentStatus: string;
     createdBy?: Types.ObjectId;
     mod_flag?: boolean;

@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Trash2, RefreshCw, Loader2 } from 'lucide-react'
-import { playErrorSound } from '@/lib/audio'
 import { toast } from '@/hooks/use-toast'
-import { deleteTrash, restoreDocument } from '@/lib/actions/trash.actons'
 import { useRouter } from 'next/navigation'
 import moment from 'moment'
+import { deleteTrash, restoreDocument } from '@/lib/actions/trash.actions'
 
 interface TrashItem {
     _id: string
@@ -58,7 +57,6 @@ export function TrashList({ trashes }: { trashes: TrashItem[] }) {
             });
 
         } catch {
-            playErrorSound();
             toast({
                 title: "Error restoring",
                 description: "Failed to restore trash item",
@@ -83,7 +81,6 @@ export function TrashList({ trashes }: { trashes: TrashItem[] }) {
             });
 
         } catch {
-            playErrorSound();
             toast({
                 title: "Error deleting",
                 description: "Failed to delete trash item",

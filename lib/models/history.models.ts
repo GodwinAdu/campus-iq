@@ -3,17 +3,10 @@ import { model, models, Schema } from "mongoose";
 
 // Define an enum for action types
 const actionTypes = [
-    // Sales and Transactions
-    'SALE_CREATED',
-    'SALE_UPDATED',
-    'SALE_DELETED',
-    'SALE_RETURNED',
-    'SALE_VOIDED',
-    'SALE_DISCOUNT_APPLIED',
-    'SALE_TAX_APPLIED',
-
-    'PAYMENT_RECEIVED',
-    'REFUND_ISSUED',
+    'CLASS_CREATED',
+    'CLASS_UPDATED',
+    'CLASS_DELETED',
+    'CLASS_RESTORED',
 
     // Inventory Management
     'PRODUCT_CREATED',
@@ -180,7 +173,7 @@ const historySchema = new Schema(
         },
         performedBy: {
             type: Schema.Types.ObjectId,
-            ref: 'User', // Reference to the user who performed the action
+            ref: 'Employee', // Reference to the user who performed the action
             required: true,
         },
         timestamp: {

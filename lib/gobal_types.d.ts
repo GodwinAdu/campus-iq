@@ -95,3 +95,30 @@ interface employeeSchema {
 interface StudentCanteen extends IStudent {
     payed: boolean;
 }
+
+type EmailFolder = "inbox" | "sent" | "drafts" | "important" | "trash"
+
+type EmailLabel = "work" | "personal" | "urgent" | "follow-up"
+
+type Email = {
+    id: string
+    sender: string
+    recipients: string[]
+    subject: string
+    message: string
+    time: string
+    unread: boolean
+    attachments?: {
+        name: string
+        url: string
+    }[]
+    folder: EmailFolder
+    labels: EmailLabel[]
+}
+
+type EmailFilter = {
+    folder: EmailFolder
+    labels: EmailLabel[]
+    search: string
+}
+

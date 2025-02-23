@@ -392,7 +392,17 @@ export async function uploadBulkStudents(classId: string, students: any[]) {
             };
         });
 
-        await Student.insertMany(processedStudents);
+        // Insert students and get their _ids
+        const newStudents = await Student.insertMany(processedStudents);
+
+        if (newStudents.length === 0) throw new Error("No students were inserted into the database");
+        
+        const studentIds = newStudents.map(student => student._id);
+
+
+        // Update class by adding new students' _id to the students array
+        await Class.findByIdAndUpdate(classId, { $push: { students: { $each: studentIds } } });
+        ;
         // Count students and update school's student count
         const studentCount = await Student.countDocuments({ schoolId });
         await School.findByIdAndUpdate(schoolId, { "subscriptionPlan.currentStudent": studentCount });

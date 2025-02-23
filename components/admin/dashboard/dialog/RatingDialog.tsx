@@ -217,7 +217,7 @@ export function RatingDialog() {
                                             </Label>
                                             <Textarea
                                                 id="feature_suggestion"
-                                                placeholder="What new feature would you like to see in our POS system?"
+                                                placeholder="What new feature would you like to see in our SM system?"
                                                 value={formData.feature_suggestion}
                                                 onChange={(e) => setFormData(prev => ({ ...prev, feature_suggestion: e.target.value }))}
                                             />
@@ -226,7 +226,7 @@ export function RatingDialog() {
                                         {/* Likelihood to Recommend */}
                                         <div className="space-y-2">
                                             <Label htmlFor="likelihood_to_recommend" className="text-base font-semibold">
-                                                How likely are you to recommend our POS system to others?
+                                                How likely are you to recommend our SMS to others?
                                             </Label>
                                             <Slider
                                                 id="likelihood_to_recommend"

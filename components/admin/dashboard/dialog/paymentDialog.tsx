@@ -38,74 +38,69 @@ const PaystackButton = dynamic(() => import("react-paystack").then(mod => mod.Pa
     ssr: false // Disable SSR for this component
 });
 
-
-
 const formSchema = z.object({
     period: z.object({
-        name: z.string(),
-        value: z.number().min(1),
+        frequency: z.string(),
+        value: z.coerce.number().min(1),
     }),
-    numberOfBranches: z.coerce.number(),
+    totalStudents: z.coerce.number().min(1),
 });
 
-// Calculate the setup price per branch
-const calculateSetupPrice = (branches: number) => (branches / 5) * 200;
+// Calculate price per student based on plan
+const calculatePrice = (plan: "basic" | "pro" | "custom", students: number) => {
+    const rates = { basic: 5, pro: 10, custom: 15 };
+    return students * rates[plan];
+};
 
-// Calculate the total price with discounts for longer durations
-const calculateTotalPrice = (branches: number, period: number) => {
-    const basePrice = calculateSetupPrice(branches) * period;
+// Calculate the total price with discounts
+const calculateTotalPrice = (plan: "basic" | "pro" | "custom", students: number, period: number) => {
+    const basePrice = calculatePrice(plan, students) * period;
 
-    // Apply discounts
-    if (period === 6) {
-        return basePrice * 0.9; // 10% discount for 6 months
+    if (period === 4) {
+        return basePrice * 0.95; // 5% discount for 4 months
     }
     if (period === 12) {
-        return basePrice * 0.8; // 20% discount for yearly
+        return basePrice * 0.90; // 10% discount for 12 months
     }
-
-    return basePrice; // No discount for other durations
+    return basePrice;
 };
 
 const periods = [
-    { name: "1 Month", value: 1 },
-    { name: "3 Months", value: 3 },
-    { name: "6 Months (10% Discount)", value: 6 },
-    { name: "Yearly (20% Discount)", value: 12 },
+    { frequency: "monthly", value: 1 },
+    { frequency: "term", value: 4 },
+    { frequency: "yearly", value: 12 },
 ];
 
-export function PaymentDialog({ store }: { store: IStore }) {
-    const [setupPrice, setSetupPrice] = useState(200);
-    const [totalPrice, setTotalPrice] = useState(200);
+export function PaymentDialog({ school }: { school: ISchool }) {
+    const [setupPrice, setSetupPrice] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            period: store.subscriptionPlan.period,
-            numberOfBranches: store.numberOfBranches,
+            period: { frequency: "monthly", value: 1 },
+            totalStudents: school.subscriptionPlan.currentStudent,
         },
     });
-    const branches = form.watch('numberOfBranches')
-    const period = form.watch("period")
 
-    // Watch form changes and update prices
+    const students = form.watch("totalStudents");
+    const period = form.watch("period");
+
     useEffect(() => {
-        const branches = form.watch("numberOfBranches");
-        const period = form.watch("period");
-        setSetupPrice(calculateSetupPrice(Number(branches)));
-        setTotalPrice(calculateTotalPrice(Number(branches), Number(period.value)));
-    }, [branches, period, form]);
-
+        setSetupPrice(calculatePrice(school.subscriptionPlan.plan, students));
+        setTotalPrice(calculateTotalPrice(school.subscriptionPlan.plan, students, period.value));
+    }, [students, period, school.subscriptionPlan.plan]);
 
     const handlePaymentSuccess = () => {
         form.handleSubmit(onSubmit)();
     };
 
-    const subscriptionClose = () => {
+    const subscriptionClose = async () => {
         alert("You closed the payment dialog.");
     };
 
     const componentProps = {
-        email: "gyamfiadu01@gmail.com",
+        email:school?.schoolEmail ?? "gyamfiadu01@gmail.com",
         amount: totalPrice * 100,
         currency: process.env.NEXT_PUBLIC_PAYSTACK_CURRENCY!,
         publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY!,
@@ -114,11 +109,11 @@ export function PaymentDialog({ store }: { store: IStore }) {
         onClose: subscriptionClose,
     };
 
+    // const show = publicRoutes.some((route) => path === route || path.startsWith(`${route}/`));
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         console.log("Form submitted:", values);
     }
-
 
     return (
         <Dialog>
@@ -132,7 +127,7 @@ export function PaymentDialog({ store }: { store: IStore }) {
                 <DialogHeader>
                     <DialogTitle>Proceed Payment</DialogTitle>
                     <DialogDescription>
-                        Select a subscription period, confirm your store details, and proceed to payment.
+                        Select a subscription period, confirm your school details, and proceed to payment.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -147,7 +142,7 @@ export function PaymentDialog({ store }: { store: IStore }) {
                                     <Select
                                         onValueChange={(value) => {
                                             const selectedPeriod = periods.find(
-                                                (period) => String(period.value) === value
+                                                (p) => String(p.value) === value
                                             );
                                             field.onChange(selectedPeriod!);
                                         }}
@@ -159,9 +154,9 @@ export function PaymentDialog({ store }: { store: IStore }) {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            {periods.map((period) => (
-                                                <SelectItem key={period.value} value={String(period.value)}>
-                                                    {period.name}
+                                            {periods.map((p) => (
+                                                <SelectItem key={p.value} value={String(p.value)}>
+                                                    {p.frequency}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -172,36 +167,39 @@ export function PaymentDialog({ store }: { store: IStore }) {
                         />
                         <FormField
                             control={form.control}
-                            name="numberOfBranches"
+                            name="totalStudents"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Number of Branches</FormLabel>
-                                    <Input disabled {...field} type="number" />
+                                    <FormLabel>Number of Students</FormLabel>
+                                    <Input {...field} type="number" min={1} />
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
                         <p className="text-gray-600">
                             Setup Price:{" "}
-                            <span className="font-bold text-green-700">GH₵{setupPrice}</span>{" "}
-                            Monthly
+                            <span className="font-bold text-green-700">GH₵{setupPrice}</span> Monthly
                         </p>
                         <p className="text-gray-600">
                             Total Price:{" "}
                             <span className="font-bold text-blue-700">GH₵{totalPrice}</span>
                         </p>
-                        {form.watch("period.value") >= 6 && (
+                        {form.watch("period.value") === 4 && (
                             <p className="text-sm text-green-600">
-                                {form.watch("period.value") === 6
-                                    ? "A 10% discount has been applied."
-                                    : "A 20% discount has been applied for yearly subscriptions."}
+                                A 5% discount has been applied for a 4-month subscription.
                             </p>
                         )}
+                        {form.watch("period.value") === 12 && (
+                            <p className="text-sm text-green-600">
+                                A 10% discount has been applied for a yearly subscription.
+                            </p>
+                        )}
+
+                        <DialogClose className="w-full">
+                            <PaystackButton {...componentProps} className="inline-block w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300" />
+                        </DialogClose>
                     </form>
                 </Form>
-                <DialogClose>
-                    <PaystackButton {...componentProps} className="inline-block w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors duration-300" />
-                </DialogClose>
             </DialogContent>
         </Dialog>
     );

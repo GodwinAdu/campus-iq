@@ -145,22 +145,20 @@ const StudentSchema: Schema<IStudent> = new Schema({
             type: Number,
             default: 0,
         },
-        payClasses: {
-            type: Boolean,
-            default: false,
-        },
-        payCanteen: {
-            type: Boolean,
-            default: false,
-        },
-        payTransportation: {
-            type: Boolean,
-            default: false,
-        },
     },
     studentStatus: {
         type: String,
         default: "Active",
+    },
+    permissions: {
+        createCommunity: {
+            type: Boolean,
+            default: false
+        },
+        accessAI: {
+            type: Boolean,
+            default: false
+        }
     },
     createdBy: {
         type: Schema.Types.ObjectId,
@@ -183,7 +181,7 @@ const StudentSchema: Schema<IStudent> = new Schema({
     deletedBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
-        default:null,
+        default: null,
     },
     action_type: {
         type: String,

@@ -8,6 +8,8 @@ import Subject from "../models/subject.models";
 import Student from "../models/student.models";
 import Teacher from "../models/teacher.models";
 import { currentUser } from "../helpers/current-user";
+import { deleteDocument } from "./trash.actions";
+import History from "../models/history.models";
 
 interface CreateClassProps {
     name: string;
@@ -20,15 +22,35 @@ export async function createClass({ name }: CreateClassProps) {
         const schoolId = user.schoolId;
         await connectToDB();
 
+        const existingClass = await Class.findOne({ schoolId, name });
+        if (existingClass) {
+            throw new Error(`Class with name "${name}" already exists`);
+        }
+
         const value = new Class({
             schoolId,
             name,
             code: generateCode(name),
             createdBy: user?._id,
             action_type: "created"
-        })
+        });
+        const history = new History({
+            schoolId,
+            actionType: 'CLASS_CREATED', // Use a relevant action type
+            details: {
+                itemId: value._id,
+                deletedAt: new Date(),
+            },
+            message: `User ${user.personalInfo.fullName} created "${name}" (ID: ${value._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: value._id,  // The ID of the deleted unit
+            entityType: 'CLASS',  // The type of the entity
+        });
 
-        await value.save();
+        await Promise.all([
+            value.save(),
+            history.save()
+        ]);
 
     } catch (error) {
         console.log("unable to create new value", error)
@@ -90,6 +112,7 @@ export async function updateClass(classId: string, values: Partial<CreateClassPr
         const user = await currentUser();
 
         if (!user) throw new Error('user not logged in');
+        const schoolId = user.schoolId;
 
         await connectToDB();
 
@@ -110,6 +133,18 @@ export async function updateClass(classId: string, values: Partial<CreateClassPr
             console.log("Term not found");
             return null;
         }
+        await History.create({
+            schoolId,
+            actionType: 'CLASS_UPDATED', // Use a relevant action type
+            details: {
+                itemId:classId,
+                deletedAt: new Date(),
+            },
+            message: `User ${user.personalInfo.fullName} Updated "${values.name}" (ID: ${classId}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId:classId,  // The ID of the deleted unit
+            entityType: 'CLASS',  // The type of the entity
+        });
 
         revalidatePath(path)
 
@@ -125,17 +160,32 @@ export async function deleteClass(id: string) {
         const user = await currentUser();
 
         if (!user) throw new Error('user not logged in');
-
+        const schoolId = user.schoolId;
         await connectToDB();
 
-        const value = await Class.findByIdAndDelete(id)
-        if (!value) {
-            console.log("Class don't exist");
-            return null; // or throw an error if you want to handle it differently
+        const classData = await Class.findById(id);
+        if (!classData) {
+            return { success: false, message: "Class not found" };
         }
-        console.log("delete successfully")
+        const className = classData?.name || "Unknown Class";
 
-        return JSON.parse(JSON.stringify(value));
+        if (
+            classData?.students.length > 0 ||
+            classData?.teachers.length > 0 ||
+            classData?.subjects.length > 0
+        ) return { success: false, message: "class cant be delete with students, teachers or subjects" };
+
+        await deleteDocument({
+            actionType: 'CLASS_DELETED',
+            documentId: id,
+            collectionName: 'Class',
+            userId: user?._id,
+            schoolId,
+            trashMessage: `"${className}" (ID: ${id}) was moved to trash by ${user.personalInfo.fullName}.`,
+            historyMessage: `User ${user.personalInfo.fullName} deleted "${className}" (ID: ${id}) on ${new Date().toLocaleString()}.`
+        });
+
+        return { success: true, message: "Class deleted successfully" };
     } catch (error) {
         console.error("Error deleting Class:", error);
         throw error; // throw the error to handle it at a higher level if needed
@@ -143,7 +193,7 @@ export async function deleteClass(id: string) {
 
 }
 
-export async function totalClass(){
+export async function totalClass() {
     try {
         const user = await currentUser();
         if (!user) throw new Error('user not logged in');

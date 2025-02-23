@@ -9,15 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Loader2, Search, Trash2 } from "lucide-react";
 import moment from "moment";
 import { toast } from "@/hooks/use-toast";
-import { deleteHistory, fetchAllHistories } from "@/lib/actions/history.actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { playErrorSound, playSuccessSound } from "@/lib/audio";
 import { useRouter } from "next/navigation";
+import { deleteHistory, fetchAllHistories } from "@/lib/actions/history.actions";
 
 
 interface HistoryItem {
@@ -188,7 +187,6 @@ export function HistoryList() {
         try {
             setIsLoading(true);
             await deleteHistory(id);
-            playSuccessSound();
             router.refresh();
             toast({
                 title: "Deleted history",
@@ -197,7 +195,7 @@ export function HistoryList() {
 
 
         } catch {
-            playErrorSound();
+
             toast({
                 title: "Error deleting history",
                 description: "Failed to delete history. Please try again later.",

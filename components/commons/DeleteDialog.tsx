@@ -17,13 +17,11 @@ import { useState } from "react"
 
 type DeleteDialogProps = {
     id: string;
-    title: string;
-    description: string;
     onContinue: (data: string) => void;
     isLoading: boolean;
 }
 
-export function DeleteDialog({ id, title, description, onContinue, isLoading }: DeleteDialogProps) {
+export function DeleteDialog({ id, onContinue, isLoading }: DeleteDialogProps) {
     const [open, setOpen] = useState(false)
 
     const handleContinue = () => {
@@ -43,14 +41,18 @@ export function DeleteDialog({ id, title, description, onContinue, isLoading }: 
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{title}</AlertDialogTitle>
-                    <AlertDialogDescription>{description}</AlertDialogDescription>
+                    <AlertDialogTitle>Confirm Move to Trash</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        This item will be moved to the trash. You can restore it later if needed.
+                        Are you sure you want to proceed?
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
+
                 <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction className="bg-red-500 hover:bg-red-800" onClick={handleContinue} disabled={isLoading}>
                         {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                        {isLoading ? "Deleting..." : "Delete"}
+                        {isLoading ? "Moving..." : "Trash"}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
