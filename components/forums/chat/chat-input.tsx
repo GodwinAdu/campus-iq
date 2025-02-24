@@ -1,8 +1,6 @@
 "use client";
 
 import * as z from "zod";
-import axios from "axios";
-import qs from "query-string";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Send, SendHorizonal } from "lucide-react";

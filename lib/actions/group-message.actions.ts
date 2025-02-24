@@ -1,12 +1,11 @@
 "use server"
 
-import { current_user } from "../helpers/current-user";
+import { currentUser } from "../helpers/current-user";
 import Channel from "../models/channel.models";
-import GroupMessage from "../models/group-message.models";
 import Member from "../models/member.models";
+import Message from "../models/message.models";
 import Server from "../models/server.model";
 import { connectToDB } from "../mongoose";
-import { parseStringify } from "../utils";
 
 interface MessageProps {
     values: {
@@ -20,7 +19,7 @@ interface MessageProps {
 export async function createGroupMessages({ values, serverId, channelId }: MessageProps) {
     try {
         const { content, fileUrl } = values;
-        const user = await current_user();
+        const user = await currentUser();
 
         if (!user) throw new Error('Unauthenticated user')
 
@@ -60,7 +59,7 @@ export async function createGroupMessages({ values, serverId, channelId }: Messa
         }
 
         // Create the message
-        const message = await GroupMessage.create({
+        const message = await Message.create({
             content,
             fileUrl,
             channelId,
@@ -72,7 +71,7 @@ export async function createGroupMessages({ values, serverId, channelId }: Messa
         // Emit the message to the socket
         // res?.socket?.server?.io?.emit(channelKey, message);
 
-        return parseStringify(message);
+        return JSON.parse(JSON.stringify(message));
 
     } catch (error) {
         console.log("Error creating group messages", error);
