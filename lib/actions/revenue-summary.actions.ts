@@ -3,7 +3,7 @@
 import { currentUser } from "../helpers/current-user";
 import RevenueSummary from "../models/revenue-summary.models";
 import { connectToDB } from "../mongoose";
-import { getCurrentSessionAndTerm } from '../helpers/current-session-term';
+// import { getCurrentSessionAndTerm } from '../helpers/current-session-term';
 
 
 export const fetchCurrentMonthRevenue = async () => {
@@ -13,7 +13,7 @@ export const fetchCurrentMonthRevenue = async () => {
 
         const schoolId = user.schoolId;
 
-        const sessionAndTerm = await getCurrentSessionAndTerm()
+        // const sessionAndTerm = await getCurrentSessionAndTerm()
 
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -23,8 +23,8 @@ export const fetchCurrentMonthRevenue = async () => {
 
         const revenueSummary = await RevenueSummary.findOne({
             schoolId,
-            sessionId: sessionAndTerm.session._id,
-            termId: sessionAndTerm.term._id,
+            // sessionId: sessionAndTerm.session._id,
+            // termId: sessionAndTerm.term._id,
             date: { $gte: startOfMonth, $lt: endOfMonth },
         });
 
@@ -44,11 +44,11 @@ export const totalRevenues = async () => {
         if (!user) throw new Error("User not found");
         
         const schoolId = user.schoolId;
-        const sessionAndTerm = await getCurrentSessionAndTerm();
+        // const sessionAndTerm = await getCurrentSessionAndTerm();
         // if (!sessionAndTerm?.session?._id) throw new Error("Session ID not found");
 
         await connectToDB();
-        const sessionId = sessionAndTerm.session?._id;
+        // const sessionId = sessionAndTerm.session?._id;
 
         const revenues = await RevenueSummary.find({ schoolId });
         
@@ -74,7 +74,7 @@ export const fetchMonthlyRevenues = async () => {
         if (!user) throw new Error("User not found");
 
         const schoolId = user.schoolId;
-        const sessionAndTerm = await getCurrentSessionAndTerm();
+        // const sessionAndTerm = await getCurrentSessionAndTerm();
         // if (!sessionAndTerm?.session?._id || !sessionAndTerm?.term?._id) {
         //     throw new Error("Session or Term not found");
         // }
@@ -91,8 +91,8 @@ export const fetchMonthlyRevenues = async () => {
             {
                 $match: {
                     schoolId,
-                    sessionId: sessionAndTerm.session?._id,
-                    termId: sessionAndTerm.term?._id,
+                    // sessionId: sessionAndTerm.session?._id,
+                    // termId: sessionAndTerm.term?._id,
                     date: { $gte: startOfYear, $lt: endOfYear },
                 },
             },
