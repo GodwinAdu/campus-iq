@@ -7,12 +7,12 @@ import { Separator } from "@/components/ui/separator";
 import { ServerHeader } from "./server-header";
 import { ServerSection } from "./server-section";
 import { ServerMember } from "./server-member";
-import { current_user } from "@/lib/helpers/current-user";
 import { ChannelType } from "@/lib/models/channel.models";
 import { MemberRole } from "@/lib/models/member.models";
 import { ServerSearch } from "./sever-search";
 import ServerChannel from "./server-channel";
 import { findServerWithChannelAndMember } from "@/lib/actions/server.actions";
+import { currentUser } from "@/lib/helpers/current-user";
 
 interface ServerSidebarProps {
   serverId: string;
@@ -33,7 +33,7 @@ const roleIconMap = {
 export const ServerSidebar = async ({
   serverId
 }: ServerSidebarProps) => {
-  const user = await current_user();
+  const user = await currentUser();
 
   const server = await findServerWithChannelAndMember(serverId)
 

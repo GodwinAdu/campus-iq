@@ -1,20 +1,17 @@
-import { redirect } from "next/navigation";
-
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { Separator } from "@/components/ui/separator";
-import { current_user } from "@/lib/helpers/current-user";
+import { currentUser } from "@/lib/helpers/current-user";
 import { findAllServersByProfileId } from "@/lib/actions/server.actions";
 import { NavigationItem } from "./navigation-item";
 import { NavigationAction } from "./navigation-action";
-import UserAccountNav from "@/components/UserAccountNav";
 
 
 export const NavigationSidebar = async () => {
-  const profile = await current_user();
+  const profile = await currentUser();
 
-  const servers = await findAllServersByProfileId(profile?._id);
+  const servers: { _id: string; name: string; imageUrl: string }[] = await findAllServersByProfileId(profile?._id);
 
   return (
     <div
@@ -36,7 +33,7 @@ export const NavigationSidebar = async () => {
         ))}
       </ScrollArea>
       <div className="pb-3 mt-auto flex items-center flex-col gap-y-4">
-        <UserAccountNav user={profile} />
+        {/* <UserAccountNav user={profile} /> */}
       </div>
     </div>
   )
