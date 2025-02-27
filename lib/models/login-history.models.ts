@@ -40,6 +40,14 @@ const UserLoginSchema = new Schema({
         type: String, // Example: "Windows", "macOS", "Android"
         required: true,
     },
+    engine: {
+        type: String, // Example: "Windows", "macOS", "Android"
+        required: true,
+    },
+    cpu: {
+        type: String, // Example: "Windows", "macOS", "Android"
+        required: true,
+    },
     location: {
         country: { type: String, default: "Unknown" },
         city: { type: String, default: "Unknown" },

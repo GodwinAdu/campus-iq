@@ -17,6 +17,7 @@ import School from "../models/school.models";
 import MealPayment from "../models/meal-payment.models";
 import MealPlan from "../models/meal-plan.models";
 import { hashSync } from "bcryptjs";
+import ClassPayment from "../models/class-payment.models";
 
 /**
  * Interface for creating a new student.
@@ -481,6 +482,51 @@ export async function fetchStudentsForCanteenList(classId: string) {
                     ...studentObj.canteen,
                     planId: studentObj.canteen?.planId ?? null  // Avoid deep references
                 }
+            };
+        });
+
+
+        return JSON.parse(JSON.stringify(updatedStudents));
+    } catch (error) {
+        console.log("Something went wrong", error);
+        throw error;
+    }
+}
+export async function fetchStudentsForClassFeesList(classId: string) {
+    try {
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
+        const schoolId = user.schoolId;
+        await connectToDB();
+
+        // Fetch students from the specified class and school with populated MealPlan
+        const students = await Student.find({ schoolId, classId })
+
+        if (!students || students.length === 0) {
+            return [];
+        }
+
+        // Fetch meal payments for these students with today's date
+        const studentIds = students.map(student => student._id);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const paidStudents = await ClassPayment.find({
+            schoolId,
+            payerId: { $in: studentIds },
+            status: "Completed",
+            createdAt: { $gte: today }
+        }).select("payerId");
+
+        const paidStudentIds = new Set(paidStudents.map(payment => payment.payerId.toString()));
+
+        // Add "payed" field to student objects and handle null planId
+        const updatedStudents = students.map(student => {
+            const studentObj = student.toObject();
+            return {
+                ...studentObj,
+                payed: paidStudentIds.has(studentObj._id.toString()),
             };
         });
 

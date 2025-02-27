@@ -946,6 +946,41 @@ interface IInventoryStore extends Document {
     updatedAt: Date;
 }
 
+// Interface for DistributionItem
+interface IDistributionItem {
+    distribution: string;
+    mark: number;
+}
+
+// Interface for SubjectItem
+interface ISubjectItem {
+    subjectName: string;
+    distributionItems: IDistributionItem[];
+    totalMark: number;
+    grade: string | null;
+}
+
+// Interface for Mark
+interface IMark extends Document {
+    _id?:string;
+    schoolId: Types.ObjectId;
+    examId: Types.ObjectId;
+    studentId: Types.ObjectId;
+    classId: Types.ObjectId;
+    subjectItems: ISubjectItem[];
+    totalMarks: number;
+    position: number;
+    publish: boolean;
+    createdBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    delete_flag: boolean;
+    modifyBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 interface IInventorySupplier extends Document {
     _id?: string;
     schoolId: Types.ObjectId;
@@ -1130,6 +1165,89 @@ interface IRole extends Document {
     updatedAt: Date;
 }
 
+
+// Define the TypeScript interface for Assignment
+interface IAssignment extends Document {
+    _id?: string;
+    schoolId: Types.ObjectId;
+    classId: Types.ObjectId;
+    sessionId: Types.ObjectId;
+    subjectId: Types.ObjectId;
+    termId: Types.ObjectId;
+    date: Date;
+    dateOfSubmission: Date;
+    publishLater: boolean;
+    scheduleDate?: Date;
+    homework?: string;
+    attachmentFile?: string;
+    createdBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    modifiedBy?: Types.ObjectId | null;
+    deletedBy?: Types.ObjectId | null;
+    action_type?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+
+// Define the TypeScript interface for Postal
+interface IPostal extends Document {
+    _id?:string;
+    schoolId: Types.ObjectId;
+    sender: string;
+    receiver: string;
+    postalType: "dispatch" | "receive";
+    postalNumber: string;
+    address: string;
+    postalDate: Date;
+    postalDetails?: string;
+    attachmentFile?: string;
+    confidential: boolean;
+    createdBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    modifiedBy?: Types.ObjectId | null;
+    action_type?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+// Define TypeScript interface for Call
+interface ICall extends Document {
+    _id?:string;
+    schoolId: Types.ObjectId;
+    callType: "incoming" | "outgoing";
+    callPurpose: string;
+    callerName: string;
+    phone: string;
+    email: string;
+    message: string;
+    date: Date;
+    timeSlot: string;
+    followDate?: Date | null;
+    createdBy?: Types.ObjectId | null;
+    mod_flag: boolean;
+    del_flag: boolean;
+    modifiedBy?: Types.ObjectId | null;
+    action_type?: string;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface INotification extends Document {
+    _id?: string;
+    schoolId:Schema.Types.ObjectId;
+    userType: "Employee" | "Student" | "Parent";
+    userId: string;
+    message: string;
+    type: "info" | "success" | "error" | "warning";
+    read: boolean;
+    isDeleted: boolean;
+    createdAt: Date;
+}
 
 
 type UserIdParams = Promise<{ userId: string }>

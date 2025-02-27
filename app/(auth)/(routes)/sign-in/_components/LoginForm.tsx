@@ -120,7 +120,7 @@ const LoginForm = () => {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    <SelectItem value="employee">Admin</SelectItem>
+                                    <SelectItem value="employee">Administration</SelectItem>
                                     <SelectItem value="student">Student</SelectItem>
                                     <SelectItem value="parent">Parent</SelectItem>
                                 </SelectContent>

@@ -21,7 +21,10 @@ import {
   CookingPot,
   Menu,
   HistoryIcon,
-  Trash
+  Trash,
+  ReceiptIcon,
+  ListCheck,
+  LucideReceiptText
 } from "lucide-react"
 import {
   Collapsible,
@@ -85,20 +88,40 @@ export function NavMain({ role, school }: NavMainProps) {
     {
       title: "Admission Portal",
       url: `/${schoolId}/admin/${userId}/admissions`,
-      icon: Menu,
+      icon:ListCheck,
       isActive: false,
 
     },
     {
       title: "Front Desk",
       url: "#",
-      icon: HardDrive,
+      icon: LucideReceiptText,
       isActive: true,
       roleField: "systemConfig",
       items: [
         {
-          title: "manage Sessions",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-sessions`,
+          title: "Admission",
+          url: `/${schoolId}/admin/${userId}/front-desk/admission`,
+          roleField: "manageSession"
+        },
+        {
+          title: "Postal Records",
+          url: `/${schoolId}/admin/${userId}/front-desk/postal-records`,
+          roleField: "manageSession"
+        },
+        {
+          title: "Call Logs",
+          url: `/${schoolId}/admin/${userId}/front-desk/call-logs`,
+          roleField: "manageSession"
+        },
+        {
+          title: "Visitor Logs",
+          url: `/${schoolId}/admin/${userId}/front-desk/visitor-logs`,
+          roleField: "manageSession"
+        },
+        {
+          title: "Complaints",
+          url: `/${schoolId}/admin/${userId}/front-desk/complaints`,
           roleField: "manageSession"
         },
       ],
@@ -282,24 +305,6 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/manage-employee/manage-employees`,
           roleField: "manageEmployee"
         },
-      ],
-    },
-    {
-      title: "Manage Attendance",
-      url: "#",
-      icon: BookOpenCheck,
-      roleField: "manageAttendance",
-      items: [
-        {
-          title: "Students",
-          url: `/${schoolId}/admin/${userId}/manage-attendance/students`,
-          roleField: "manageStudentAttendance"
-        },
-        {
-          title: "Employees",
-          url: `/${schoolId}/admin/${userId}/manage-attendance/employees`,
-          roleField: "manageEmployeeAttendance",
-        }
       ],
     },
     proPlan && {

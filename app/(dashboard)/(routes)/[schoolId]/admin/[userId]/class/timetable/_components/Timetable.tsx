@@ -19,7 +19,7 @@ const classTypeColors: Record<ClassType, string> = {
     tutorial: 'bg-yellow-100 text-yellow-800',
 }
 
-export default function Timetable({ data }: { data: ITimetable[] }) {
+export default function Timetable({ data }: { data: ITimetable }) {
     const [currentDay, setCurrentDay] = useState<string>('')
     const [currentTime, setCurrentTime] = useState<string>('')
 

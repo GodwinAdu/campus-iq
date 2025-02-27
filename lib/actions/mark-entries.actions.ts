@@ -2,7 +2,6 @@
 
 
 import ExamSchedule from "../models/exam-schedule.models";
-import ExamSetup from "../models/exam-setup.models";
 import Mark from "../models/mark-entries.models";
 import Student from "../models/student.models";
 import Subject from "../models/subject.models";
@@ -10,7 +9,6 @@ import { connectToDB } from "../mongoose";
 import GradeRange from "../models/grade-range.models";
 import Employee from "../models/employee.models";
 import { currentUser } from "../helpers/current-user";
-import { Types } from "mongoose";
 
 // examId: {
 //     type: Schema.Types.ObjectId,
@@ -40,18 +38,19 @@ import { Types } from "mongoose";
 //     default: null
 // },
 
-export async function createMarkEntries(classId: string) {
+export async function createMarkEntries(classId: string, studentId: string) {
     try {
         const user = await currentUser();
         if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
 
         await connectToDB(); // Ensure DB connection is established
 
         // Run queries concurrently
         const [classSubjects, examSchedule, markEntries] = await Promise.all([
-            Subject.find({ classId }).select("subjectName").lean(),
-            ExamSchedule.findOne({ classId }).populate("examId", "markDistributions").lean(),
-            Mark.findOne({ classId }).populate("studentId", "fullName").lean(),
+            Subject.find({ schoolId, classId }).select("subjectName").lean(),
+            ExamSchedule.findOne({schoolId, classId }).populate("examId", "markDistributions").lean(),
+            Mark.findOne({ classId, studentId }).populate("studentId", "fullName").lean(),
         ]);
 
         if (!classSubjects.length) throw new Error(`Subjects not found for class ${classId}`);
@@ -61,7 +60,7 @@ export async function createMarkEntries(classId: string) {
         if (markEntries) return JSON.parse(JSON.stringify(markEntries));
 
         // Fetch student IDs only when mark entries don't exist
-        const student = await Student.findOne({ classId }).select("_id fullName").lean();
+        const student = await Student.findById(studentId).select("_id fullName").lean();
         if (!student) throw new Error("No students found");
 
         // Prepare subject items structure
@@ -75,7 +74,7 @@ export async function createMarkEntries(classId: string) {
 
         // Create new mark entry
         const newMarkEntry = await Mark.create({
-            schoolId: user.schoolId,
+            schoolId,
             examId: examSchedule.examId._id,
             classId,
             studentId: student._id,
@@ -85,7 +84,7 @@ export async function createMarkEntries(classId: string) {
         // Populate `studentId` before returning
         const populatedMarkEntry = await Mark.findById(newMarkEntry._id).populate("studentId", "fullName").lean();
 
-        return JSON.parse(JSON.stringify( populatedMarkEntry)); //
+        return JSON.parse(JSON.stringify(populatedMarkEntry)); //
 
     } catch (error) {
         console.error("Error creating mark entries:", error);
@@ -122,6 +121,7 @@ export async function saveMarkEntries({
         const { subjectItems, publish } = values
 
         const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
 
         // Ensure the database connection is established
         await connectToDB();
@@ -187,8 +187,11 @@ export async function saveMarkEntries({
 
 export async function fetchAllMarks(classId: string) {
     try {
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+        const schoolId = user.schoolId;
         await connectToDB()
-        const markEntries = await Mark.find({ classId })
+        const markEntries = await Mark.find({ schoolId,classId })
             .populate([
                 { path: "studentId", model: Student, select: "fullName" },
                 { path: "createdBy", model: Employee, select: "fullName" },
@@ -199,6 +202,7 @@ export async function fetchAllMarks(classId: string) {
             console.log("No mark entries found");
             return [];
         }
+        console.log("Mark entries found",markEntries);
 
         return JSON.parse(JSON.stringify(markEntries));
 

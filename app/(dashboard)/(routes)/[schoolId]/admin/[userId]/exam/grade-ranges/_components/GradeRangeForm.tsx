@@ -32,6 +32,8 @@ const GradeRangeForm = ({ type, initialData }: { type: "create" | "update", init
     const router = useRouter();
     const params = useParams();
 
+    const { schoolId, userId } = params;
+
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -56,9 +58,9 @@ const GradeRangeForm = ({ type, initialData }: { type: "create" | "update", init
             if (type === "update") {
                 await updateGradeRange(gradeId, values, path);
             }
-          
+
             form.reset();
-            router.push(`/admin/${params.adminId}/exam/grade-ranges`)
+            router.push(`/${schoolId}/admin/${userId}/exam/grade-ranges`)
             toast({
                 title: "Grade Range Created",
                 description: "Grade range was created successfully...",

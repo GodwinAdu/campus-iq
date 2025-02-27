@@ -9,7 +9,7 @@ import { AlertCircle } from 'lucide-react'
 const TimetableGrid = ({ classes }: { classes: IClass[] }) => {
     const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [rowData, setRowData] = useState<ITimetable[] | []>([]);
+    const [rowData, setRowData] = useState<ITimetable | null>(null);
 
     useEffect(() => {
         const fetchPayment = async () => {
@@ -37,15 +37,22 @@ const TimetableGrid = ({ classes }: { classes: IClass[] }) => {
 
             </div>
             <div className="py-4 mt-2 px-2">
-                {rowData.length === 0 ? (
-                    <div className="flex flex-col items-center py-10 mt-16">
-                        <AlertCircle className="w-12 h-12 text-gray-500 mb-4" />
-                        <p className="text-lg text-gray-600 mb-2">No Time found found.</p>
-                        <p className="text-md text-gray-500">Please add new timetable to manage them here.</p>
+                {isLoading ? (
+                    <div className="flex items-center justify-center w-full h-full bg-gray-500 opacity-50">
+                        <div className="w-8 h-8 text-white text-center">Loading...</div>
                     </div>
                 ) : (
-                    <Timetable data={rowData} />
+                    !rowData ? (
+                        <div className="flex flex-col items-center py-10 mt-16">
+                            <AlertCircle className="w-12 h-12 text-gray-500 mb-4" />
+                            <p className="text-lg text-gray-600 mb-2">No Time found found.</p>
+                            <p className="text-md text-gray-500">Please add new timetable to manage them here.</p>
+                        </div>
+                    ) : (
+                        <Timetable data={rowData} />
+                    )
                 )}
+
             </div>
 
         </>

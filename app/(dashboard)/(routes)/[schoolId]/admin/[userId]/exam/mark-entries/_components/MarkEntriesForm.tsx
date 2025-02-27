@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { saveMarkEntries } from "@/lib/actions/mark-entries.actions";
 import { Switch } from "@/components/ui/switch";
 
@@ -31,10 +31,10 @@ const formSchema = z.object({
             totalMark: z.number().nullable().optional(), // totalMark field
             distributionItems: z.array(
                 z.object({
-                    distributionId: z.string().min(2, {
+                    distribution: z.string().min(2, {
                         message: "Distribution ID must be at least 2 characters.",
                     }),
-                    mark: z.coerce.number().nullable().optional(),
+                    mark: z.coerce.number().nullable(),
                 })
             ),
         })
@@ -43,9 +43,11 @@ const formSchema = z.object({
 
 
 export function MarkEntriesForm({ mark }: { mark: IMark }) {
-    const path = usePathname();
+    // const path = usePathname();
     const router = useRouter();
     const params = useParams();
+
+    const {schoolId,userId} = params;
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -65,12 +67,13 @@ export function MarkEntriesForm({ mark }: { mark: IMark }) {
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
             await saveMarkEntries({ mark, values })
-            router.push(`/admin/${params.adminId}/exam/mark-entries`);
+            router.push(`/${schoolId}/admin/${userId}/exam/mark-entries`);
             toast({
                 title: "Update Successfully",
                 description: "Update exam schedule successfully...",
             });
         } catch (error) {
+            console.log(error);
             toast({
                 title: "Something went wrong",
                 description: "Please try again later",

@@ -9,9 +9,11 @@ import { getOrdinalSuffix } from '@/lib/utils';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import ClassSelection from '@/components/commons/ClassSelection';
+import { DataTable } from '@/components/table/data-table';
+import { columns } from './column';
 
 const PositionGrid = ({ classes }: { classes: IClass[] }) => {
-    const [selectedClass, setSelectedClass] = useState("");
+    const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [isLoadingGenerate, setIsLoadingGenerate] = useState<boolean>(false)
     const [rowData, setRowData] = useState([]);
@@ -19,37 +21,52 @@ const PositionGrid = ({ classes }: { classes: IClass[] }) => {
     const router = useRouter()
 
     useEffect(() => {
-        const fetchPayment = async () => {
+        let isMounted = true; // Prevents state update if component unmounts
+
+        const fetchMarks = async () => {
             try {
-                setIsLoading(true)
-                const classId = classes[0]._id;
-                const data = await fetchAllMarks(classId);
-                const formattedData = data.map((mark: IMark) => ({
+                setIsLoading(true);
+                const data = await fetchAllMarks(selectedClass as string);
+
+                if (!isMounted) return; // Prevent state update after unmount
+
+                let formattedData = data?.map((mark: IMark) => ({
                     ...mark,
-                    student: mark.studentId.fullName,
-                    position:(mark.position <= 0) ? "Null" : getOrdinalSuffix(mark.position),
-                    createdBy: mark.createdBy.fullName,
+                    student: mark.studentId?.fullName || "Unknown",
+                    position: mark.position && mark.position > 0 ? mark.position : null, // Keep as number for sorting
+                    createdBy: mark.createdBy?.fullName || "Unknown",
                     createdAt: moment(mark.createdAt).format("YYYY-MM-DD HH:mm"),
                 }));
-                setRowData(formattedData)
+
+                // Sort by position (ascending), ensuring "Null" values are last
+                formattedData.sort((a: IMark, b: IMark) => {
+                    if (a.position === null) return 1; // Move nulls to the bottom
+                    if (b.position === null) return -1;
+                    return a.position - b.position; // Sort numerically
+                });
+
+                // Convert position to ordinal suffix *after* sorting
+                formattedData = formattedData.map((mark: IMark) => ({
+                    ...mark,
+                    position: mark.position ? getOrdinalSuffix(mark.position) : "Null",
+                }));
+
+                setRowData(formattedData);
             } catch (error) {
-                console.log(error)
+                console.error("Error fetching marks:", error);
             } finally {
-                setIsLoading(false)
+                if (isMounted) setIsLoading(false);
             }
-        }
-        const newColumnDefs = [
-            { field: "student" },
-            { field: "totalMarks" },
-            { field: "position" },
-            { field: "createdBy" },
-            { field: "createdAt" },
-        ];
+        };
 
-        fetchPayment()
-    }, []);
+        fetchMarks();
 
-    const onGenerateHandler = async (classId:string) =>{
+        return () => {
+            isMounted = false; // Cleanup function to avoid state updates
+        };
+    }, [selectedClass]);
+    
+    const onGenerateHandler = async (classId: string) => {
         try {
             setIsLoadingGenerate(true)
             await generatePosition(classId)
@@ -58,37 +75,21 @@ const PositionGrid = ({ classes }: { classes: IClass[] }) => {
                 title: "Marks generated successfully",
                 description: "The marks have been generated for all students in the selected class.",
             })
-            
+
         } catch (error) {
+            console.error("Error generating position:", error)
             toast({
                 title: "Something went wrong",
                 description: "Please try again later...",
                 variant: "destructive",
             })
-            
-        } finally{
+
+        } finally {
             setIsLoadingGenerate(false)
         }
     }
-    const onSearchHandler = async () => {
-        try {
-            setIsLoading(true)
-            const data = await fetchAllMarks(selectedClass);
-            const formattedData = data.map((mark: IMark) => ({
-                ...mark,
-                student: mark.studentId.fullName,
-                createdBy: mark.createdBy.fullName,
-                createdAt: moment(mark.createdAt).format("YYYY-MM-DD HH:mm"),
-            }));
-            setRowData(formattedData);
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setIsLoading(false)
-        }
-    };
-
+    console.log(rowData, "row data")
 
     return (
         <>
@@ -100,17 +101,12 @@ const PositionGrid = ({ classes }: { classes: IClass[] }) => {
                     <ClassSelection selectedClass={(value) => setSelectedClass(value)} classes={classes} />
                 </div>
 
-                <Button disabled={isLoading} className="flex" size="sm" onClick={onSearchHandler}>
-                    {isLoading ? (<Loader2 className="w-4 h-4 ml-2 animate-spin" />) : "Search"}
-                </Button>
-
-                <Button disabled={isLoadingGenerate} className="flex" size="sm" onClick={() => onGenerateHandler(selectedClass)}>
-                    {isLoadingGenerate ? (<Loader2 className="w-4 h-4 ml-2 animate-spin" /> ) : "generate position"}
+                <Button disabled={isLoadingGenerate} className="flex" size="sm" onClick={() => onGenerateHandler(selectedClass as string)}>
+                    {isLoadingGenerate ? (<Loader2 className="w-4 h-4 ml-2 animate-spin" />) : "generate position"}
                 </Button>
             </div>
             <div className="py-4 mt-2 px-2">
-
-               
+                <DataTable searchKey="student" data={rowData} columns={columns} isLoading={isLoading} />
             </div>
 
         </>

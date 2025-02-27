@@ -64,7 +64,7 @@ export async function fetchTimetableByClassId(classId: string) {
             .populate("createdBy");
 
         if (!timetable) {
-            throw new Error("Timetable not found");
+            return null
         }
 
         return JSON.parse(JSON.stringify(timetable));
