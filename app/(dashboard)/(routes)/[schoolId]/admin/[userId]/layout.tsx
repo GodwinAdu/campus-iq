@@ -9,6 +9,7 @@ import TourLayout from "@/provider/TourLayout";
 import AppSidebarMain from "@/components/admin/dashboard/app-sidebar-main";
 import Navbar from "@/components/admin/Navbar";
 import { getAllSessions } from "@/lib/actions/session.actions";
+import { ModalProvider } from "@/components/admin/modals/modal-provider";
 
 
 export default async function RootLayout({
@@ -28,6 +29,7 @@ export default async function RootLayout({
                         <Navbar sessions={sessions} user={user} />
                         <div className="relative">
                             <div id="main-content" className="py-4 px-4 overflow-hidden">
+                                <ModalProvider />
                                 {children}
                                 {/* <UseCheckStoreExpired /> */}
                             </div>

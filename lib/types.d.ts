@@ -1199,7 +1199,7 @@ interface IPostal extends Document {
     sender: string;
     receiver: string;
     postalType: "dispatch" | "receive";
-    postalNumber: string;
+    referenceNo: string;
     address: string;
     postalDate: Date;
     postalDetails?: string;
@@ -1226,7 +1226,8 @@ interface ICall extends Document {
     email: string;
     message: string;
     date: Date;
-    timeSlot: string;
+    startTime: string;
+    endTime:string;
     followDate?: Date | null;
     createdBy?: Types.ObjectId | null;
     mod_flag: boolean;

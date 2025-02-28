@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type ModalType = 
+export type ModalType =
   | "createServer"
   | "invite"
   | "editServer"
@@ -15,11 +15,11 @@ export type ModalType =
   | "deleteMessage";
 
 interface ModalData {
-  server?: any;
-  channel?: any;
-  channelType?: any;
+  server?: { id: string; name: string }; // Replace with a more specific type
+  channel?: { id: string; name: string }; // Replace with a more specific type
+  channelType?: "text" | "voice" | "video";
   apiUrl?: string;
-  query?: Record<string, any>;
+  query?: Record<string, string | number | boolean>;
 }
 
 interface ModalStore {

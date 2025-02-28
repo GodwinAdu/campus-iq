@@ -2,18 +2,18 @@
 import { Model, model, models, Schema } from "mongoose";
 
 
-const CallSchema:Schema<ICall> = new Schema({
-    schoolId:{
+const CallSchema: Schema<ICall> = new Schema({
+    schoolId: {
         type: Schema.Types.ObjectId,
         ref: "School",
         required: true,
     },
-    callType:{
+    callType: {
         type: String,
         enum: ['incoming', 'outgoing'],
         required: true,
     },
-    callPurpose:{
+    callPurpose: {
         type: String,
         required: true,
     },
@@ -38,15 +38,19 @@ const CallSchema:Schema<ICall> = new Schema({
         type: Date,
         default: Date.now(),
     },
-    timeSlot:{
+    startTime: {
         type: String,
         required: true,
     },
-    followDate:{
-        type: Date,
-        default:null,
+    endTime: {
+        type: String,
+        required: true,
     },
-    createdBy:{
+    followDate: {
+        type: Date,
+        default: null,
+    },
+    createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
         default: null,
@@ -59,22 +63,22 @@ const CallSchema:Schema<ICall> = new Schema({
         type: Boolean,
         default: false,
     },
-    modifiedBy:{
+    modifiedBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
         default: null,
     },
-    action_type:{
+    action_type: {
         type: String,
     }
-},{
-    timestamps:true,
-    versionKey:false, // Removes the __v field
+}, {
+    timestamps: true,
+    versionKey: false, // Removes the __v field
 });
 
 
 type CallModel = Model<ICall>;
 
-const Call:CallModel = models.Call || model<ICall>("Call",CallSchema);
+const Call: CallModel = models.Call || model<ICall>("Call", CallSchema);
 
 export default Call;

@@ -235,25 +235,20 @@ export function NavMain({ role, school }: NavMainProps) {
       roleField: "studentManagement",
       items: [
         {
-          title: "Add Bulk Students",
-          url: `/${schoolId}/admin/${userId}/manage-students/bulk-students`,
+          title: "Assistant Manager",
+          url: `/${schoolId}/admin/${userId}/student-wellbeing/assistant`,
           roleField: "manageStudent"
         },
         {
-          title: "Student Type",
-          url: `/${schoolId}/admin/${userId}/manage-students/student-type`,
+          title: "Social Support",
+          url: `/${schoolId}/admin/${userId}/student-wellbeing/social-support`,
           roleField: "manageStudent"
         },
         {
-          title: "Manage Student",
-          url: `/${schoolId}/admin/${userId}/manage-students/manage-student`,
+          title: "Add Wellbeing",
+          url: `/${schoolId}/admin/${userId}/student-wellbeing/wellbeing`,
           roleField: "manageStudent"
-        },
-        {
-          title: "Manage Parent",
-          url: `/${schoolId}/admin/${userId}/manage-students/manage-parent`,
-          roleField: "manageStudent"
-        },
+        }
       ],
     },
     {

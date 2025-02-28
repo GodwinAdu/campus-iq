@@ -19,7 +19,7 @@ const PostalSchema:Schema<IPostal> = new Schema({
         type:String,
         enum:['dispatch', 'receive'],
     },
-    postalNumber:{
+    referenceNo:{
         type:String,
         required:true
     },
