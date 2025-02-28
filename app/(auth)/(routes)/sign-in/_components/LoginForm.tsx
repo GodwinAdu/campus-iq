@@ -50,10 +50,10 @@ const LoginForm = () => {
             let user;
             if (values.role === "student") {
                 user = await loginStudent(values);
-                router.push(`/${user.schoolId}/student/${user._id}`);
+                router.push(`/${user.schoolId}`);
             } else if (values.role === "employee") {
                 user = await loginEmployee(values);
-                router.push(`/${user.schoolId}/admin/${user._id}`);
+                router.push(`/${user.schoolId}`);
             } else if (values.role === "parent") {
                 // Placeholder for parent login logic
                 toast({ title: "Parent login not yet implemented." });
