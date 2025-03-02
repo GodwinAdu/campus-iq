@@ -20,10 +20,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { loginEmployee } from "@/lib/actions/employee-login.actions";
-import { loginStudent } from "@/lib/actions/student/login.actions";
+import Link from "next/link";
+import { loginUser } from "@/lib/actions/login.action";
 
 // Define a schema that ensures identifier and password validation
 const formSchema = z.object({
@@ -33,7 +33,6 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
-    const router = useRouter();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -47,18 +46,12 @@ const LoginForm = () => {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            let user;
-            if (values.role === "student") {
-                user = await loginStudent(values);
-                router.push(`/${user.schoolId}`);
-            } else if (values.role === "employee") {
-                user = await loginEmployee(values);
-                router.push(`/${user.schoolId}`);
-            } else if (values.role === "parent") {
-                // Placeholder for parent login logic
-                toast({ title: "Parent login not yet implemented." });
-                return;
-            }
+            const user = await loginUser(values)
+            const role = user.role.toLowerCase();
+            const schoolId = user.schoolId;
+            const destination = `/${schoolId}/${role}/${user._id}`;
+
+            window.location.href = (destination)
 
             toast({
                 title: "Welcome Back!",
@@ -98,7 +91,15 @@ const LoginForm = () => {
                     name="password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="font-bold">Password</FormLabel>
+                            <div className="flex items-center">
+                                <FormLabel className="font-bold" htmlFor="password">Password</FormLabel>
+                                <Link
+                                    href="/forget_password"
+                                    className="ml-auto text-sm underline-offset-2 hover:underline"
+                                >
+                                    Forgot your password?
+                                </Link>
+                            </div>
                             <FormControl>
                                 <Input type="password" placeholder="Enter password" {...field} disabled={isSubmitting} />
                             </FormControl>

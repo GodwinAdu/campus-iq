@@ -118,15 +118,14 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
             throw new Error("School not found");
         }
 
-        const [rawUsername, parentUsername, rawPassword, parentPassword] = await Promise.all([
-            generateUniqueUsername(fullName),
-            generateUniqueUsername(guardianName as string),
-            generatePassword(),
-            generatePassword(),
-        ]);
+        const rawUsername = generateUniqueUsername(fullName)
+        const parentUsername = generateUniqueUsername(guardianName as string)
+        const rawPassword = generatePassword()
+        const parentPassword = generatePassword()
 
-        const hashedPassword = hash(rawPassword, 10);
-        const parentHashedPassword = hash(parentPassword, 10)
+
+        const hashedPassword = await hash(rawPassword, 10);
+        const parentHashedPassword = await hash(parentPassword, 10)
 
         let parent;
 
@@ -137,15 +136,13 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
             }
         } else {
             parent = new Parent({
-                personalInfo: {
-                    username: parentUsername,
-                    fullName: guardianName,
-                    email: guardianEmail,
-                    phone: guardianPhone,
-                    relationship: guardianRelationship,
-                    address: guardianAddress,
-                    password: parentHashedPassword,
-                },
+                username: parentUsername,
+                fullName: guardianName,
+                email: guardianEmail,
+                phone: guardianPhone,
+                relationship: guardianRelationship,
+                address: guardianAddress,
+                password: parentHashedPassword,
                 occupation: guardianOccupation,
                 schoolId,
                 createdBy: user._id,
@@ -224,26 +221,22 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
     }
 }
 
-export async function fetchStudent(id: string) {
+export async function fetchStudentById(id: string) {
     try {
-        const user = await currentUser();
-        if (!user) throw new Error("user not logged in");
 
         await connectToDB();
-        const student = await Student.findById(id);
+        const student = await Student.findById(id).select('-password');;
 
         if (!student) {
-            console.log("student doesn't exist")
-            return null
+            console.warn("Student doesn't exist");
+            return null;
         }
 
-        // Exclude sensitive information like password
-        const { password: _, ...userWithoutPassword } = student.toObject();
-
-        return JSON.parse(JSON.stringify(userWithoutPassword));
+        return JSON.parse(JSON.stringify(student));
 
     } catch (error) {
-        console.log("Unable to fetch student", error)
+        console.error("Unable to fetch student:", error);
+        return null;  // Ensure the function always returns something
     }
 }
 
@@ -320,33 +313,104 @@ export async function fetchStudentByRole(role: string, classId: string) {
 }
 
 
-export async function updateStudent(studentId: string, values: Partial<CreateStudentProps>, path?: string) {
-    await connectToDB();
-
+export async function updateStudent(
+    studentId: string,
+    values: Partial<CreateStudentProps>,
+    path?: string
+) {
     try {
+        await connectToDB(); // Ensure DB connection first
+
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
+        const school = await School.findById(user.schoolId).lean();
+        if (!school) throw new Error("School not found");
+
+        const {
+            parentId,
+            guardianName,
+            guardianEmail,
+            guardianPhone,
+            guardianOccupation,
+            guardianRelationship,
+            guardianAddress,
+        } = values;
+
+
+        if (!parentId || parentId === "undefined") {
+            const existingParent = await Parent.findOne({ email: guardianEmail }).lean();
+            if (existingParent) throw new Error("Parent with this email already exists");
+
+            const username = generateUniqueUsername(guardianName as string);
+            const password = generatePassword();
+            const hashedPassword = await hash(password, 10);
+
+            const newParent = await Parent.create({
+                username,
+                fullName: guardianName,
+                email: guardianEmail,
+                phone: guardianPhone,
+                relationship: guardianRelationship,
+                address: guardianAddress,
+                password: hashedPassword,
+                occupation: guardianOccupation,
+                schoolId: user.schoolId,
+                createdBy: user._id,
+                action_type: "created",
+            });
+
+            await wrappedSendMail({
+                to: guardianEmail,
+                subject: "New Parent Registration",
+                html: welcomeRegisterEmail(
+                    guardianName!,
+                    password,
+                    username,
+                    school.schoolName,
+                    school.schoolEmail
+                ),
+            });
+
+            console.log("New parent created:", newParent._id);
+        }
+
         const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
             { $set: values },
             { new: true, runValidators: true }
-        );
+        ).lean();
 
-        if (!updatedStudent) {
-            console.log("Students not found");
-            return null;
-        }
+        if (!updatedStudent) throw new Error("Student not found");
 
-        console.log("Update successful");
+        console.log("Student update successful:", updatedStudent._id);
 
-        if (path) {
-            revalidatePath(path);
-        }
+        if (path) revalidatePath(path);
 
-        return JSON.parse(JSON.stringify(updatedStudent));
+        return updatedStudent;
     } catch (error) {
-        console.error("Error updating Student:", error);
+        console.error("Error updating student:", error);
         throw error;
     }
 }
+
+export async function updateOnlyStudent(studentId: string, values: Partial<CreateStudentProps>) {
+    try {
+        await connectToDB();
+        const updatedStudent = await Student.findByIdAndUpdate(
+            studentId,
+            { $set: values },
+            { new: true, runValidators: true })
+            .lean();
+        if (!updatedStudent) throw new Error("Student not found");
+
+        return updatedStudent;
+    } catch (error) {
+        console.error("Error updating student:", error);
+        throw error;
+    }
+}
+
 
 export async function fetchStudentByClassId(id: string) {
     try {
@@ -397,7 +461,7 @@ export async function uploadBulkStudents(classId: string, students: any[]) {
         const newStudents = await Student.insertMany(processedStudents);
 
         if (newStudents.length === 0) throw new Error("No students were inserted into the database");
-        
+
         const studentIds = newStudents.map(student => student._id);
 
 

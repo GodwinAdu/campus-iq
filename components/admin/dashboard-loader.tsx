@@ -22,7 +22,7 @@ export const DashboardLoader = () => {
             setProgress((prev) => {
                 if (prev >= 50) {
                     clearInterval(interval)
-                    return 50
+                    return 99
                 }
 
                 // Calculate which step we're on based on progress
@@ -55,7 +55,7 @@ export const DashboardLoader = () => {
 
                 <Card className="border-2 border-primary/10 shadow-lg backdrop-blur-sm bg-card/95">
                     <CardHeader className="pb-4">
-                        <CardTitle className="text-center text-xl font-bold">School Management System</CardTitle>
+                        <CardTitle className="text-center text-xl font-bold">Please Wait ...</CardTitle>
                         <CardDescription className="text-center">Preparing your dashboard experience</CardDescription>
                     </CardHeader>
 

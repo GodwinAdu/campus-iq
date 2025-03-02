@@ -9,7 +9,7 @@ import { columns } from './column';
 
 
 const WellbeingGrid = ({ classes }: { classes: IClass[] }) => {
-    const [selectedClass, setSelectedClass] = useState(classes[0]._id)
+    const [selectedClass, setSelectedClass] = useState(classes[0]?._id)
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [studentList, setStudentList] = useState<StudentCanteen[] | []>([]);
     useEffect(() => {

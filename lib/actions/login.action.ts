@@ -8,7 +8,6 @@ import jwt from 'jsonwebtoken';
 import Student from "../models/student.models";
 import Parent from "../models/parent.models";
 import { Model } from "mongoose";
-import Teacher from "../models/teacher.models";
 
 
 export const loginUser = async (values: { identifier: string; password: string; role: string }) => {
@@ -22,7 +21,6 @@ export const loginUser = async (values: { identifier: string; password: string; 
 
         const models = {
             Employee,
-            Teacher,
             Student,
             Parent,
         } as const;
@@ -32,9 +30,6 @@ export const loginUser = async (values: { identifier: string; password: string; 
         switch (role) {
             case "employee":
                 userModel = Employee;
-                break;
-            case "teacher":
-                userModel = Teacher;
                 break;
             case "student":
                 userModel = Student;
@@ -51,8 +46,8 @@ export const loginUser = async (values: { identifier: string; password: string; 
         if (!userModel) throw new Error("Invalid role");
 
         const user = await (userModel as Model<IEmployee | IStudent | IParent>).findOne({
-            $or: [{ "personalInfo.email": identifier }, { "personalInfo.username": identifier }],
-        });
+            $or: [{ email: identifier }, { username: identifier }],
+        }).lean();
 
 
         if (!user) throw new Error(`${role} not found`);
@@ -62,7 +57,7 @@ export const loginUser = async (values: { identifier: string; password: string; 
 
         const tokenData = {
             id: user._id,
-            role: user.role,
+            role: (user as IEmployee | IStudent | IParent).role,
         };
 
         const token = jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY!, { expiresIn: "1d" });

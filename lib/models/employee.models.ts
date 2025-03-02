@@ -6,71 +6,69 @@ const EmployeeSchema: Schema<IEmployee> = new Schema({
         ref: "School",
         required: true
     },
-    personalInfo: {
-        username: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        fullName: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        imgUrl: {
-            type: String,
-            default: ""
-        },
-        dob: {
-            type: Date,
-        },
-        email: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        gender: {
-            type: String,
-        },
-        phone: {
-            type: String,
-        },
-        password: {
-            type: String,
-            required: true
-        },
-        religion: {
-            type: String,
-        },
-        maritalStatus: {
-            type: String,
-        },
-        addresses: {
-            street: {
-                type: String,
-            },
-            city: {
-                type: String,
-            },
-            state: {
-                type: String,
-            },
-            zipCode: {
-                type: String,
-            },
-            country: {
-                type: String,
-            },
-        },
-        emergencyContact: {
-            type: Object,
-        },
-        currentAddress: {
+    username: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    fullName: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    imgUrl: {
+        type: String,
+        default: ""
+    },
+    dob: {
+        type: Date,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    gender: {
+        type: String,
+    },
+    phone: {
+        type: String,
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    religion: {
+        type: String,
+    },
+    maritalStatus: {
+        type: String,
+    },
+    addresses: {
+        street: {
             type: String,
         },
-        permanentAddress: {
+        city: {
             type: String,
         },
+        state: {
+            type: String,
+        },
+        zipCode: {
+            type: String,
+        },
+        country: {
+            type: String,
+        },
+    },
+    emergencyContact: {
+        type: Object,
+    },
+    currentAddress: {
+        type: String,
+    },
+    permanentAddress: {
+        type: String,
     },
     role: {
         type: String,

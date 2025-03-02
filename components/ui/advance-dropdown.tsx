@@ -29,6 +29,7 @@ interface DropdownItemProps {
     onClick?: () => void
     variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
     modalType?: "settings" | "invite" | "help" | "notifications" | "documents" | "mood" | "activity" | "behavior"
+    data: IStudent
 }
 
 export function AdvancedDropdown({
@@ -37,13 +38,14 @@ export function AdvancedDropdown({
     className,
     align = "end",
     items = [],
+
 }: AdvancedDropdownProps) {
     const { openModal } = useModal()
 
     const handleItemClick = React.useCallback(
         (item: DropdownItemProps) => {
             if (item.modalType) {
-                openModal(item.modalType)
+                openModal(item.modalType, item.data)
             }
 
             if (item.onClick) {

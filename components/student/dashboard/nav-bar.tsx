@@ -5,10 +5,10 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import FullScreenButton from "@/components/commons/FullScreenButton";
 import UserDropdown from "@/components/commons/user-dropdown";
-import { AcademicDropdown } from "@/components/commons/AcademicDropdown";
 
 
-const Navbar = ({ user,sessions }: { user: IStudent,sessions:ISession[] }) => {
+
+const Navbar = ({ user }: { user: IStudent, }) => {
 
 
     useTourControl([
@@ -33,7 +33,7 @@ const Navbar = ({ user,sessions }: { user: IStudent,sessions:ISession[] }) => {
             </div>
 
             <div className=".dashboard-stats flex gap-4 ml-auto items-center pr-10">
-                <AcademicDropdown sessions={sessions} />
+                {/* <AcademicDropdown sessions={sessions} /> */}
                 <FullScreenButton />
                 <UserDropdown
                     email={user?.email}

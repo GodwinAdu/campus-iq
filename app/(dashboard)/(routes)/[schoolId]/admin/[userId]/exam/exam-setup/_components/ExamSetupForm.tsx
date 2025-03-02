@@ -40,10 +40,13 @@ const formSchema = z.object({
     examType: z.string().min(2, {
         message: "Username must be at least 2 characters.",
     }),
+    markType: z.string().min(2, {
+        message: "Mark is require please.",
+    }),
     nextTerm: z.string().min(2, {
         message: "Username must be at least 2 characters.",
     }),
-    markDistributions: z.array(z.string()),
+    markDistributions: z.array(z.string()).min(1, "At least one mark distribution must be provided"),
     publish: z.boolean().optional()
 })
 
@@ -68,6 +71,7 @@ const ExamSetupForm = ({ type, terms, sessions, distributions, initialData }: Pr
             termId: "",
             sessionId: "",
             examType: "",
+            markType: "",
             nextTerm: "",
             markDistributions: [],
             publish: false
@@ -168,6 +172,28 @@ const ExamSetupForm = ({ type, terms, sessions, distributions, initialData }: Pr
                             />
                             <FormField
                                 control={form.control}
+                                name="markType"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Mark Types</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select mark type" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                <SelectItem value="Mark">Mark</SelectItem>
+                                                <SelectItem value="Grade">Grade</SelectItem>
+                                                <SelectItem value="Mark and Grade">Mark and Grade</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
                                 name="examType"
                                 render={({ field }) => (
                                     <FormItem>
@@ -179,9 +205,8 @@ const ExamSetupForm = ({ type, terms, sessions, distributions, initialData }: Pr
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
-                                                <SelectItem value="Mark">Mark</SelectItem>
-                                                <SelectItem value="Grade">Grade</SelectItem>
-                                                <SelectItem value="Mark and Grade">Mark and Grade</SelectItem>
+                                                <SelectItem value="online">Online</SelectItem>
+                                                <SelectItem value="written">Written</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />

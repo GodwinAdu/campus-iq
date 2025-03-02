@@ -6,10 +6,10 @@ import Class from "../models/class.models";
 import { generateCode } from "../helpers/generateCode";
 import Subject from "../models/subject.models";
 import Student from "../models/student.models";
-import Teacher from "../models/teacher.models";
 import { currentUser } from "../helpers/current-user";
 import { deleteDocument } from "./trash.actions";
 import History from "../models/history.models";
+import Employee from "../models/employee.models";
 
 interface CreateClassProps {
     name: string;
@@ -41,7 +41,7 @@ export async function createClass({ name }: CreateClassProps) {
                 itemId: value._id,
                 deletedAt: new Date(),
             },
-            message: `User ${user.personalInfo.fullName} created "${name}" (ID: ${value._id}) on ${new Date().toLocaleString()}.`,
+            message: `User ${user.fullName} created "${name}" (ID: ${value._id}) on ${new Date().toLocaleString()}.`,
             performedBy: user._id, // User who performed the action,
             entityId: value._id,  // The ID of the deleted unit
             entityType: 'CLASS',  // The type of the entity
@@ -67,7 +67,7 @@ export async function fetchClassById(classId: string) {
         await connectToDB();
 
         const classData = await Class.findById(classId)
-            .populate([{ path: 'subjects', model: Subject }, { path: 'students', model: Student }, { path: 'teachers', model: Teacher }])
+            .populate([{ path: 'subjects', model: Subject }, { path: 'students', model: Student }, { path: 'teachers', model: Employee }])
             .exec();
 
         if (!classData) {
@@ -140,7 +140,7 @@ export async function updateClass(classId: string, values: Partial<CreateClassPr
                 itemId:classId,
                 deletedAt: new Date(),
             },
-            message: `User ${user.personalInfo.fullName} Updated "${values.name}" (ID: ${classId}) on ${new Date().toLocaleString()}.`,
+            message: `User ${user.fullName} Updated "${values.name}" (ID: ${classId}) on ${new Date().toLocaleString()}.`,
             performedBy: user._id, // User who performed the action,
             entityId:classId,  // The ID of the deleted unit
             entityType: 'CLASS',  // The type of the entity
@@ -181,8 +181,8 @@ export async function deleteClass(id: string) {
             collectionName: 'Class',
             userId: user?._id,
             schoolId,
-            trashMessage: `"${className}" (ID: ${id}) was moved to trash by ${user.personalInfo.fullName}.`,
-            historyMessage: `User ${user.personalInfo.fullName} deleted "${className}" (ID: ${id}) on ${new Date().toLocaleString()}.`
+            trashMessage: `"${className}" (ID: ${id}) was moved to trash by ${user.fullName}.`,
+            historyMessage: `User ${user.fullName} deleted "${className}" (ID: ${id}) on ${new Date().toLocaleString()}.`
         });
 
         return { success: true, message: "Class deleted successfully" };

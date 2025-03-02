@@ -210,12 +210,10 @@ export const registerUser = async (values: RegisterProps) => {
         });
 
         const user = new Employee({
-            personalInfo: {
-                fullName,
-                email,
-                password: hPassword,
-                username: rawUsername,
-            },
+            fullName,
+            email,
+            password: hPassword,
+            username: rawUsername,
             schoolId: newSchool._id,
             role: 'admin',
             employment: {
@@ -260,7 +258,7 @@ export const registerUser = async (values: RegisterProps) => {
             html: welcomeMail(fullName, password, rawUsername),
         };
 
-       await wrappedSendMail(mailOptions); 
+        await wrappedSendMail(mailOptions);
 
         return JSON.parse(JSON.stringify(user))
 

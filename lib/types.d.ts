@@ -55,22 +55,20 @@ interface ISchool extends Document {
 interface IEmployee extends Document {
     _id?: string;
     schoolId: Schema.Types.ObjectId;
-    personalInfo: {
-        username: string;
-        fullName: string;
-        imgUrl?: string;
-        dob?: Date;
-        email: string;
-        gender?: string;
-        phone?: string;
-        password: string;
-        religion?: string;
-        maritalStatus?: string;
-        addresses?: Address;
-        emergencyContact?: EmergencyContact; // Can be an object structure
-        currentAddress?: string;
-        permanentAddress?: string;
-    };
+    username: string;
+    fullName: string;
+    imgUrl?: string;
+    dob?: Date;
+    email: string;
+    gender?: string;
+    phone?: string;
+    password: string;
+    religion?: string;
+    maritalStatus?: string;
+    addresses?: Address;
+    emergencyContact?: EmergencyContact; // Can be an object structure
+    currentAddress?: string;
+    permanentAddress?: string;
     role: string;
     identification?: {
         idCardType?: string;
@@ -132,8 +130,8 @@ interface IEmployee extends Document {
 }
 
 type StudentPermissions = {
-    createCommunity:boolean;
-    accessAI:boolean;
+    createCommunity: boolean;
+    accessAI: boolean;
 }
 
 
@@ -154,7 +152,7 @@ interface IStudent extends Document {
     currentAddress: string;
     permanentAddress?: string;
     classId: Types.ObjectId;
-    studentType:Types.ObjectId;
+    studentType: Types.ObjectId;
     studentID: string;
     roomId?: Types.ObjectId;
     parentId?: Types.ObjectId;
@@ -170,7 +168,7 @@ interface IStudent extends Document {
     canteen: {
         planId: Schema.Types.ObjectId,
     },
-    permissions:StudentPermissions;
+    permissions: StudentPermissions;
     studentStatus: string;
     createdBy?: Types.ObjectId;
     mod_flag?: boolean;
@@ -273,7 +271,8 @@ interface IIdentification {
     taxIdentificationNumber?: string;
 }
 
-interface IPersonalInfo {
+interface IParent extends Document {
+    schoolId: Types.ObjectId;
     username: string;
     fullName: string;
     imgUrl?: string;
@@ -288,11 +287,8 @@ interface IPersonalInfo {
     emergencyContact?: EmergencyContact;
     currentAddress?: string;
     permanentAddress?: string;
-}
-
-interface IParent extends Document {
-    schoolId: Types.ObjectId;
-    personalInfo: IPersonalInfo;
+    role:string;
+    relationship:string;
     children: Types.ObjectId[]; // References to Student IDs
     occupation?: string;
     workplace?: string;
@@ -510,11 +506,13 @@ interface IExamSchedule extends Document {
 
 // Type for ExamSetup
 interface IExamSetup extends Document {
+    _id?: string; // Unique identifier for the exam setup
     schoolId: Types.ObjectId; // Reference to the school
     name: string; // Name of the exam setup (e.g., "Final Exam")
     termId: Types.ObjectId; // Reference to the term
     sessionId: Types.ObjectId; // Reference to the session
-    examType: string; // Type of the exam (e.g., "Mid-Term", "Final")
+    markType: string; // Type of the mark (e.g., "Grade", "Mark", etc.)
+    examType: string; // Type of the exam (e.g., "Written", "online")
     markDistributions: string[]; // List of mark distributions
     nextTerm?: string; // Information about the next term (optional)
     publish: boolean; // Whether the exam setup is published
@@ -962,7 +960,7 @@ interface ISubjectItem {
 
 // Interface for Mark
 interface IMark extends Document {
-    _id?:string;
+    _id?: string;
     schoolId: Types.ObjectId;
     examId: Types.ObjectId;
     studentId: Types.ObjectId;
@@ -1194,7 +1192,7 @@ interface IAssignment extends Document {
 
 // Define the TypeScript interface for Postal
 interface IPostal extends Document {
-    _id?:string;
+    _id?: string;
     schoolId: Types.ObjectId;
     sender: string;
     receiver: string;
@@ -1217,7 +1215,7 @@ interface IPostal extends Document {
 
 // Define TypeScript interface for Call
 interface ICall extends Document {
-    _id?:string;
+    _id?: string;
     schoolId: Types.ObjectId;
     callType: "incoming" | "outgoing";
     callPurpose: string;
@@ -1227,7 +1225,7 @@ interface ICall extends Document {
     message: string;
     date: Date;
     startTime: string;
-    endTime:string;
+    endTime: string;
     followDate?: Date | null;
     createdBy?: Types.ObjectId | null;
     mod_flag: boolean;
@@ -1240,7 +1238,7 @@ interface ICall extends Document {
 
 interface INotification extends Document {
     _id?: string;
-    schoolId:Schema.Types.ObjectId;
+    schoolId: Schema.Types.ObjectId;
     userType: "Employee" | "Student" | "Parent";
     userId: string;
     message: string;

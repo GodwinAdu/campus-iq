@@ -18,7 +18,7 @@ export const loginEmployee = async (values: { identifier: string; password: stri
         await connectToDB();
 
         const user = await Employee.findOne({
-            $or: [{ "personalInfo.email": identifier }, { "personalInfo.username": identifier }],
+            $or: [{ email: identifier }, { username: identifier }],
         });
 
         const schoolId = user?.schoolId;
@@ -26,7 +26,7 @@ export const loginEmployee = async (values: { identifier: string; password: stri
 
         if (!user) throw new Error(`${role} not found`);
 
-        const isPasswordValid = await compare(password, user.personalInfo.password);
+        const isPasswordValid = await compare(password, user.password);
         if (!isPasswordValid) throw new Error("Invalid password");
 
         const tokenData = {

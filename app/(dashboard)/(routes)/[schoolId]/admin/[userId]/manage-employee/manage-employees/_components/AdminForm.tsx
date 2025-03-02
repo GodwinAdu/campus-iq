@@ -43,30 +43,28 @@ const MedicalHistorySchema = z.object({
     medicalNotes: z.string().optional()
 });
 const formSchema = z.object({
-    personalInfo: z.object({
-        username:z.string().optional(),
-        password:z.string().optional(),
-        fullName: z.string().min(3, "Full name must be at least 3 characters long"),
-        imgUrl: z.string().optional(),
-        dob: z.coerce.date().optional(),
-        email: z.string().email("Invalid email format"),
-        gender: z.enum(["Male", "Female", "Other"]).optional(),
-        phone: z.string().optional(),
-        religion: z.string().optional(),
-        maritalStatus: z.enum(["Single", "Married", "Divorced", "Widowed"]).optional(),
-        addresses: z
-            .object({
-                street: z.string().optional(),
-                city: z.string().optional(),
-                state: z.string().optional(),
-                zipCode: z.string().optional(),
-                country: z.string().optional(),
-            })
-            .optional(),
-        emergencyContact: z.record(z.string(), z.any()).optional(),
-        currentAddress: z.string().optional(),
-        permanentAddress: z.string().optional(),
-    }),
+    username: z.string().optional(),
+    password: z.string().optional(),
+    fullName: z.string().min(3, "Full name must be at least 3 characters long"),
+    imgUrl: z.string().optional(),
+    dob: z.coerce.date().optional(),
+    email: z.string().email("Invalid email format"),
+    gender: z.enum(["Male", "Female", "Other"]).optional(),
+    phone: z.string().optional(),
+    religion: z.string().optional(),
+    maritalStatus: z.enum(["Single", "Married", "Divorced", "Widowed"]).optional(),
+    addresses: z
+        .object({
+            street: z.string().optional(),
+            city: z.string().optional(),
+            state: z.string().optional(),
+            zipCode: z.string().optional(),
+            country: z.string().optional(),
+        })
+        .optional(),
+    emergencyContact: z.record(z.string(), z.any()).optional(),
+    currentAddress: z.string().optional(),
+    permanentAddress: z.string().optional(),
 
     role: z.string().min(3, "Role is required"),
 
@@ -158,26 +156,24 @@ const AdminForm = ({ rolename, departments, type, initialData, classes }: Props)
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: initialData ?? {
-            personalInfo: {
-                fullName: "",
-                imgUrl: "",
-                dob: new Date(),
-                email: "",
-                gender: "",
-                phone: "",
-                religion: "",
-                maritalStatus: "",
-                addresses: {
-                    street: "",
-                    city: "",
-                    state: "",
-                    zipCode: "",
-                    country: "",
-                },
-                emergencyContact: {},
-                currentAddress: "",
-                permanentAddress: "",
+            fullName: "",
+            imgUrl: "",
+            dob: new Date(),
+            email: "",
+            gender: "",
+            phone: "",
+            religion: "",
+            maritalStatus: "",
+            addresses: {
+                street: "",
+                city: "",
+                state: "",
+                zipCode: "",
+                country: "",
             },
+            emergencyContact: {},
+            currentAddress: "",
+            permanentAddress: "",
             role: "",
             identification: {
                 idCardType: "",
@@ -230,9 +226,9 @@ const AdminForm = ({ rolename, departments, type, initialData, classes }: Props)
         }
     });
 
-    const { isSubmitting,errors } = form.formState;
+    const { isSubmitting, errors } = form.formState;
 
-    console.log(errors,"see errors");
+    console.log(errors, "see errors");
 
     const handleNext = async () => {
         const currentStepValid = validateStep(activeStep); // Validate current step
@@ -259,14 +255,14 @@ const AdminForm = ({ rolename, departments, type, initialData, classes }: Props)
             case 0: // Personal Info
                 return form
                     .getValues([
-                        "personalInfo.fullName",
-                        "personalInfo.email",
-                        "personalInfo.phone",
-                        "personalInfo.dob",
-                        "personalInfo.gender",
-                        "personalInfo.addresses.state",
-                        "personalInfo.addresses.city",
-                        "personalInfo.currentAddress",
+                        "fullName",
+                        "email",
+                        "phone",
+                        "dob",
+                        "gender",
+                        "addresses.state",
+                        "addresses.city",
+                        "currentAddress",
                     ])
                     .every(Boolean);
             case 1: // Guardian Info

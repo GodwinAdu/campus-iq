@@ -20,6 +20,10 @@ const ExamSetupSchema: Schema<IExamSetup> = new Schema({
         ref: "Session",
         required: true
     },
+    markType: {
+        type: String,
+        required: true
+    },
     examType: {
         type: String,
         required: true

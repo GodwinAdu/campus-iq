@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
 import { fetchAllPlans } from "@/lib/actions/meal-plan.actions";
-import { updateStudent } from "@/lib/actions/student.actions";
+import { updateOnlyStudent, updateStudent } from "@/lib/actions/student.actions";
 
 
 const FormSchema = z.object({
@@ -68,7 +68,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
-            await updateStudent(data._id as string, values);
+            await updateOnlyStudent(data._id as string, values);
             toast({
                 title: "Salary Assigned Successfully",
                 description: "Salary was assigned successfully...",

@@ -37,9 +37,9 @@ const Navbar = ({ user, sessions }: { user: IEmployee, sessions: ISession[] }) =
                 <FullScreenButton />
 
                 <UserDropdown
-                    email={user?.personalInfo.email}
-                    username={user?.personalInfo.fullName}
-                    avatarUrl={user?.personalInfo.imgUrl as string}
+                    email={user?.email}
+                    username={user?.fullName}
+                    avatarUrl={user?.imgUrl as string}
                     notificationCount={100}
                 />
             </div>

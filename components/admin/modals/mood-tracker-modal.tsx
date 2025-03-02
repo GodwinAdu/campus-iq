@@ -10,13 +10,17 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Calendar, Frown, Meh, Smile, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Calendar, Frown, Loader2, Meh, Smile, TrendingUp } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Slider } from "@/components/ui/slider"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { toast } from "@/hooks/use-toast"
+import { getMoodHistory, saveMood } from "@/lib/actions/mood.actions"
+import {  useRouter } from "next/navigation"
+import moment from "moment"
 
 const moodEmojis = [
     { value: 1, icon: <Frown className="w-8 h-8" />, label: "Very Sad", color: "text-red-500" },
@@ -29,31 +33,45 @@ const moodEmojis = [
 const moodFactors = ["Sleep", "Diet", "Exercise", "Social Interactions", "Work/Study", "Hobbies", "Weather"]
 
 type MoodEntry = {
+    id?: string
     date: string
     mood: number
     energy: number
     factors: string[]
+    studentId:string;
 }
 
 export const MoodTracker = () => {
-    const { type, isOpen, closeModal } = useModal()
+    const { type, isOpen, closeModal,modalData } = useModal()
     const [mood, setMood] = useState<number>(3)
     const [energy, setEnergy] = useState<number>(50)
     const [factors, setFactors] = useState<string[]>([])
-    const [moodHistory, setMoodHistory] = useState<MoodEntry[]>([])
+    const [moodHistory, setMoodHistory] = useState<MoodEntry[] | []>([])
     const [showTrends, setShowTrends] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+
+    const router = useRouter();
+
+    const studentId = modalData?._id as string;
 
     useEffect(() => {
-        // In a real app, you'd fetch this data from an API
-        const mockHistory: MoodEntry[] = [
-            { date: "2023-05-01", mood: 4, energy: 70, factors: ["Sleep", "Exercise"] },
-            { date: "2023-05-02", mood: 3, energy: 50, factors: ["Work/Study"] },
-            { date: "2023-05-03", mood: 5, energy: 80, factors: ["Social Interactions", "Hobbies"] },
-            { date: "2023-05-04", mood: 2, energy: 30, factors: ["Weather", "Work/Study"] },
-            { date: "2023-05-05", mood: 4, energy: 60, factors: ["Exercise", "Diet"] },
-        ]
-        setMoodHistory(mockHistory)
-    }, [])
+        if(type !== "mood") return;
+        fetchMoodHistory()
+    }, [modalData])
+
+    const fetchMoodHistory = async () => {
+        try {
+
+            if (!studentId) {
+                return;
+            }
+            const response = await getMoodHistory(studentId)
+            console.log(response,"success")
+            setMoodHistory(response)
+        } catch (error) {
+            console.error("Error fetching mood history:", error)
+        }
+    }
 
     const handleMoodSelect = (value: number) => {
         setMood(value)
@@ -63,23 +81,47 @@ export const MoodTracker = () => {
         setFactors((prev) => (prev.includes(factor) ? prev.filter((f) => f !== factor) : [...prev, factor]))
     }
 
-    const handleSubmit = () => {
-        const newEntry: MoodEntry = {
-            date: new Date().toISOString().split("T")[0],
-            mood,
-            energy,
-            factors,
+    const handleSubmit = async () => {
+        setIsLoading(true)
+        try {
+            const newEntry: MoodEntry = {
+                date: new Date().toISOString().split("T")[0],
+                mood,
+                energy,
+                factors,
+                studentId,
+            };
+
+            console.log(newEntry, "newEntry")
+
+            await saveMood(newEntry);
+
+            // Reset form
+            setMood(3)
+            setEnergy(50)
+            setFactors([])
+
+            router.refresh();
+            fetchMoodHistory();
+
+            toast({
+                title: "Success",
+                description: "Your mood has been logged successfully!",
+            })
+        } catch (error) {
+            console.error("Error saving mood entry:", error)
+            toast({
+                title: "Error",
+                description: "Failed to save your mood entry. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
         }
-        setMoodHistory((prev) => [...prev, newEntry])
-        // Here you would typically send this data to your backend
-        console.log("Mood entry submitted:", newEntry)
-        // Reset form
-        setMood(3)
-        setEnergy(50)
-        setFactors([])
     }
 
     const getAverageMood = () => {
+        if (moodHistory.length === 0) return "N/A"
         const sum = moodHistory.reduce((acc, entry) => acc + entry.mood, 0)
         return (sum / moodHistory.length).toFixed(1)
     }
@@ -103,7 +145,7 @@ export const MoodTracker = () => {
                     <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900">
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
-                                <span>Daily Mood Tracker</span>
+                                <span>{modalData?.fullName} Mood Tracker</span>
                                 <Dialog>
                                     <DialogTrigger asChild>
                                         <Button variant="outline" size="icon">
@@ -113,18 +155,22 @@ export const MoodTracker = () => {
                                     <DialogContent>
                                         <DialogHeader>
                                             <DialogTitle>Mood History</DialogTitle>
-                                            <DialogDescription>Your mood entries for the past days</DialogDescription>
+                                            <DialogDescription>{modalData?.fullName} mood entries for the past days</DialogDescription>
                                         </DialogHeader>
                                         <div className="space-y-4">
-                                            {moodHistory.map((entry, index) => (
-                                                <div key={index} className="flex items-center justify-between">
-                                                    <span>{entry.date}</span>
-                                                    <div className="flex items-center space-x-2">
-                                                        {moodEmojis[entry.mood - 1].icon}
-                                                        <span>{entry.energy}% energy</span>
+                                            {moodHistory.length > 0 ? (
+                                                moodHistory.map((entry, index) => (
+                                                    <div key={entry.id || index} className="flex items-center justify-between">
+                                                        <span>{moment(entry.date).fromNow()}</span>
+                                                        <div className="flex items-center space-x-2 ">
+                                                            {moodEmojis[entry.mood - 1].icon}
+                                                            <span>{entry.energy}% energy</span>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))
+                                            ) : (
+                                                <p className="text-center text-muted-foreground">No mood entries yet</p>
+                                            )}
                                         </div>
                                     </DialogContent>
                                 </Dialog>
@@ -187,8 +233,9 @@ export const MoodTracker = () => {
                                     </div>
                                 </div>
 
-                                <Button onClick={handleSubmit} className="w-full">
-                                    Log Mood
+                                <Button onClick={handleSubmit} className="w-full" disabled={isLoading}>
+                                    {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    {isLoading ? "Saving..." : "Log Mood"}
                                 </Button>
 
                                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">

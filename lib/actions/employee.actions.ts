@@ -36,8 +36,11 @@ export const getEmployeeById = async (id: string) => {
 export async function createEmployee(values: employeeSchema, path: string) {
     try {
         // Extract necessary data
-        const { personalInfo, role, identification, employment, professionalDetails, medicalHistory } = values;
-        const { fullName, email } = personalInfo;
+        const {
+            fullName, email, gender, dob, phone, religion, maritalStatus,
+            addresses, emergencyContact, currentAddress, permanentAddress,
+
+            role, identification, employment, professionalDetails, medicalHistory } = values;
 
         // Start parallel execution for user, school, and email check
         await connectToDB();
@@ -82,7 +85,19 @@ export async function createEmployee(values: employeeSchema, path: string) {
         // Create Employee
         const newEmployee = new Employee({
             schoolId,
-            personalInfo: { ...personalInfo, password: hashedPassword, username: rawUsername },
+            fullName,
+            email,
+            gender,
+            dob,
+            phone,
+            religion,
+            maritalStatus,
+            addresses,
+            currentAddress,
+            permanentAddress,
+            emergencyContact,
+            password: hashedPassword,
+            username: rawUsername,
             role,
             employment: { ...employment, employeeID: rawStaffId },
             identification,
@@ -181,7 +196,7 @@ export async function fetchEmployeeByRole(role: string) {
 
 
 
-export async function updateEmployee(adminId: string, values: Partial<any>, path?: string) {
+export async function updateEmployee(adminId: string, values: Partial<employeeSchema>, path?: string) {
     try {
         console.log(values);
         const user = await currentUser();
@@ -281,7 +296,7 @@ export const countEmployeesExcludingTeachers = async () => {
         await connectToDB();
 
         const count = await Employee.countDocuments({ schoolId, role: { $ne: "teacher" } });
-       
+
         return count;
     } catch (error) {
         console.error("Error counting employees:", error);

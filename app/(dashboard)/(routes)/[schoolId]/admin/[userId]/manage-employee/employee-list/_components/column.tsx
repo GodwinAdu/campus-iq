@@ -11,10 +11,10 @@ export const columns: ColumnDef<IEmployee>[] = [
         cell: ({ row }) => (
             <div className="flex gap-2 items-center">
                 <Avatar>
-                    <AvatarImage src={row.original.personalInfo.imgUrl} alt="User_image" />
-                    <AvatarFallback>{row.original.personalInfo.username[0].toUpperCase()}</AvatarFallback>
+                    <AvatarImage src={row.original.imgUrl} alt="User_image" />
+                    <AvatarFallback>{row.original.username[0].toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <span className="ml-2 text-sm font-extrabold">{row.original.personalInfo.username}</span>
+                <span className="ml-2 text-sm font-extrabold">{row.original.username}</span>
             </div>
         )
     },

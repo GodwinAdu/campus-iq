@@ -1,54 +1,53 @@
-"use server"
-
-import { cookies } from "next/headers";
-import jwt, { TokenExpiredError } from "jsonwebtoken";
+import { TokenExpiredError } from "jsonwebtoken";
 import { getEmployeeById } from "../actions/employee.actions";
-import Student from "../models/student.models";
+import { fetchStudentById } from "../actions/student.actions";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
-
-// Fetch current user based on token
 export async function currentUser() {
     try {
-        const cookiesStore = await cookies();
+        const cookiesStore = await cookies(); // No need for `await`
         const tokenValue = cookiesStore.get("token");
 
-        if (!tokenValue || !tokenValue.value) {
-            return null; // No token found
+        if (!tokenValue?.value) {
+            console.log("No token found in cookies");
+            return null;
         }
 
-        const decoded = jwt.verify(tokenValue.value, process.env.TOKEN_SECRET_KEY!);
+        console.log("Verifying token...");
+        const decoded = jwt.verify(tokenValue.value, process.env.TOKEN_SECRET_KEY!) as { id: string, role: string };
 
-        // Ensure the decoded token is not a string (JwtPayload) and contains userId
-        if (!decoded || typeof decoded === "string" || !decoded.id) {
-            return null; // Invalid token structure
+        if (!decoded?.id) {
+            console.log("Invalid token structure");
+            return null;
         }
 
-        // Fetch the user from the correct model based on the role stored in the token
+        console.log("Decoded Token:", decoded);
+
         const { id, role } = decoded;
-        let user;
+        let user: any = null;
 
-
-        // Switch based on role to fetch the user from the correct collection/model
-        switch (role) {
-            case "student":
-                user = await Student.findById(id); // For Student role
-                break;
-            case "parent":
-                // user = await Parent.findById(id); // For Parent role
-                break;
-            default:
-                user = await getEmployeeById(id);
+        if (role === "student") {
+            console.log(`Fetching student with ID: ${id}`);
+            user = await fetchStudentById(id);
+        } else if (role === "parent") {
+            console.log(`Fetching parent with ID: ${id}`);
+            // user = await fetchParentById(id);
+        } else  {
+            console.log(`Fetching employee with ID: ${id}`);
+            user = await getEmployeeById(id);
         }
 
-        // Return the user if found, or null if not found
+        console.log("Fetched User:", user);
         return user || null;
 
     } catch (error) {
         if (error instanceof TokenExpiredError) {
-            return null; // Token expired, return null
+            console.log("Token expired");
+            return null;
         }
 
-        console.error("Error decoding token", error);
-        return null; // In case of any other error
+        console.error("Error decoding token:", error);
+        return null;
     }
 }

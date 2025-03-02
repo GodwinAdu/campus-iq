@@ -1,35 +1,37 @@
-"use client"
+"use client";
 
-import { create } from "zustand"
+import { create } from "zustand";
 
-type ModalType = "settings" | "invite" | "help" | "notifications" | "documents" | "mood" | "activity" | "behavior"
+type ModalType = "settings" | "invite" | "help" | "notifications" | "documents" | "mood" | "activity" | "behavior";
 
 interface ModalStore {
-    type: ModalType | null
-    isOpen: boolean
-    onOpen: (type: ModalType) => void
-    onClose: () => void
+    type: ModalType | null;
+    isOpen: boolean;
+    modalData: IStudent | null; // Store the selected student's data
+    onOpen: (type: ModalType, data?: any) => void;
+    onClose: () => void;
 }
 
 export const useModalStore = create<ModalStore>((set) => ({
     type: null,
     isOpen: false,
-    onOpen: (type) => set({ isOpen: true, type }),
-    onClose: () => set({ isOpen: false, type: null }),
-}))
+    modalData: null,
+    onOpen: (type, data = null) => set({ isOpen: true, type, modalData: data }),
+    onClose: () => set({ isOpen: false, type: null, modalData: null }),
+}));
 
 export const useModal = () => {
-    const store = useModalStore()
+    const store = useModalStore();
 
     return {
         type: store.type,
         isOpen: store.isOpen,
-        openModal: (type: ModalType) => {
-            store.onOpen(type)
+        modalData: store.modalData, // Access modal data
+        openModal: (type: ModalType, data?: IStudent) => {
+            store.onOpen(type, data);
         },
         closeModal: () => {
-            store.onClose()
+            store.onClose();
         },
-    }
-}
-
+    };
+};

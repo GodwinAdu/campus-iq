@@ -6,7 +6,7 @@ import { Activity, Brain, MoreHorizontal, SmileIcon } from "lucide-react";
 
 
 interface CellActionProps {
-    data: StudentCanteen;
+    data: IStudent;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
@@ -22,21 +22,25 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
                 }
+
                 items={[
                     {
                         label: "Activity Tracker",
                         icon: <Activity className="h-4 w-4" />,
                         modalType: "activity",
+                        data: data,
                     },
                     {
                         label: "Behavior Tracker",
                         icon: <Brain className="h-4 w-4" />,
                         modalType: "behavior",
+                        data: data,
                     },
                     {
                         label: "Mood Tracker",
                         icon: <SmileIcon className="h-4 w-4" />,
                         modalType: "mood",
+                        data: data,
                     },
                 ]}
             />

@@ -3,12 +3,13 @@ import {
     SidebarInset,
     SidebarProvider,
 } from "@/components/ui/sidebar";
-import { currentUser } from "@/lib/helpers/current-user";
 import { TourProvider } from "@/lib/context/TourContext";
 import TourLayout from "@/provider/TourLayout";
 import { getAllSessions } from "@/lib/actions/session.actions";
 import AppSidebarMain from "@/components/student/dashboard/app-sidebar-main";
 import Navbar from "@/components/student/dashboard/nav-bar";
+import { currentStudent } from "@/lib/helpers/current-student";
+import { currentUser } from "@/lib/helpers/current-user";
 
 
 export default async function RootLayout({
@@ -17,7 +18,8 @@ export default async function RootLayout({
     children: React.ReactNode;
 }>) {
     const user = (await currentUser()) ?? null;
-    const sessions = await getAllSessions() ?? [];
+    console.log(user);
+    // const sessions = await getAllSessions() ?? [];
 
     return (
         <TourProvider>
@@ -25,7 +27,7 @@ export default async function RootLayout({
                 <SidebarProvider>
                     <AppSidebarMain />
                     <SidebarInset>
-                        <Navbar sessions={sessions} user={user} />
+                        <Navbar  user={user} />
                         <div className="relative">
                             <div id="main-content" className="py-4 px-4 overflow-hidden">
                                 {children}

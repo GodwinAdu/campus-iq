@@ -21,7 +21,6 @@ import { fetchMonthlyRevenues } from '@/lib/actions/revenue-summary.actions';
 
 
 const page = async () => {
-  const user = await currentUser();
   const teachers = await totalTeachers() ?? 0 ;
   const students = await totalStudents()?? 0 ;
   const employees = await countEmployeesExcludingTeachers() ?? 0

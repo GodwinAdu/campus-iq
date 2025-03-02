@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import { CellAction } from './cell-action'
 import { fetchEmployeesList } from '@/lib/actions/employee.actions'
 import DepartmentSelection from '@/components/commons/DepartmentSelection'
 import { DataTable } from '@/components/table/data-table'
@@ -18,11 +17,7 @@ const EmployeeListGrid = ({ departments }: { departments: IDepartment[] }) => {
                 const data = await fetchEmployeesList(selectedDepartment as string)
                 const newValues = data.map((value:IEmployee) => ({
                     ...value,
-                    username: value.personalInfo.username,
-                    fullName: value.personalInfo.fullName,
-                    email: value.personalInfo.email,
                     staffID: value.employment.employeeID,
-                    imgUrl: value.personalInfo.imgUrl,
                 }))
     setRowData(newValues)
 } catch (error) {

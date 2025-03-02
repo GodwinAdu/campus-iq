@@ -42,7 +42,6 @@ interface NavItem {
 
 
 interface NavMainProps {
-  role: IRole | undefined;
   school: ISchool
 }
 
@@ -71,23 +70,34 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Courses",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-sessions`,
+          url: `/${schoolId}/student/${userId}/academics/courses`,
         },
         {
           title: "Assignments",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-role`,
+          url: `/${schoolId}/student/${userId}/academics/assignments`,
         },
         {
           title: "Grades",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
+          url: `/${schoolId}/student/${userId}/academics/grades`,
         },
         {
           title: "Attendance",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
+          url: `/${schoolId}/student/${userId}/academics/attendance`,
         },
         {
           title: "Academic Planner",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
+          url: `/${schoolId}/student/${userId}/academics/academic-planner`,
+        },
+      ],
+    },
+    proPlan && {
+      title: "Teachers",
+      url: "#",
+      icon: Mail,
+      items: [
+        {
+          title: "All Teachers",
+          url: `/${schoolId}/student/${userId}/teachers/`,
         },
       ],
     },
@@ -99,11 +109,11 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Library Resources",
-          url: `/${schoolId}/admin/${userId}/class/manage-classes`,
+          url: `/${schoolId}/student/${userId}/campus-life/library-resources`,
         },
         {
           title: "Campus Tour",
-          url: `/${schoolId}/admin/${userId}/class/manage-subjects`,
+          url: `/${schoolId}/student/${userId}/campus-life/campus-tour`,
         },
       ],
     },
@@ -115,11 +125,19 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Fees Payment",
-          url: `/${schoolId}/admin/${userId}/attendance/manage-attendance`,
+          url: `/${schoolId}/student/${userId}/financial/fees-payment`,
         },
         {
           title: "Canteen",
-          url: `/${schoolId}/admin/${userId}/attendance/manage-attendance`,
+          url: `/${schoolId}/student/${userId}/financial/canteen`,
+        },
+        {
+          title: "Class Fee",
+          url: `/${schoolId}/student/${userId}/financial/class-fee`,
+        },
+        {
+          title: "Transport Fee",
+          url: `/${schoolId}/student/${userId}/financial/transport-fee`,
         },
       ],
     },
@@ -130,11 +148,11 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "AI Study Assistant",
-          url: `/${schoolId}/admin/${userId}/manage-students/student-type`,
+          url: `/${schoolId}/student/${userId}/smart-tools/study-assistant`,
         },
         {
           title: "AI Study Planner",
-          url: `/${schoolId}/admin/${userId}/manage-students/manage-student`,
+          url: `/${schoolId}/student/${userId}/smart-tools/study-planner`,
         }
       ],
     },
@@ -145,7 +163,7 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Gamified Learning",
-          url: `/${schoolId}/admin/${userId}/manage-employee/add-department`,
+          url: `/${schoolId}/student/${userId}/learning-resources/gamified-learning`,
         },
       ],
     },
@@ -156,11 +174,11 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Hostel",
-          url: `/${schoolId}/admin/${userId}/manage-attendance/students`,
+          url: `/${schoolId}/student/${userId}/supervision/hostel`,
         },
         {
           title: "Transport",
-          url: `/${schoolId}/admin/${userId}/manage-attendance/employees`,
+          url: `/${schoolId}/student/${userId}/supervision/transport`,
         }
       ],
     },
@@ -171,11 +189,11 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Book List",
-          url: `/${schoolId}/admin/${userId}/stock-adjustment/list-stock-adjustments`,
+          url: `/${schoolId}/student/${userId}/exams/list-examss`,
         },
         {
           title: "Issued Book",
-          url: `/${schoolId}/admin/${userId}/stock-adjustment/add-stock-adjustment`,
+          url: `/${schoolId}/student/${userId}/exams/add-exams`,
         }
       ],
     },
@@ -186,11 +204,11 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Book List",
-          url: `/${schoolId}/admin/${userId}/stock-adjustment/list-stock-adjustments`,
+          url: `/${schoolId}/student/${userId}/library/list-stock-adjustments`,
         },
         {
           title: "Issued Book",
-          url: `/${schoolId}/admin/${userId}/stock-adjustment/add-stock-adjustment`,
+          url: `/${schoolId}/student/${userId}/stock-adjustment/add-stock-adjustment`,
         }
       ],
     },
@@ -201,25 +219,15 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "All Events",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/student/${userId}/payment-accounts/list-accounts`,
         },
         {
           title: "Calendar",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/student/${userId}/payment-accounts/list-accounts`,
         },
       ],
     },
-    proPlan && {
-      title: "Teachers",
-      url: "#",
-      icon: Mail,
-      items: [
-        {
-          title: "All Teachers",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
-        },
-      ],
-    },
+    
     proPlan && {
       title: "Messaging",
       url: "#",
@@ -227,8 +235,13 @@ export function NavMain({ school }: NavMainProps) {
       // roleField: "message",
       items: [
         {
-          title: "List Accounts",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+          title: "Email Message",
+          url: `/${schoolId}/student/${userId}/payment-accounts/list-accounts`,
+          // roleField: "manageListAccount"
+        },
+        {
+          title: "Forum",
+          url: `/${schoolId}/student/${userId}/payment-accounts/list-accounts`,
           // roleField: "manageListAccount"
         },
       ],
@@ -236,7 +249,7 @@ export function NavMain({ school }: NavMainProps) {
   ];
   const isActive = useCallback(
     (url: string) => {
-      const dashboardPath = `/${schoolId}/admin/${userId}`;
+      const dashboardPath = `/${schoolId}/student/${userId}`;
 
       if (pathname === dashboardPath || pathname === `${dashboardPath}/`) {
         return url === pathname; // Only activate when it exactly matches the dashboard
@@ -254,7 +267,7 @@ export function NavMain({ school }: NavMainProps) {
         setOpenGroup(group.title);
       }
     });
-  }, [pathname,]);
+  }, [pathname]);
 
 
   return (

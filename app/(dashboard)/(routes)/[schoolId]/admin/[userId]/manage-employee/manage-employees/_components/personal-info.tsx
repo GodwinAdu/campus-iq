@@ -20,7 +20,7 @@ const PersonalInfoStep = () => {
     const { control } = useFormContext()
     const { fields, append, remove } = useFieldArray({
         control,
-        name: "personalInfo.emergencyContacts",
+        name: "emergencyContacts",
     })
 
 
@@ -29,7 +29,7 @@ const PersonalInfoStep = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                     control={control}
-                    name="personalInfo.fullName"
+                    name="fullName"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Full Name</FormLabel>
@@ -42,7 +42,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.email"
+                    name="email"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Email Address</FormLabel>
@@ -55,7 +55,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.phone"
+                    name="phone"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Phone Number</FormLabel>
@@ -68,7 +68,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.gender"
+                    name="gender"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Gender</FormLabel>
@@ -90,7 +90,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.maritalStatus"
+                    name="maritalStatus"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Marital Status</FormLabel>
@@ -112,7 +112,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.addresses.state"
+                    name="addresses.state"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>State</FormLabel>
@@ -125,7 +125,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.addresses.city"
+                    name="addresses.city"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>City</FormLabel>
@@ -138,7 +138,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.addresses.street"
+                    name="addresses.street"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Street</FormLabel>
@@ -151,7 +151,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.addresses.country"
+                    name="addresses.country"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Country</FormLabel>
@@ -164,7 +164,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.addresses.zipCode"
+                    name="addresses.zipCode"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Zip Code</FormLabel>
@@ -177,7 +177,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.dob"
+                    name="dob"
                     render={({ field }) => (
                         <FormItem className="flex flex-col">
                             <FormLabel>Date of birth</FormLabel>
@@ -235,7 +235,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.currentAddress"
+                    name="currentAddress"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Current Address</FormLabel>
@@ -248,7 +248,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.religion"
+                    name="religion"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Religion (Optional)</FormLabel>
@@ -261,7 +261,7 @@ const PersonalInfoStep = () => {
                 />
                 <FormField
                     control={control}
-                    name="personalInfo.permanentAddress"
+                    name="permanentAddress"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Permanent Address</FormLabel>
@@ -284,7 +284,7 @@ const PersonalInfoStep = () => {
                         <div key={field.id} className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border rounded-lg shadow-sm">
                             <FormField
                                 control={control}
-                                name={`personalInfo.emergencyContacts.${index}.name`}
+                                name={`emergencyContacts.${index}.name`}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-sm font-medium">Name</FormLabel>
@@ -298,7 +298,7 @@ const PersonalInfoStep = () => {
 
                             <FormField
                                 control={control}
-                                name={`personalInfo.emergencyContacts.${index}.relationship`}
+                                name={`emergencyContacts.${index}.relationship`}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel className="text-sm font-medium">Relationship</FormLabel>
@@ -312,7 +312,7 @@ const PersonalInfoStep = () => {
                             <div className="flex items-center gap-3 w-full">
                                 <FormField
                                     control={control}
-                                    name={`personalInfo.emergencyContacts.${index}.phone`}
+                                    name={`emergencyContacts.${index}.phone`}
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel className="text-sm font-medium">Phone Number</FormLabel>

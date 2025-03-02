@@ -12,31 +12,6 @@ interface MedicalHistory {
     medicalNotes?: string;
 }
 
-interface PersonalInfo {
-    fullName: string;
-    imgUrl?: string;
-    dob?: Date;
-    email: string;
-    gender?: "Male" | "Female" | "Other";
-    phone?: string;
-    religion?: string;
-    maritalStatus?: "Single" | "Married" | "Divorced" | "Widowed";
-    addresses?: {
-        street?: string;
-        city?: string;
-        state?: string;
-        zipCode?: string;
-        country?: string;
-    };
-    emergencyContact?: {
-        name: string;
-        relationship: string;
-        phone: string;
-        email?: string;
-    };
-    currentAddress?: string;
-    permanentAddress?: string;
-}
 
 interface Identification {
     idCardType: string;
@@ -83,7 +58,29 @@ interface ProfessionalDetails {
     };
 }
 interface employeeSchema {
-    personalInfo: PersonalInfo;
+    fullName: string;
+    imgUrl?: string;
+    dob?: Date;
+    email: string;
+    gender?: "Male" | "Female" | "Other";
+    phone?: string;
+    religion?: string;
+    maritalStatus?: "Single" | "Married" | "Divorced" | "Widowed";
+    addresses?: {
+        street?: string;
+        city?: string;
+        state?: string;
+        zipCode?: string;
+        country?: string;
+    };
+    emergencyContact?: {
+        name: string;
+        relationship: string;
+        phone: string;
+        email?: string;
+    };
+    currentAddress?: string;
+    permanentAddress?: string;
     role: string;
     identification?: Identification;
     employment: Employment;

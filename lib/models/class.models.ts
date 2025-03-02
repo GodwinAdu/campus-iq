@@ -29,7 +29,7 @@ const ClassSchema:Schema<IClass> = new Schema({
     }],
     teachers: [{
         type: Schema.Types.ObjectId,
-        ref: 'Teacher',
+        ref: 'Employee',
     }],
     createdBy: {
         type: Schema.Types.ObjectId,

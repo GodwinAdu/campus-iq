@@ -34,7 +34,7 @@ export const columns: ColumnDef<IEmployee>[] = [
         accessorKey: "fullName",
         header: "Full Name",
         cell: ({ row }) => (
-            <div className="capitalize">{row.original.personalInfo.fullName}</div>
+            <div className="capitalize">{row.original.fullName}</div>
         ),
     },
     {
@@ -54,7 +54,7 @@ export const columns: ColumnDef<IEmployee>[] = [
                 </Button>
             );
         },
-        cell: ({ row }) => <div className="lowercase">{row.original.personalInfo.email}</div>,
+        cell: ({ row }) => <div className="lowercase">{row.original.email}</div>,
     },
     {
         id: "actions",

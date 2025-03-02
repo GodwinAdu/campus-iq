@@ -3,32 +3,33 @@ import { Schema, model, models, Model } from "mongoose";
 const ParentSchema = new Schema<IParent>(
     {
         schoolId: { type: Schema.Types.ObjectId, ref: "School", required: true },
-
-        personalInfo: {
-            username: { type: String, required: true, minlength: 3 },
-            fullName: { type: String, required: true, minlength: 3 },
-            imgUrl: { type: String },
-            dob: { type: Date },
-            email: { type: String, required: true, unique: true },
-            gender: { type: String, enum: ["Male", "Female", "Other"] },
-            phone: { type: String },
-            password: { type: String, required: true, minlength: 6 },
-            religion: { type: String },
-            maritalStatus: {
-                type: String,
-                enum: ["Single", "Married", "Divorced", "Widowed"],
-            },
-            addresses: {
-                street: { type: String },
-                city: { type: String },
-                state: { type: String },
-                zipCode: { type: String },
-                country: { type: String },
-            },
-            emergencyContact: { type: Schema.Types.Mixed },
-            currentAddress: { type: String },
-            permanentAddress: { type: String },
+        username: { type: String, required: true, minlength: 3 },
+        fullName: { type: String, required: true, minlength: 3 },
+        imgUrl: { type: String },
+        dob: { type: Date },
+        email: { type: String, required: true, unique: true },
+        gender: { type: String, enum: ["Male", "Female", "Other"] },
+        phone: { type: String },
+        password: { type: String, required: true, minlength: 6 },
+        religion: { type: String },
+        maritalStatus: {
+            type: String,
+            enum: ["Single", "Married", "Divorced", "Widowed"],
         },
+        addresses: {
+            street: { type: String },
+            city: { type: String },
+            state: { type: String },
+            zipCode: { type: String },
+            country: { type: String },
+        },
+        role: {
+            type: String,
+            default: "parent",
+        },
+        emergencyContact: { type: Schema.Types.Mixed },
+        currentAddress: { type: String },
+        permanentAddress: { type: String },
 
         children: [{ type: Schema.Types.ObjectId, ref: "Student", default: null }], // Parent can have multiple students
 
