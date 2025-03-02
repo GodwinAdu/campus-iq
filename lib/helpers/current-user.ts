@@ -1,3 +1,5 @@
+"use server"
+
 import { TokenExpiredError } from "jsonwebtoken";
 import { getEmployeeById } from "../actions/employee.actions";
 import { fetchStudentById } from "../actions/student.actions";
@@ -6,7 +8,7 @@ import jwt from "jsonwebtoken";
 
 export async function currentUser() {
     try {
-        const cookiesStore = await cookies(); // No need for `await`
+        const cookiesStore = await cookies();
         const tokenValue = cookiesStore.get("token");
 
         if (!tokenValue?.value) {
