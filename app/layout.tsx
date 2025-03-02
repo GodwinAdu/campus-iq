@@ -4,6 +4,9 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Loader from "@/components/commons/loader/loader";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +43,8 @@ export default function RootLayout({
           <Loader />
           {/* <UseCheckStoreExpired /> */}
           {children}
+          <Analytics />
+          <SpeedInsights />
           <Toaster />
         </ThemeProvider>
       </body>
