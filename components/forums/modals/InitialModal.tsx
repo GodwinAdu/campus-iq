@@ -24,9 +24,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { createNewServer } from "@/lib/actions/server.actions";
 import { FileUpload } from "../file-upload";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const formSchema = z.object({
   name: z.string().min(1, {
@@ -37,10 +38,10 @@ const formSchema = z.object({
   })
 });
 
-export const InitialModal = () => {
+export const InitialModal = ({ school }: { school: ISchool }) => {
   const [isMounted, setIsMounted] = useState(false);
 
-  const router = useRouter();
+  // const router = useRouter();
 
   useEffect(() => {
     setIsMounted(true);
@@ -59,8 +60,8 @@ export const InitialModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const response = await createNewServer({
-        name:values.name,
-        imageUrl:values.imageUrl
+        name: values.name,
+        imageUrl: values.imageUrl
       });
       console.log('Server response:', response);
       form.reset();
@@ -80,8 +81,14 @@ export const InitialModal = () => {
     <Dialog open>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
-          <DialogTitle className="text-2xl text-center font-bold">
-            Customize your server
+          <div className="flex justify-center items-center">
+            <Avatar className="h-16 w-16">
+              <AvatarImage src={school?.schoolLogo} alt="school_logo" />
+              <AvatarFallback className="text-white">{school?.schoolName.split('')[0]}</AvatarFallback>
+            </Avatar>
+          </div>
+          <DialogTitle className="text-xl text-center font-bold">
+            Create a New <span className="text-primary">{school?.schoolName}</span> Server
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-500">
             Give your server a personality with a name and an image. You can always change it later.

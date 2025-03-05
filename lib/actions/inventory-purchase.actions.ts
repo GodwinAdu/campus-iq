@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import InventorySupplier from '../models/inventory-supplier.models';
 import InventoryStore from '../models/inventory-store.models';
 import { currentUser } from '../helpers/current-user';
+import History from '../models/history.models';
 
 interface ItemsProps {
     products: string;
@@ -54,7 +55,24 @@ export async function createPurchase(values: PurchaseProps, path: string) {
             action_type: "created"
         });
 
-        await newPurchase.save();
+        const history = new History({
+            schoolId,
+            actionType: 'PURCHASE_CREATED',
+            details: {
+                itemId: newPurchase._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new purchase with (ID: ${newPurchase._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newPurchase._id,
+            entityType: 'PURCHASE', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([
+            newPurchase.save(),
+            history.save(),
+        ]);
+        
         revalidatePath(path); // Revalidate the cache for the updated data
 
     } catch (error) {

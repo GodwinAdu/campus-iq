@@ -3,6 +3,7 @@
 import Mood from "../models/mood.models";
 import { currentUser } from "../helpers/current-user";
 import { connectToDB } from "../mongoose";
+import History from '../models/history.models';
 
 
 interface SaveMoodInput {
@@ -55,6 +56,22 @@ export async function saveMood(values: SaveMoodInput) {
                 },
                 { new: true }
             );
+
+            const history = new History({
+                schoolId,
+                actionType: 'MOOD_UPDATED', // Use a relevant action type
+                details: {
+                    itemId: updatedMood._id,
+                    deletedAt: new Date(),
+                },
+                message: `${user.fullName} updated Mood for a student with (ID: ${updatedMood._id}) on ${new Date().toLocaleString()}.`,
+                performedBy: user._id,
+                entityId: updatedMood._id,
+                entityType: 'MOOD'  // The type of the entity
+            });
+
+            await history.save();
+
             console.log("Mood updated:", updatedMood);
             return JSON.parse(JSON.stringify(updatedMood));
         }
@@ -71,6 +88,20 @@ export async function saveMood(values: SaveMoodInput) {
             action_type: "created"
         });
 
+        const history = new History({
+            schoolId,
+            actionType: 'MOOD_UPDATED', // Use a relevant action type
+            details: {
+                itemId: newMood._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created Mood for a student with (ID: ${newMood._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newMood._id,
+            entityType: 'MOOD'  // The type of the entity
+        });
+
+        await history.save();
         console.log("New mood entry created:", newMood);
         return JSON.parse(JSON.stringify(newMood));
     } catch (error) {

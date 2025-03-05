@@ -9,6 +9,7 @@ import { connectToDB } from "../mongoose";
 import GradeRange from "../models/grade-range.models";
 import Employee from "../models/employee.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 // examId: {
 //     type: Schema.Types.ObjectId,
@@ -73,13 +74,26 @@ export async function createMarkEntries(classId: string, studentId: string) {
         }));
 
         // Create new mark entry
-        const newMarkEntry = await Mark.create({
+        const newMarkEntry = new Mark({
             schoolId,
             examId: examSchedule.examId._id,
             classId,
             studentId: student._id,
             subjectItems,
         });
+        const history = new History({
+            schoolId,
+            actionType: 'MARK_ENTRIES_CREATED',
+            details: {
+                itemId: newMarkEntry._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new mark entries for student with (ID: ${student._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newMarkEntry._id,
+            entityType: 'MARK_ENTRIES', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+        await Promise.all([newMarkEntry.save(), history.save()]);
 
         // Populate `studentId` before returning
         const populatedMarkEntry = await Mark.findById(newMarkEntry._id).populate("studentId", "fullName").lean();

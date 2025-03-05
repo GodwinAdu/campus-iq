@@ -5,6 +5,7 @@ import Account from "../models/account.models";
 import { connectToDB } from "../mongoose";
 import Expense from "../models/expenses.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 interface AccountProps {
     accountId: string;
     expenseName: string;
@@ -41,11 +42,26 @@ export async function createExpenses(values: AccountProps, path: string) {
             schoolId,
         });
 
-        await expenses.save();
-
         account.expenses.push(expenses._id);
         account.balance -= expenseAmount as number;
-        await account.save();
+
+        const history = new History({
+            schoolId,
+            actionType: 'EXPENSE_CREATED', // Use a relevant action type
+            details: {
+                itemId: expenses._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} added new expense with (ID: ${expenses._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: expenses._id,  // The ID of the deleted unit
+        });
+
+        await Promise.all([
+            expenses.save(),
+            account.save(),
+            history.save()
+        ]);
 
         revalidatePath(path);
     } catch (error) {

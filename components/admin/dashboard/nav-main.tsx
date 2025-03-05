@@ -10,21 +10,17 @@ import {
   HardDrive,
   NotebookPen,
   UsersRound,
-  BookOpenCheck,
-  TvMinimalPlay,
   BookOpenCheckIcon,
   Combine,
   House,
   Library,
   Mail,
-  HospitalIcon,
   CookingPot,
   Menu,
   HistoryIcon,
   Trash,
-  ReceiptIcon,
-  ListCheck,
-  LucideReceiptText
+  LucideReceiptText,
+  CalendarPlus
 } from "lucide-react"
 import {
   Collapsible,
@@ -85,10 +81,17 @@ export function NavMain({ role, school }: NavMainProps) {
       isActive: false,
 
     },
+ ,   // {
+    //   title: "Admission Portal",
+    //   url: `/${schoolId}/admin/${userId}/admissions`,
+    //   icon:ListCheck,
+    //   isActive: false,
+
+    // },
     {
-      title: "Admission Portal",
-      url: `/${schoolId}/admin/${userId}/admissions`,
-      icon:ListCheck,
+      title: "Events",
+      url: `/${schoolId}/admin/${userId}/events`,
+      icon:CalendarPlus,
       isActive: false,
 
     },
@@ -99,11 +102,11 @@ export function NavMain({ role, school }: NavMainProps) {
       isActive: true,
       roleField: "systemConfig",
       items: [
-        {
-          title: "Admission",
-          url: `/${schoolId}/admin/${userId}/front-desk/admission`,
-          roleField: "manageSession"
-        },
+        // {
+        //   title: "Admission",
+        //   url: `/${schoolId}/admin/${userId}/front-desk/admission`,
+        //   roleField: "manageSession"
+        // },
         {
           title: "Postal Records",
           url: `/${schoolId}/admin/${userId}/front-desk/postal-records`,
@@ -148,11 +151,11 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
           roleField: "manageTerm"
         },
-        {
-          title: "Audit Logs",
-          url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
-          roleField: "manageTerm"
-        },
+        // {
+        //   title: "Audit Logs",
+        //   url: `/${schoolId}/admin/${userId}/system-config/manage-term`,
+        //   roleField: "manageTerm"
+        // },
       ],
     },
     {
@@ -162,11 +165,11 @@ export function NavMain({ role, school }: NavMainProps) {
       isActive: true,
       roleField: "classManagement",
       items: [
-        {
-          title: "Assignments",
-          url: `/${schoolId}/admin/${userId}/class/assignment`,
-          roleField: "manageClass"
-        },
+        // {
+        //   title: "Assignments",
+        //   url: `/${schoolId}/admin/${userId}/class/assignment`,
+        //   roleField: "manageClass"
+        // },
         {
           title: "Classes",
           url: `/${schoolId}/admin/${userId}/class/manage-classes`,
@@ -187,11 +190,11 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/class/class-fees`,
           roleField: "manageClass"
         },
-        {
-          title: "Promote Student",
-          url: `/${schoolId}/admin/${userId}/class/promotion`,
-          roleField: "manageSubject"
-        },
+        // {
+        //   title: "Promote Student",
+        //   url: `/${schoolId}/admin/${userId}/class/promotion`,
+        //   roleField: "manageSubject"
+        // },
       ],
     },
     {
@@ -234,16 +237,16 @@ export function NavMain({ role, school }: NavMainProps) {
       icon: Users,
       roleField: "studentManagement",
       items: [
-        {
-          title: "Assistant Manager",
-          url: `/${schoolId}/admin/${userId}/student-wellbeing/assistant`,
-          roleField: "manageStudent"
-        },
-        {
-          title: "Social Support",
-          url: `/${schoolId}/admin/${userId}/student-wellbeing/social-support`,
-          roleField: "manageStudent"
-        },
+        // {
+        //   title: "Assistant Manager",
+        //   url: `/${schoolId}/admin/${userId}/student-wellbeing/assistant`,
+        //   roleField: "manageStudent"
+        // },
+        // {
+        //   title: "Social Support",
+        //   url: `/${schoolId}/admin/${userId}/student-wellbeing/social-support`,
+        //   roleField: "manageStudent"
+        // },
         {
           title: "Add Wellbeing",
           url: `/${schoolId}/admin/${userId}/student-wellbeing/wellbeing`,
@@ -302,19 +305,19 @@ export function NavMain({ role, school }: NavMainProps) {
         },
       ],
     },
-    proPlan && {
-      title: "Virtual Learning",
-      url: "#",
-      icon: TvMinimalPlay,
-      roleField: "onlineLearning",
-      items: [
-        {
-          title: "List Accounts",
-          url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
-          roleField: "manageListAccount"
-        },
-      ],
-    },
+    // proPlan && {
+    //   title: "Virtual Learning",
+    //   url: "#",
+    //   icon: TvMinimalPlay,
+    //   roleField: "onlineLearning",
+    //   items: [
+    //     {
+    //       title: "List Accounts",
+    //       url: `/${schoolId}/admin/${userId}/payment-accounts/list-accounts`,
+    //       roleField: "manageListAccount"
+    //     },
+    //   ],
+    // },
     proPlan && {
       title: "Exams Management",
       url: "#",
@@ -412,31 +415,31 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/hr-payroll/salary-payment`,
           roleField: "manageHr"
         },
-        {
-          title: "Request Salary",
-          url: `/${schoolId}/admin/${userId}/hr-payroll/request-salary`,
-          roleField: "manageRequestSalary",
-        },
-        {
-          title: "Manage Salary Request",
-          url: `/${schoolId}/admin/${userId}/hr-payroll/manage-salary-request`,
-          roleField: "manageHr"
-        },
+        // {
+        //   title: "Request Salary",
+        //   url: `/${schoolId}/admin/${userId}/hr-payroll/request-salary`,
+        //   roleField: "manageRequestSalary",
+        // },
+        // {
+        //   title: "Manage Salary Request",
+        //   url: `/${schoolId}/admin/${userId}/hr-payroll/manage-salary-request`,
+        //   roleField: "manageHr"
+        // },
         {
           title: "Leave Category",
           url: `/${schoolId}/admin/${userId}/hr-payroll/leave-category`,
           roleField: "manageLeaveCategory",
         },
-        {
-          title: "Request Leave",
-          url: `/${schoolId}/admin/${userId}/hr-payroll/request-leave`,
-          roleField: "manageRequestLeave",
-        },
-        {
-          title: "Manage Leave",
-          url: `/${schoolId}/admin/${userId}/hr-payroll/manage-leave`,
-          roleField: "manageHr"
-        },
+        // {
+        //   title: "Request Leave",
+        //   url: `/${schoolId}/admin/${userId}/hr-payroll/request-leave`,
+        //   roleField: "manageRequestLeave",
+        // },
+        // {
+        //   title: "Manage Leave",
+        //   url: `/${schoolId}/admin/${userId}/hr-payroll/manage-leave`,
+        //   roleField: "manageHr"
+        // },
         {
           title: "Awards",
           url: `/${schoolId}/admin/${userId}/hr-payroll/awards`,
@@ -523,24 +526,24 @@ export function NavMain({ role, school }: NavMainProps) {
         },
       ],
     },
-    proPlan && {
-      title: "Health Records",
-      url: "#",
-      icon: HospitalIcon,
-      roleField: "library",
-      items: [
-        {
-          title: "Books",
-          url: `/${schoolId}/admin/${userId}/library/manage-books`,
-          roleField: "manageHealth"
-        },
-        {
-          title: "Issue Books",
-          url: `/${schoolId}/admin/${userId}/library/manage-issue-books`,
-          roleField: "manageHealth"
-        },
-      ],
-    },
+    // proPlan && {
+    //   title: "Health Records",
+    //   url: "#",
+    //   icon: HospitalIcon,
+    //   roleField: "library",
+    //   items: [
+    //     {
+    //       title: "Books",
+    //       url: `/${schoolId}/admin/${userId}/library/manage-books`,
+    //       roleField: "manageHealth"
+    //     },
+    //     {
+    //       title: "Issue Books",
+    //       url: `/${schoolId}/admin/${userId}/library/manage-issue-books`,
+    //       roleField: "manageHealth"
+    //     },
+    //   ],
+    // },
     {
       title: "Deposit & Expenses",
       url: "#",
@@ -571,6 +574,29 @@ export function NavMain({ role, school }: NavMainProps) {
           title: "All Transactions",
           url: `/${schoolId}/admin/${userId}/deposit-expenses/all-transactions`,
           roleField: "manageAccount"
+        },
+      ],
+    },
+    proPlan && {
+      title: "Messaging Hub",
+      url: "#",
+      icon:Mail,
+      roleField: "message",
+      items: [
+        {
+          title: "Bulk Emails",
+          url: `/${schoolId}/admin/${userId}/messaging/bulk-email`,
+          roleField: "message",
+        },
+        {
+          title: "Email Message",
+          url: `/${schoolId}/admin/${userId}/messaging/email`,
+          roleField: "message",
+        },
+        {
+          title: "Forums",
+          url: `/${schoolId}/forum`,
+          roleField: "message",
         },
       ],
     },
@@ -618,12 +644,6 @@ export function NavMain({ role, school }: NavMainProps) {
           // roleField: "sellReturnReport"
         },
       ],
-    },
-    proPlan && {
-      title: "Email Messages",
-      url: `/${schoolId}/admin/${userId}/messaging/email`,
-      icon: Mail,
-      roleField: "message",
     },
     {
       title: "History",

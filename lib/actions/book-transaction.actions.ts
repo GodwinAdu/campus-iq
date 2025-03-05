@@ -7,6 +7,7 @@ import Book from "../models/book.models";
 import { connectToDB } from "../mongoose";
 import { ClientSession, startSession } from "mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 export async function createFinedAmount(amount: number): Promise<void> {
     try {
@@ -23,9 +24,24 @@ export async function createFinedAmount(amount: number): Promise<void> {
             schoolId,
             createdBy: user?._id,
             action_type: "created"
-        })
+        });
+        const history = new History({
+            schoolId,
+            actionType: 'BOOKFINE_CREATED', // Use a relevant action type
+            details: {
+                itemId: newBookFine._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new Behavior for  a student with (ID: ${newBookFine._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: newBookFine._id,  // The ID of the deleted unit
+            entityType: 'BOOKFINE',  // The type of the entity
+        });
 
-        await newBookFine.save();
+        await Promise.all([
+            newBookFine.save(),
+            history.save()
+        ]);
     } catch (error) {
         console.error("Error adding amount to user:", error);
         throw error;
@@ -202,8 +218,16 @@ export async function deleteBookIssued(id: string) {
         await BookTransaction.findByIdAndDelete(id).session(session);
 
         // Update book copies
-        book.copiesIssued -= 1;
-        book.copiesAvailable += 1;
+        if (book.copiesIssued !== undefined) {
+            book.copiesIssued -= 1;
+        } else {
+            book.copiesIssued = 0;
+        }
+        if (book.copiesAvailable !== undefined) {
+            book.copiesAvailable += 1;
+        } else {
+            book.copiesAvailable = 1;
+        }
 
         // Save the updated book details
         await book.save({ session });

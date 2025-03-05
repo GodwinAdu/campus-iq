@@ -1,6 +1,7 @@
 "use server"
 
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 import MealPlan from "../models/meal-plan.models";
 import { connectToDB } from "../mongoose";
 
@@ -28,7 +29,20 @@ export async function createMealPlan(values: Props) {
             action_type: "created",
         });
 
-        await newPlan.save();
+        const history = new History({
+            schoolId,
+            actionType: 'MEAL_PLAN_CREATED', // Use a relevant action type
+            details: {
+                itemId: newPlan._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new meal plan with (ID: ${newPlan._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newPlan._id,
+            entityType: 'MEAL_PLAN', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([newPlan.save(), history.save()]);
 
     } catch (error) {
         console.error("Error creating meal plan", error);

@@ -6,6 +6,8 @@ import Loader from "@/components/commons/loader/loader";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import IntroModal from "@/components/commons/IntroModal";
+import FeedbackModal from "@/components/commons/FeedbackModal";
 
 
 const geistSans = Geist({
@@ -43,9 +45,11 @@ export default function RootLayout({
           <Loader />
           {/* <UseCheckStoreExpired /> */}
           {children}
+          <IntroModal />
           <Analytics />
           <SpeedInsights />
           <Toaster />
+          <FeedbackModal />
         </ThemeProvider>
       </body>
     </html>

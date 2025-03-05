@@ -12,7 +12,7 @@ const page = () => {
             <Separator />
             {/* Add Postal Form */}
             <div className="py-4">
-                <PostalForm />
+                <PostalForm type='create' />
             </div>
         </>
     )

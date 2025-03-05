@@ -14,7 +14,7 @@ import { buttonVariants } from '@/components/ui/button'
 const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const
 
 const classTypeColors: Record<ClassType, string> = {
-    lecture: 'bg-blue-100 text-blue-800',
+    lecture: 'bg-primary/10 text-primary',
     lab: 'bg-green-100 text-green-800',
     tutorial: 'bg-yellow-100 text-yellow-800',
 }

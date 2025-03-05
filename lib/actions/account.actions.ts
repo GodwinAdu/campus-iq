@@ -5,6 +5,7 @@ import Account from "../models/account.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
 import { AccountSchema } from "../validators/account.validator";
+import History from "../models/history.models";
 
 interface CreateAccountProps {
     accountName: string;
@@ -44,8 +45,24 @@ export async function createAccount( values: CreateAccountProps) {
             createdBy: user?._id,
             action_type: "created",
         });
+        const history = new History({
+            schoolId,
+            actionType: 'ACCOUNT_CREATED', // Use a relevant action type
+            details: {
+                itemId: account._id,
+                deletedAt: new Date(),
+            },
+            message: `User ${user.fullName} created Account named "${accountName}" (ID: ${account._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: account._id,  // The ID of the deleted unit
+            entityType: 'ACCOUNT',  // The type of the entity
+        });
 
-        await account.save();
+        await Promise.all([
+            account.save(),
+            history.save()
+        ])
+
 
     } catch (error) {
         console.error("Error creating account", error);

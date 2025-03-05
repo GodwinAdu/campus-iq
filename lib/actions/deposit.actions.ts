@@ -5,6 +5,7 @@ import Account from "../models/account.models";
 import Deposit from "../models/deposit.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 interface AccountProps {
     accountId: string;
     depositName: string;
@@ -40,10 +41,31 @@ export async function createDeposit(values: AccountProps, path: string) {
             action_type: "create",
         });
 
-        await deposit.save();
-
         account.deposits.push(deposit._id);
         account.balance += depositAmount;
+
+        const history =  new History({
+            schoolId,
+            actionType: 'DEPOSIT_ADDED', // Use a relevant action type
+            details: {
+                itemId: deposit._id,
+                depositAmount,
+                depositDate,
+                depositName,
+                payVia,
+                reference,
+            },
+            message: `${user.fullName} added a deposit of ${depositAmount} to account (ID: ${accountId}) on ${depositDate.toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: deposit._id,  // The ID of the created deposit
+            entityType: 'DEPOSIT',  // The type of the entity
+        });
+
+        await Promise.all([
+            deposit.save(),
+            account.save(),
+            history.save(),
+        ]);
         await account.save();
 
         revalidatePath(path);

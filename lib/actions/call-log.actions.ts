@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { currentUser } from "../helpers/current-user";
 import Call from "../models/call.models";
+import History from "../models/history.models";
 
 interface CallProps {
     callType: string;
@@ -51,7 +52,24 @@ export async function createCallLog(values: CallProps, path: string) {
             action_type: "created",
         });
 
-        await newCall.save();
+        const history = new History({
+            schoolId,
+            actionType: 'CALL_CREATED', // Use a relevant action type
+            details: {
+                itemId: newCall._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new call log  with (ID: ${newCall._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: newCall._id,  // The ID of the deleted unit
+            entityType: 'CALL',  // The type of the entity
+        });
+
+        await Promise.all([
+            newCall.save(),
+            history.save(),
+        ]);
+
         revalidatePath(path);
 
     } catch (error) {

@@ -5,6 +5,7 @@ import { connectToDB } from '../mongoose';
 import Server from "../models/server.model";
 import Member from "../models/member.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 
 
@@ -30,6 +31,7 @@ export async function createChannel(values: { name: string, type: string }, serv
   try {
     const user = await currentUser();
     if (!user) throw new Error("Unauthorized user");
+    const schoolId = user.schoolId;
     const { name, type } = values;
 
     console.log(serverId, "serverId")
@@ -55,8 +57,20 @@ export async function createChannel(values: { name: string, type: string }, serv
 
     await newChannel.save();
     server.channels.push(newChannel._id);
+    const history = new History({
+      schoolId,
+      actionType: 'CHANNEL_CREATED', // Use a relevant action type
+      details: {
+        itemId: newChannel._id,
+        deletedAt: new Date(),
+      },
+      message: `${user.fullName} created new channel with (ID: ${newChannel._id}) on ${new Date().toLocaleString()}.`,
+      performedBy: user._id, // User who performed the action,
+      entityId: newChannel._id,  // The ID of the deleted unit
+      entityType: 'CHANNEL',  // The type of the entity
+    });
 
-    await server.save();
+    await Promise.all([server.save(), history.save()]);
 
   } catch (error) {
     console.error("Error creating channel:", error);

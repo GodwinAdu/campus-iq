@@ -5,6 +5,7 @@ import InventoryCategory from "../models/inventory-category.models";
 import InventoryProduct from "../models/inventory-product.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 
 interface ProductProps {
@@ -49,11 +50,25 @@ export async function createProduct(values: ProductProps, path: string) {
             createdBy: user._id,
             action_type: "created",
         });
+        const history = new History({
+            schoolId,
+            actionType: 'PRODUCT_CREATED', // Use a relevant action type
+            details: {
+                itemId: newProduct._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new product with (ID: ${newProduct._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newProduct._id,
+            entityType: 'PRODUCT', // The type of the entity
+        })
 
         category.products.push(newProduct._id);
+        
         await Promise.all([
             newProduct.save(),
             category.save(),
+            history.save(),
         ]);
 
         revalidatePath(path)

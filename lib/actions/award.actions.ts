@@ -6,6 +6,7 @@ import { connectToDB } from '../mongoose';
 import Student from "../models/student.models";
 import Employee from "../models/employee.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface AwardProps {
     role: string;
@@ -58,7 +59,24 @@ export async function createAward(values: AwardProps, path: string) {
             action_type: "create"
         });
 
-        await award.save();
+        const history = new History({
+            schoolId,
+            actionType: 'AWARD_CREATED', // Use a relevant action type
+            details: {
+                itemId: award._id,
+                deletedAt: new Date(),
+            },
+            message: `User ${user.fullName} created award called "${awardName}" (ID: ${award._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: award._id,  // The ID of the deleted unit
+            entityType: 'AWARD',  // The type of the entity
+        });
+
+        await Promise.all([
+            award.save(),
+            history.save()
+        ])
+
         revalidatePath(path)
 
     } catch (error) {

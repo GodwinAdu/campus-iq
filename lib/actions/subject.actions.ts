@@ -6,6 +6,7 @@ import Subject from "../models/subject.models";
 import { connectToDB } from "../mongoose";
 import Class from "../models/class.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface CreateSubjectProps {
     subjectName: string;
@@ -64,13 +65,28 @@ export async function createSubject(values: CreateSubjectProps, path: string) {
             schoolId,
             createdBy: user?._id,
             action_type: "create"
+        });
+
+        const history = new History({
+            schoolId,
+            actionType:"SUBJECT_CREATED",
+            details:{
+                itemId:value._id
+            },
+            message: `${user.fullName} created new subject with (ID: ${value._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: value._id,
+            entityType: "SESSION", // The type of the entity
         })
 
         const subjectData = await value.save();
 
         classData.subjects.push(subjectData._id);
 
-        await classData.save();
+        await Promise.all([
+            classData.save(),
+            history.save()
+        ]);
 
         revalidatePath(path);
 

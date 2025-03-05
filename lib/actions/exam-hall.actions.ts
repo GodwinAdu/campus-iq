@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import ExamHall from "../models/exams-hall.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from '../models/history.models';
 
 
 interface ExamProps {
@@ -31,9 +32,25 @@ export async function createExamsHall(values: ExamProps) {
             seats,
             createdBy: user._id,
             action_type: "created"
-        })
+        });
 
-        await newExamsHall.save();
+        const history = new History({
+            schoolId,
+            actionType: 'EXAM_HALL_CREATED', // Use a relevant action type
+            details: {
+                itemId: newExamsHall._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new examsHall with (ID: ${newExamsHall._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newExamsHall._id,
+            entityType: 'EXAM_HALL'  // The type of the entity
+        });
+
+        await Promise.all([
+            newExamsHall.save(),
+            history.save(),
+        ]);
 
     } catch (error) {
         console.log("Error creating examsHall", error);

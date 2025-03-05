@@ -13,21 +13,22 @@ import {
 } from "@/components/ui/card";
 import { fetchClassById } from '@/lib/actions/class.actions'
 import { cn } from '@/lib/utils'
-import { buttonVariants } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { DataTable } from '@/components/table/data-table'
 import { subjectColumns } from '../_components/subject/column'
 import { studentColumns } from '../_components/student/column'
 import { teacherColumns } from '../_components/teacher/column'
 import { currentUser } from '@/lib/helpers/current-user'
+
+type Props = Promise<{ schoolId: string, userId: string, classId: string }>
 const page = async ({
   params
-}: { params: { schoolId: string, adminId: string, classId: string } }) => {
+}: { params: Props }) => {
   const user = await currentUser();
 
   if (!user) redirect("/");
 
-  const pathId = params.adminId;
-  const classId = params.classId;
+  const { schoolId, userId, classId } = await params;
 
   const data = await fetchClassById(classId);
   console.log(data, " class data")
@@ -39,7 +40,7 @@ const page = async ({
           description={`View ${data?.name} with it subjects, students and it teachers.`}
         />
         <Link
-          href={`/admin/${pathId}/manage-class/manage-classes`}
+          href={`/${schoolId}/admin/${userId}/class/manage-classes`}
           className={cn(buttonVariants())}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -49,11 +50,12 @@ const page = async ({
       <Separator />
       <div className="md:px-4 pt-3">
         <Tabs defaultValue="details" className=" w-full">
-          <TabsList className="grid w-full max-w-lg grid-cols-4">
+          <TabsList className="grid w-full max-w-lg grid-cols-5">
             <TabsTrigger value="details">Details</TabsTrigger>
             <TabsTrigger value="subjects">Subjects</TabsTrigger>
             <TabsTrigger value="students">Students</TabsTrigger>
             <TabsTrigger value="teachers">Teachers</TabsTrigger>
+            <TabsTrigger value="timetable">Timetable</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="w-ful">
             <Card>
@@ -93,15 +95,13 @@ const page = async ({
                   </div>
                   <Separator />
                   <div className="flex gap-4 items-center py-5 flex-wrap">
-                    <Link href={`/${params.schoolId}/admin/${params.adminId}/system-config/manage-subjects`} className={cn(buttonVariants())}>
-                      Create subject
-                    </Link>
-                    <Link href={``} className={cn(buttonVariants())}>
-                      Create student
-                    </Link>
-                    <Link href={``} className={cn(buttonVariants())}>
-                      Create teacher
-                    </Link>
+                    
+                    <Button>
+                      Add Student
+                    </Button>
+                    <Button>
+                      Add Teacher
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -133,6 +133,17 @@ const page = async ({
               <CardContent className="space-y-2">
                 <div className="space-y-1">
                   <DataTable searchKey="fullName" columns={teacherColumns} data={data?.teachers} />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="timetable">
+            <Card>
+              <CardHeader></CardHeader>
+              <CardContent className="space-y-2">
+                <div className="space-y-1">
+                  {/* Timetable component */}
+                  <p>This is timetable for {data?.name}</p>
                 </div>
               </CardContent>
             </Card>

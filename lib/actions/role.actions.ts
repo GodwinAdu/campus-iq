@@ -6,6 +6,7 @@ import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
 import RoleSchema from "../validators/role.validator";
 import { z } from "zod";
+import History from "../models/history.models";
 
 
 type CreateRoleProps = z.infer<typeof RoleSchema>
@@ -39,7 +40,24 @@ export async function createRole(values: CreateRoleProps, path: string) {
             ...permissions
         });
 
-        await role.save();
+        const history = new History({
+            schoolId,
+            actionType: 'ROLE_CREATED',
+            details: {
+                roleId: role._id,
+                createdBy: user?._id,
+            },
+            message: `${user.fullName} created new role with (ID: ${role._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user?._id,
+            entityId: role._id,
+            entityType: 'ROLE'  // The type of the entity
+        });
+
+
+        await Promise.all([
+            role.save(),
+            history.save(),
+        ]);
 
         revalidatePath(path)
 

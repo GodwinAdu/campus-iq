@@ -86,7 +86,11 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
             ) : (
                 <Dialog>
                     <DialogTrigger asChild>
+
+                        <button>
+                            <span className="sr-only">Open menu</span>
                         <Badge className="cursor-pointer">Pay Now</Badge>
+                        </button>
                     </DialogTrigger>
                     <DialogContent className="w-[96%] max-w-lg">
                         <DialogHeader>

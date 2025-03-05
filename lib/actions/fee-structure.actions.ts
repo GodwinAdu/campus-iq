@@ -6,6 +6,7 @@ import { connectToDB } from "../mongoose";
 import Class from "../models/class.models";
 import { currentUser } from "../helpers/current-user";
 import Term from "../models/term.models";
+import History from "../models/history.models";
 
 interface CreateStructureProps {
     classId: string;
@@ -41,9 +42,25 @@ export async function createFeeStructure(data: CreateStructureProps, path: strin
             fees: data.fees,
             createdBy: user._id,
             action_type: "create"
-        })
+        });
 
-        await newFees.save();
+        const history = new History({
+            schoolId,
+            actionType: 'FEES_STRUCTURE_CREATED', // Use a relevant action type
+            details: {
+                itemId: newFees._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new fees structure for class (ID: ${data.classId}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newFees._id,
+            entityType: 'FEES_STRUCTURE'  // The type of the entity
+        });
+
+        await Promise.all([
+            newFees.save(),
+            history.save(),
+        ]);
 
         revalidatePath(path);
 

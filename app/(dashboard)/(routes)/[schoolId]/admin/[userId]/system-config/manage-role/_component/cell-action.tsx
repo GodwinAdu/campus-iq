@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Edit, Loader2, MoreHorizontal } from "lucide-react"
+import { Edit, Loader2, MoreHorizontal, View } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
@@ -71,26 +71,24 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     </DropdownMenuItem>
                 ) : (
                     <>
-                        {role?.viewRole && (
+                        {role?.permissions.viewRole && (
                             <DropdownMenuItem asChild>
                                 <Link href={`/${schoolId}/admin/${userId}/system-config/manage-role/${data._id}`}>
-                                    <Edit className="mr-2 h-4 w-4" /> Update
+                                    <View className="mr-2 h-4 w-4" /> View
                                 </Link>
                             </DropdownMenuItem>
                         )}
-                        {role?.editRole && (
+                        {role?.permissions.editRole && (
                             <DropdownMenuItem asChild>
                                 <Link href={`/${schoolId}/admin/${userId}/system-config/manage-role/${data._id}/edit`}>
                                     <Edit className="mr-2 h-4 w-4" /> Update
                                 </Link>
                             </DropdownMenuItem>
                         )}
-                        {role?.deleteRole && (
+                        {role?.permissions.deleteRole && (
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="bg-red-500 hover:bg-red-800">
                                 <DeleteDialog
                                     id={data?._id as string}
-                                    title="Are you sure you want to delete this Role?"
-                                    description="This action cannot be undone. Are you sure you want to proceed?"
                                     onContinue={handleDelete}
                                     isLoading={loading}
                                 />

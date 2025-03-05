@@ -2,6 +2,7 @@
 
 import { currentUser } from "../helpers/current-user";
 import { generateTransactionId } from "../helpers/generate-transactionid";
+import History from "../models/history.models";
 import MealPayment from "../models/meal-payment.models";
 import { connectToDB } from "../mongoose";
 
@@ -23,7 +24,21 @@ export async function createCanteenPayment(values:{amount:number,paymentMethod:s
             action_type: "created"
         });
 
-        await canteenPayment.save();
+        const history = new History({
+            schoolId,
+            actionType: 'CANTEEN_PAYMENT_CREATED', // Use a relevant action type
+            details: {
+                itemId: canteenPayment._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new canteen payment with (ID: ${canteenPayment._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: canteenPayment._id,
+            entityType: 'CANTEEN_PAYMENT', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([canteenPayment.save(), history.save()]);
+
     } catch (error) {
         console.error("Failed to create canteen payment", error);
         throw error;

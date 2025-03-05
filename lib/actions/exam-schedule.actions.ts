@@ -10,6 +10,7 @@ import Class from "../models/class.models";
 import Employee from "../models/employee.models";
 import ExamHall from "../models/exams-hall.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 
 export async function fetchExamSchedule(examId: string, classId: string) {
@@ -56,6 +57,21 @@ export async function fetchExamSchedule(examId: string, classId: string) {
             classId,
             subjectItems,
         });
+
+        const history = new History({
+            schoolId,
+            actionType: 'EXAM_SCHEDULE_CREATED', // Use a relevant action type
+            details: {
+                itemId: newExamSchedule._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new exam schedule with (ID: ${newExamSchedule._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newExamSchedule._id,
+            entityType: 'EXAM_SCHEDULE'  // The type of the entity
+        })
+
+        await history.save();
 
         return JSON.parse(JSON.stringify(newExamSchedule));
     } catch (error) {

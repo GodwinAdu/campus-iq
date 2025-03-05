@@ -22,6 +22,9 @@ import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
+import { toast } from "@/hooks/use-toast"
+import { createPostal } from "@/lib/actions/postal.actions"
+import { useParams, usePathname, useRouter } from "next/navigation"
 const formSchema = z.object({
     sender: z.string({
         required_error: "Please enter sender and is required.",
@@ -29,28 +32,39 @@ const formSchema = z.object({
     receiver: z.string().min(2, {
         message: "receiver name must be at least 2 characters.",
     }),
-    postalType: z.string().optional(),
+    postalType: z.string(),
     referenceNo: z.string().min(2, {
         message: "reference number must be at least 2 characters.",
     }),
     address: z.string().min(2, {
         message: "address must be at least 2 characters.",
     }),
-    date: z.coerce.date(),
-    postalDetails: z.string().optional(),
+    postalDate: z.coerce.date(),
+    postalDetails: z.string(),
     attachmentFile: z.string().optional(),
-    confidential: z.boolean().optional(),
-})
-const PostalForm = () => {
+    confidential: z.boolean()
+});
+
+interface PostalFormProps {
+    type: "create" | "update";
+    initialData?: z.infer<typeof formSchema>;
+}
+const PostalForm = ({ type, initialData }: PostalFormProps) => {
+    const router = useRouter();
+    const path = usePathname();
+    const params = useParams();
+
+    const { schoolId, userId } = params;
     // 1. Define your form.
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
+        defaultValues: initialData ?? {
             sender: "",
             receiver: "",
             postalType: "",
             referenceNo: "",
             address: "",
+            postalDate: new Date(), // TODO get current date
             postalDetails: "",
             attachmentFile: "",
             confidential: false,
@@ -62,13 +76,28 @@ const PostalForm = () => {
     // 2. Define a submit handler.
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            // Do something with the form values.
-            // ✅ This will be type-safe and validated.
-            console.log(values)
+            if (type === "create") {
+                await createPostal(values, path)
+            }
+
+            if (type === "update") {
+                // TODO update 
+            }
+            form.reset();
+            router.push(`/${schoolId}/admin/${userId}/front-desk/postal-records`)
+            toast({
+                title: "Form submitted successfully",
+                description: type === "create" ? "New postal created successfully" : "Postal updated successfully",
+                // status: "success",
+            })
 
         } catch (error) {
             console.error(error)
-
+            toast({
+                title: "Error submitting form",
+                description: "Please try again later",
+                variant: "destructive",
+            })
         }
     }
     return (
@@ -138,7 +167,7 @@ const PostalForm = () => {
                         />
                         <FormField
                             control={form.control}
-                            name="date"
+                            name="postalDate"
                             render={({ field }) => (
                                 <FormItem className="flex flex-col">
                                     <FormLabel>Date</FormLabel>

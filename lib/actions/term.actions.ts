@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Term from "../models/term.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 /**
  * Interface for creating a new term.
@@ -37,7 +38,24 @@ export async function createTerm({ name, isCurrent }: CreateTermProps) {
             action_type: "create"
         });
 
-        await term.save();
+        const history = new History({
+            schoolId,
+            actionType:"TERM_CREATED",
+            details:{
+                itemId:term._id
+            },
+            message: `${user.fullName} created new term with (ID: ${term._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: term._id,
+            entityType: "TERM", // The type of the entity
+        });
+
+        await Promise.all([
+            term.save(),
+            history.save()
+        ]);
+
+        
     } catch (error) {
         console.log("unable to create new term", error);
         throw error;

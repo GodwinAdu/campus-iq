@@ -70,19 +70,17 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     </DropdownMenuItem>
                 ) : (
                     <>
-                        {role?.editProduct && (
+                        {role?.permissions.editAccount && (
                             <DropdownMenuItem asChild>
                                 <Link href={`/${schoolId}/admin/${userId}/deposit-expenses/accounts`}>
                                     <Edit className="mr-2 h-4 w-4" /> Update
                                 </Link>
                             </DropdownMenuItem>
                         )}
-                        {role?.deleteProduct && (
+                        {role?.permissions.deleteAccount && (
                             <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="bg-red-500 hover:bg-red-800">
                                 <DeleteDialog
                                     id={data?._id as string}
-                                    title="Are you sure you want to delete this Account?"
-                                    description="This action cannot be undone. Are you sure you want to proceed?"
                                     onContinue={handleDelete}
                                     isLoading={loading}
                                 />

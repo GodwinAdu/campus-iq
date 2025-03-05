@@ -5,6 +5,7 @@ import { connectToDB } from "../mongoose";
 import GradeRange from '../models/grade-range.models';
 import { revalidatePath } from "next/cache";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface GradeRangeProps {
     gradeName: string;
@@ -41,7 +42,23 @@ export async function createGradeRange(values: GradeRangeProps, path: string) {
             action_type: "created"
         });
 
-        await newGradeRange.save();
+        const history = new History({
+            schoolId,
+            actionType: 'GRADE_RANGE_CREATED', // Use a relevant action type
+            details: {
+                itemId: newGradeRange._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new grade range with (ID: ${newGradeRange._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newGradeRange._id,
+            entityType: 'GRADE_RANGE'  // The type of the entity
+        });
+
+        await Promise.all([
+            newGradeRange.save(),
+            history.save(),
+        ]);
 
         revalidatePath(path);
 

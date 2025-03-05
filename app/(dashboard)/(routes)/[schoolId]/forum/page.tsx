@@ -1,5 +1,6 @@
 
 import { InitialModal } from "@/components/forums/modals/InitialModal";
+import { fetchSchoolById } from "@/lib/actions/school.actions";
 import { findServersByProfileId } from "@/lib/actions/server.actions";
 import { currentUser } from "@/lib/helpers/current-user";
 import { redirect } from "next/navigation"
@@ -12,6 +13,8 @@ const SetupPage = async ({ params }: { params: Props }) => {
 
   const user = await currentUser();
 
+  const school = await fetchSchoolById(schoolId);
+
 
   const server = await findServersByProfileId(user._id)
 
@@ -19,7 +22,11 @@ const SetupPage = async ({ params }: { params: Props }) => {
     return redirect(`/forum/servers/${server?._id}`)
   }
 
-  return <InitialModal />
+  if (user.role === "student" || user.role === "parent") {
+    // TODO : create a modal to show that they are not in any community yet
+  }
+
+  return <InitialModal school={school} />
 }
 
 export default SetupPage

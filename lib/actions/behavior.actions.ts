@@ -3,6 +3,7 @@
 import { currentUser } from "../helpers/current-user";
 import { connectToDB } from "../mongoose";
 import Behavior from "../models/behavior.models";
+import History from "../models/history.models";
 
 
 interface SaveMoodInput {
@@ -53,6 +54,20 @@ export async function saveBehavior(values: SaveMoodInput) {
                 },
                 { new: true }
             );
+            const history = new History({
+                schoolId,
+                actionType: 'BEHAVIOR_UPDATED', // Use a relevant action type
+                details: {
+                    itemId: updatedBehavior._id,
+                    deletedAt: new Date(),
+                },
+                message: `${user.fullName} updated Behavior for  a student with (ID: ${updatedBehavior._id}) on ${new Date().toLocaleString()}.`,
+                performedBy: user._id, // User who performed the action,
+                entityId: updatedBehavior._id,  // The ID of the deleted unit
+                entityType: 'BEHAVIOR',  // The type of the entity
+            });
+
+            await history.save();
             console.log("Behavior updated:", updatedBehavior);
             return JSON.parse(JSON.stringify(updatedBehavior));
         }
@@ -68,6 +83,20 @@ export async function saveBehavior(values: SaveMoodInput) {
             createdBy: user._id,
             action_type: "created"
         });
+        const history = new History({
+            schoolId,
+            actionType: 'BEHAVIOR_CREATED', // Use a relevant action type
+            details: {
+                itemId: newBehavior._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new Behavior for  a student with (ID: ${newBehavior._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: newBehavior._id,  // The ID of the deleted unit
+            entityType: 'BEHAVIOR',  // The type of the entity
+        });
+
+        await history.save();
 
         console.log("New behavior entry created:", newBehavior);
         return JSON.parse(JSON.stringify(newBehavior));

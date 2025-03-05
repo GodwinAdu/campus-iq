@@ -5,7 +5,6 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -48,7 +47,7 @@ interface CellActionProps {
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
-    const [salary, setSalary] = useState<ISalaryStructure | []>([]);
+    const [salary, setSalary] = useState<ISalaryStructure[] | []>([]);
 
     useEffect(() => {
         const fetchSalary = async () => {
@@ -70,7 +69,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
 
     async function onSubmit(values: z.infer<typeof FormSchema>) {
         try {
-            await updateEmployee(data._id, values);
+            await updateEmployee(data?._id as string, values);
             toast({
                 title: "Salary Assigned Successfully",
                 description: "Salary was assigned successfully...",
@@ -121,7 +120,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                                             </FormControl>
                                             <SelectContent>
                                                 {salary?.map((value) => (
-                                                    <SelectItem key={value?._id} value={value?._id}>{value.salaryName}</SelectItem>
+                                                    <SelectItem key={value?._id} value={value?._id ?? ""}>{value.salaryName}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>

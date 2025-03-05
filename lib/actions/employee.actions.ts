@@ -13,6 +13,7 @@ import Employee from '../models/employee.models';
 import Department from "../models/department.models";
 import { generateUniqueStaffId } from "../helpers/generateStaffId";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 export const getEmployeeById = async (id: string) => {
     try {
@@ -71,13 +72,6 @@ export async function createEmployee(values: employeeSchema, path: string) {
         console.log("Generated Password:", rawPassword);
         console.log("Hashed Password:", hashedPassword);
 
-        // Send welcome email
-        await wrappedSendMail({
-            to: email,
-            subject: "Registration Successful",
-            html: welcomeRegisterEmail(fullName, rawPassword, rawUsername, schoolName, schoolEmail),
-        });
-
         // Fetch department details
         const assignDepartment = await Department.findById(employment.departmentId);
         if (!assignDepartment) throw new Error("Department not found");
@@ -106,14 +100,32 @@ export async function createEmployee(values: employeeSchema, path: string) {
             createdBy: user._id,
             action_type: "create",
         });
+        const history = new History({
+            schoolId,
+            actionType: 'EMPLOYEE_CREATED', // Use a relevant action type
+            details: {
+                itemId: newEmployee._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new employee with (ID: ${newEmployee._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newEmployee._id,
+            entityType: 'EMPLOYEE',  // The type of the entity
+        });
 
         // Save employee and update department in parallel
         await Promise.all([
             newEmployee.save(),
             Department.updateOne(
                 { _id: employment.departmentId },
-                { $push: { employees: newEmployee._id } }
-            )
+                { $push: { employees: newEmployee._id } },
+            ),
+            history.save(),
+            wrappedSendMail({
+                to: email,
+                subject: "Registration Successful",
+                html: welcomeRegisterEmail(fullName, rawPassword, rawUsername, schoolName, schoolEmail),
+            })
         ]);
 
         // Revalidate path

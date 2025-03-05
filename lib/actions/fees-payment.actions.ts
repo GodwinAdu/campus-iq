@@ -9,6 +9,7 @@ import Parent from '../models/parent.models';
 import { generateInvoiceNumber } from '../helpers/invoiceGenerator';
 import FeesFine from '../models/fees-fine.models';
 import { currentUser } from '../helpers/current-user';
+import History from '../models/history.models';
 
 
 export async function createFeePayment() {
@@ -39,9 +40,9 @@ export async function fetchFeePayment(classId: string) {
 
         // Fetch all data concurrently for better performance
         const [students, feesPaymentRecords, feesStructures] = await Promise.all([
-            Student.find({classId }),
-            FeesPayment.find({ classId }),
-            FeesStructure.findOne({ classId })
+            Student.find({ schoolId, classId }),
+            FeesPayment.find({ schoolId, classId }),
+            FeesStructure.findOne({ schoolId, classId })
         ]);
 
         if (!students.length) throw new Error("No students found for the specified class.");
@@ -165,7 +166,7 @@ export async function fetchFeePaymentForStudent(classId: string, studentId: stri
                 ])
                 .lean()
                 .exec(),
-            FeesPayment.find({schoolId, classId }).lean().exec(),
+            FeesPayment.find({ schoolId, classId }).lean().exec(),
             FeesStructure.findOne({ classId }).lean().exec(),
             FeesFine.find({ classId }).lean().exec()
         ]);
@@ -315,8 +316,8 @@ export async function updateFullyPayment(paymentId: string, data: any) {
         }
 
         feesPayment.fees.map(payment => {
-            payment.paid = payment.amount,
-                payment.status = true
+            payment.paid = payment.amount;
+            payment.status = true;
 
         })
 

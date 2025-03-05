@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Session from "../models/session.models";
 import { connectToDB } from "../mongoose"
 import { currentUser } from "../helpers/current-user";
+import History from '../models/history.models';
 
 interface CreateSessionProps {
     name: string;
@@ -24,7 +25,7 @@ export async function createSession(values: CreateSessionProps) {
         // Set all previous sessions for the same school to `false`
         await Session.updateMany({ schoolId }, { $set: { isCurrent: false } });
 
-       await Session.create({
+       const session = new Session({
             schoolId,
             name,
             period,
@@ -32,6 +33,27 @@ export async function createSession(values: CreateSessionProps) {
             createdBy: user._id,
             action_type: "create",
         });
+
+        const history = new History({
+            schoolId,
+            actionType: "SESSION_CREATED", // Use a relevant action type
+            userId: user._id,
+            details: {
+                itemId: session._id,
+                name,
+                period,
+                isCurrent,
+            },
+            message: `${user.fullName} created new session with (ID: ${session._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: session._id,
+            entityType: "SESSION", // The type of the entity
+        });
+
+        await Promise.all([
+            session.save(),
+            history.save(),
+        ])
 
     } catch (error) {
         console.error("Error creating session:", error);

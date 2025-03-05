@@ -5,6 +5,7 @@ import { connectToDB } from "../mongoose"
 import StudentCategory from "../models/student-category.models";
 import { currentUser } from "../helpers/current-user";
 import Employee from "../models/employee.models";
+import History from "../models/history.models";
 
 
 export async function createStudentCategory({ name }: { name: string }) {
@@ -20,9 +21,27 @@ export async function createStudentCategory({ name }: { name: string }) {
             name,
             createdBy: user._id,
             action_type: "create"
-        })
+        });
 
-        await studentCategory.save();
+        const history = new History({
+            schoolId,
+            actionType: "STUDENT_CATEGORY_CREATED", // Use a relevant action type
+            userId: user._id,
+            details: {
+                itemId: studentCategory._id,
+                deletedAt: new Date(),
+                name,
+            },
+            message: `${user.fullName} created new student category with (ID: ${studentCategory._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: studentCategory._id,
+            entityType: "STUDENT_CATEGORY", // The type of the entity
+        });
+
+        await Promise.all([
+            studentCategory.save(),
+            history.save(),
+        ]);
 
     } catch (error) {
         console.log("unable to create new StudentCategory", error)

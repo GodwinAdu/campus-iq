@@ -45,7 +45,7 @@ const page = async () => {
             <CardTitle>Employees</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between items-center">
-            <Users className="w-10 h-10 text-blue-500" />
+            <Users className="w-10 h-10 text-primary" />
             <span className="text-2xl font-bold">{employees}</span>
           </CardContent>
         </Card>

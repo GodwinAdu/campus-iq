@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { connectToDB } from "../mongoose"
 import House from "../models/house.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 type Props = {
     name: string,
@@ -25,7 +26,20 @@ export async function createHouse(values: Props) {
             name,
             createdBy: user._id,
             action_type: "created"
-        })
+        });
+
+        const history = new History({
+            schoolId,
+            actionType: 'HOUSE_CREATED', // Use a relevant action type
+            details: {
+                itemId: house._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new house with (ID: ${house._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: house._id,
+            entityType: 'HOUSE'  // The type of the entity
+        });
 
         await house.save();
 

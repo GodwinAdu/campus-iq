@@ -4,10 +4,6 @@ import Conversation from "../models/conversation.models";
 import { connectToDB } from "../mongoose";
 
 
-
-
-// for group discussion???
-
 export async function getOrCreateConversation(memberOneId: string, memberTwoId: string) {
     let conversation = await findConversation(memberOneId, memberTwoId)
         || await findConversation(memberTwoId, memberOneId);

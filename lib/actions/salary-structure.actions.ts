@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import SalaryStructure from "../models/salary-structure.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface AllowancesProps {
     allowanceName: string;
@@ -47,7 +48,23 @@ export async function createSalaryStructure(values: CreateSalaryStructureProps, 
             action_type: "create"
         });
 
-        await salaryStructure.save();
+        const history = new History({
+            schoolId,
+            actionType: "SALARY_STRUCTURE_CREATED",
+            details: {
+                salaryStructureId: salaryStructure._id,
+                createdBy: user._id,
+            },
+            message: `${user.fullName} created new salary structure with (ID: ${salaryStructure._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: salaryStructure._id,
+            entityType: "SALARY_STRUCTURE"  // The type of the entity
+        });
+
+        await Promise.all([
+            salaryStructure.save(),
+            history.save(),
+        ]);
 
         revalidatePath(path);
 

@@ -18,6 +18,7 @@ import MealPayment from "../models/meal-payment.models";
 import MealPlan from "../models/meal-plan.models";
 import { hashSync } from "bcryptjs";
 import ClassPayment from "../models/class-payment.models";
+import History from "../models/history.models";
 
 /**
  * Interface for creating a new student.
@@ -173,11 +174,24 @@ export async function createStudent(formData: CreateStudentProps, path: string) 
             action_type: "created"
         });
 
+        const history = new History({
+            schoolId,
+            actionType:"STUDENT_CREATED",
+            details:{
+                itemId:student._id,
+            },
+            message: `${user.fullName} created new student with (ID: ${student._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: student._id,
+            entityType: "STUDENT", // The type of the entity
+        })
+
         // Save student and update class and parent concurrently
         await Promise.all([
             student.save(),
             classData.updateOne({ $push: { students: student._id } }),
-            parent.updateOne({ $push: { children: student._id } })
+            parent.updateOne({ $push: { children: student._id } }),
+            history.save()
         ]);
 
         // Sending emails

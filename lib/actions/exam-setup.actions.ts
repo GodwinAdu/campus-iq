@@ -7,6 +7,7 @@ import Session from "../models/session.models";
 import Term from "../models/term.models";
 import Employee from "../models/employee.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface ExamSetupProp {
     name: string;
@@ -43,7 +44,23 @@ export async function createExamSetup(values: ExamSetupProp, path: string) {
             action_type: "created"
         });
 
-        await newSetup.save();
+        const history = new History({
+            schoolId,
+            actionType: 'EXAM_SETUP_CREATED', // Use a relevant action type
+            details: {
+                itemId: newSetup._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new exam setup with (ID: ${newSetup._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newSetup._id,
+            entityType: 'EXAM_SETUP'  // The type of the entity
+        });
+
+        await Promise.all([
+            newSetup.save(),
+            history.save(),
+        ]);
 
         revalidatePath(path);
 

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import InventoryStore from "../models/inventory-store.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface StoreProps {
     name: string;
@@ -14,7 +15,7 @@ export async function createStore(values: StoreProps) {
     try {
         const { name, address, contactNumber } = values;
 
-        const user: { schoolId: string; _id: string } | null = await currentUser();
+        const user = await currentUser();
         if (!user) throw new Error("User not logged in");
         const schoolId = user.schoolId;
 
@@ -35,7 +36,23 @@ export async function createStore(values: StoreProps) {
             action_type: "created",
         });
 
-        await newStore.save();
+        const history = new History({
+            schoolId,
+            actionType: 'STORE_CREATED',
+            details: {
+                itemId: newStore._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new store with (ID: ${newStore._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newStore._id,
+            entityType: 'STORE', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([
+            newStore.save(),
+            history.save(),
+        ]);
 
     } catch (error) {
         console.log("Error creating store", error)

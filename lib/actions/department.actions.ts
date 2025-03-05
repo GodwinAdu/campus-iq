@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { connectToDB } from "../mongoose"
 import Department from '../models/department.models';
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 
 export async function createDepartment(values: { name: string }) {
@@ -29,9 +30,25 @@ export async function createDepartment(values: { name: string }) {
             name,
             createdBy: user?._id,
             action_type: "created",
-        })
+        });
 
-        await department.save();
+        const history = new History({
+            schoolId,
+            actionType: 'DEPARTMENT_CREATED', // Use a relevant action type
+            details: {
+                itemId: department._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new department with (ID: ${department._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id, // User who performed the action,
+            entityId: department._id,  // The ID of the deleted unit
+            entityType: 'DEPARTMENT',  // The type of the entity
+        });
+
+        await Promise.all([
+            department.save(),
+            history.save()
+        ]);
 
     } catch (error) {
         console.log("unable to create new department", error)

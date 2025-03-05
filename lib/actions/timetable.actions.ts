@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { currentUser } from "../helpers/current-user";
 import { connectToDB } from "../mongoose";
 import Timetable from "../models/timetable.models";
+import History from "../models/history.models";
 
 interface dayProps {
     subject: string;
@@ -43,7 +44,22 @@ export async function createTimetable(values: CreateTimetableProps, path: string
             action_type: "create"
         });
 
-        await newTimetable.save();
+        const history = new History({
+            schoolId,
+            actionType: "TIMETABLE_CREATED",
+            details: {
+                itemId: newTimetable._id
+            },
+            message: `${user.fullName} created new timetable with (ID: ${newTimetable._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newTimetable._id,
+            entityType: "TIMETABLE", // The type of the entity
+        })
+
+        await Promise.all([
+            newTimetable.save(),
+            history.save()
+        ])
 
         revalidatePath(path)
 

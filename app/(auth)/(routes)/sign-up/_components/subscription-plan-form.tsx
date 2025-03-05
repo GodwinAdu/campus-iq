@@ -83,7 +83,7 @@ export function SubscriptionPlanForm({ onSubmit, onBack, isSubmitting }: Subscri
           Check the{" "}
           <Link
             href="/pricing"
-            className="text-blue-400 hover:text-blue-500 font-semibold underline decoration-dashed underline-offset-4 transition-all duration-300"
+            className="text-primary/90 hover:text-primary font-semibold underline decoration-dashed underline-offset-4 transition-all duration-300"
           >
             pricing page
           </Link>

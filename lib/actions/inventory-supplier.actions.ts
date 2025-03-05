@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import InventorySupplier from "../models/inventory-supplier.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from '../models/history.models';
 
 
 interface SupplierProps {
@@ -16,14 +17,14 @@ interface SupplierProps {
 export async function createSupplier(values: SupplierProps, path: string) {
     try {
         const user = await currentUser();
-        if(!user) throw new Error("user not logged in");
+        if (!user) throw new Error("user not logged in");
         const schoolId = user.schoolId;
 
         await connectToDB();
 
         const { name, email, contactNumber, companyName, address } = values;
 
-        const existingSupplier = await InventorySupplier.findOne({ email});
+        const existingSupplier = await InventorySupplier.findOne({ email });
 
         if (existingSupplier) {
             throw new Error("Supplier already exists");
@@ -36,11 +37,27 @@ export async function createSupplier(values: SupplierProps, path: string) {
             contactNumber,
             companyName,
             address,
-            createdBy:user._id,
+            createdBy: user._id,
             action_type: "created",
         });
 
-        await newSupplier.save();
+        const history = new History({
+            schoolId,
+            actionType: 'SUPPLIER_CREATED',
+            details: {
+                itemId: newSupplier._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new supplier with (ID: ${newSupplier._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newSupplier._id,
+            entityType: 'SUPPLIER', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([
+            newSupplier.save(),
+            history.save(),
+        ]);
 
         revalidatePath(path)
     } catch (error) {
@@ -52,12 +69,12 @@ export async function createSupplier(values: SupplierProps, path: string) {
 export async function fetchAllSuppliers() {
     try {
         const user = await currentUser();
-        if(!user) throw new Error("user not logged in");
+        if (!user) throw new Error("user not logged in");
         const schoolId = user.schoolId;
 
         await connectToDB();
 
-        const suppliers = await InventorySupplier.find({schoolId});
+        const suppliers = await InventorySupplier.find({ schoolId });
 
         if (suppliers.length === 0) {
             console.log("No suppliers found");
@@ -76,7 +93,7 @@ export async function fetchAllSuppliers() {
 export async function fetchSupplierById(id: string) {
     try {
         const user = await currentUser();
-        if(!user) throw new Error("user not logged in");
+        if (!user) throw new Error("user not logged in");
         await connectToDB();
 
         const supplier = await InventorySupplier.findById(id);

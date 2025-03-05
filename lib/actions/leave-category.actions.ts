@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import LeaveCategory from "../models/leave-category.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 export async function createLeave(values: { name: string }) {
     try {
@@ -19,9 +20,22 @@ export async function createLeave(values: { name: string }) {
             name,
             createdBy: user._id,
             action_type: "created"
-        })
+        });
 
-        await leave.save();
+        const history = new History({
+            schoolId,
+            actionType: 'LEAVE_CATEGORY_CREATED', // Use a relevant action type
+            details: {
+                itemId: leave._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new leave category with (ID: ${leave._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: leave._id,
+            entityType: 'LEAVE_CATEGORY', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([leave.save(), history.save()]);
 
     } catch (error) {
         console.log("unable to create new leave", error)

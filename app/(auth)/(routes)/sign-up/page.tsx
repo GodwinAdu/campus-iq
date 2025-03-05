@@ -74,7 +74,7 @@ export default function CreateSchoolPage() {
       {showConfetti && <Confetti />}
       <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center text-blue-700">Create Your School</CardTitle>
+          <CardTitle className="text-3xl font-bold text-center text-primary">Create Your School</CardTitle>
           <CardDescription className="text-center text-gray-600">
             Set up your school and admin account in just a few steps
           </CardDescription>

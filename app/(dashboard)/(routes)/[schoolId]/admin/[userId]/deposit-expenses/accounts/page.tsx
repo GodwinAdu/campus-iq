@@ -7,7 +7,6 @@ import { getAllAccounts } from '@/lib/actions/account.actions'
 import { DataTable } from '@/components/table/data-table'
 
 const page = async () => {
-
     const accounts = (await getAllAccounts()) || [];
     return (
         <>

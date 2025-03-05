@@ -8,6 +8,7 @@ import Student from "../models/student.models";
 import { connectToDB } from "../mongoose";
 import InventoryProduct from "../models/inventory-product.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 interface Items {
     categoryId: string;
     productId: string;
@@ -71,8 +72,24 @@ export async function createIssue(values: IssuesProps, path: string) {
             createdBy: user?._id,
             action_type: "created",
         });
+        const history = new History({
+            schoolId,
+            actionType: 'INVENTORY_ISSUE_CREATED', // Use a relevant action type
+            details: {
+                itemId: newIssue._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new inventory issue for ${roleModel} (ID: ${saleToId}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newIssue._id,
+            entityType: 'INVENTORY_ISSUE', // The type of the entity
+        });
 
-        await newIssue.save();
+        await Promise.all([
+            newIssue.save(),
+            history.save()
+        ])
+
         revalidatePath(path)
 
     } catch (error) {

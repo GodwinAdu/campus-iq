@@ -5,6 +5,7 @@ import InventoryCategory from "../models/inventory-category.models";
 import { connectToDB } from "../mongoose";
 import InventoryStore from "../models/inventory-store.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 
 export async function createCategory(values: { name: string, storeId: string }) {
@@ -37,11 +38,24 @@ export async function createCategory(values: { name: string, storeId: string }) 
             createdBy: user._id,
             action_type: "created",
         });
+        const history = new History({
+            schoolId,
+            actionType: 'CATEGORY_CREATED', // Use a relevant action type
+            details: {
+                itemId: newCategory._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new category "${name}" (ID: ${newCategory._id}) for store "${store.name}" on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newCategory._id,
+            entityType: 'CATEGORY', // The type of the entity
+        })
 
         store.categories.push(newCategory._id);
         await Promise.all([
             newCategory.save(),
             store.save(),
+            history.save(),
         ]);
 
     } catch (error) {

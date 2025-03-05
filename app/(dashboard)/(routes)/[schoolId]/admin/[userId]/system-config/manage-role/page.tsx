@@ -31,7 +31,7 @@ const page = async () => {
   }
 
   // Destructure the 'addRole' permission from the user's role
-  const { addRole } = role;
+  const { addRole } = role.permissions;
 
   // Fetch all roles, defaulting to an empty array if none are found
   const values = await getAllRoles() || [];

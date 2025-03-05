@@ -5,6 +5,7 @@ import { connectToDB } from "../mongoose";
 import FeesFine from "../models/fees-fine.models";
 import Class from "../models/class.models";
 import { currentUser } from "../helpers/current-user";
+import History from "../models/history.models";
 
 interface CreateFineProps {
     stage: string;
@@ -31,9 +32,26 @@ export async function createFineFees(values: CreateFineProps, path: string) {
             frequency: values.frequency,
             createdBy: user._id,
             action_type: "create"
-        })
+        });
 
-        await fine.save();
+        const history = new History({
+            schoolId,
+            actionType: 'FEES_FINE_CREATED', // Use a relevant action type
+            details: {
+                itemId: fine._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new fine fees for class (ID: ${values.stage}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: fine._id,
+            entityType: 'FEES_FINE'  // The type of the entity
+        });
+
+        await Promise.all([
+            fine.save(),
+            history.save(),
+        ]);
+
         revalidatePath(path)
 
     } catch (error) {

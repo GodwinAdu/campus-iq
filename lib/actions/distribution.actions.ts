@@ -5,6 +5,7 @@ import Distribution from "../models/distribution.models";
 import { connectToDB } from "../mongoose";
 import { currentUser } from "../helpers/current-user";
 import Employee from "../models/employee.models";
+import History from "../models/history.models";
 
 
 interface CreateDistributionProps {
@@ -32,7 +33,25 @@ export async function createDistribution(values: CreateDistributionProps) {
             action_type: "create"
         });
 
-        await newDistribution.save();
+        const history = new History({
+            schoolId,
+            actionType: 'DISTRIBUTION_CREATED', // Use a relevant action type
+            details: {
+                itemId: newDistribution._id,
+                deletedAt: new Date(),
+                markDistribution,
+            },
+            message: `${user.fullName} created a new distribution with mark distribution "${markDistribution}".`,
+            performedBy: user._id, // User who performed the action,
+            entityId: newDistribution._id,  // The ID of the created distribution
+            entityType: 'DISTRIBUTION',  // The type of the entity
+        });
+
+        await Promise.all([
+            newDistribution.save(),
+            history.save()
+        ]);
+
     } catch (error) {
         console.log("Error creating distribution", error);
         throw error;

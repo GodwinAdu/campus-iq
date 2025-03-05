@@ -2,6 +2,7 @@
 
 import { currentUser } from "../helpers/current-user";
 import Employee from "../models/employee.models";
+import History from "../models/history.models";
 import MealPlan from "../models/meal-plan.models";
 import MealSchedule from "../models/meal-schedule.models";
 import { connectToDB } from "../mongoose";
@@ -32,7 +33,21 @@ export async function createMealSchedule(values: Props) {
             createdBy: user._id,
             action_type: 'created',
         });
-        await newSchedule.save();
+
+        const history = new History({
+            schoolId,
+            actionType: 'MEAL_SCHEDULE_CREATED',
+            details: {
+                itemId: newSchedule._id,
+                deletedAt: new Date(),
+            },
+            message: `${user.fullName} created new meal schedule with (ID: ${newSchedule._id}) on ${new Date().toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: newSchedule._id,
+            entityType: 'MEAL_SCHEDULE', // The type of the entity, e.g., 'PRODUCT', 'SUPPLIER', etc.
+        });
+
+        await Promise.all([newSchedule.save(), history.save()]);
 
 
     } catch (error) {

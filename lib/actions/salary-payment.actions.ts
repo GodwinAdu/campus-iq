@@ -3,6 +3,7 @@
 import { currentUser } from "../helpers/current-user";
 import Department from "../models/department.models";
 import Employee from "../models/employee.models";
+import History from "../models/history.models";
 import SalaryPayment from "../models/salary-payment.models";
 import SalaryStructure from "../models/salary-structure.models";
 import { connectToDB } from "../mongoose";
@@ -44,6 +45,20 @@ export async function  fetchSalaryPayment(departmentId: string) {
             createdAt: currentDate,
             updatedAt: currentDate
         }));
+
+        const history = new History({
+            schoolId,
+            actionType: 'DEFAULT_SALARY_PAID',
+            details: {
+                employeeIds: unpaidEmployees.map(emp => emp._id.toString()),
+            },
+            message: `${user.fullName} created default salary payments for unpaid employees on ${currentDate.toLocaleString()}.`,
+            performedBy: user._id,
+            entityId: null,
+            entityType: 'SALARY_STRUCTURE'  // The type of the entity
+        });
+
+        await history.save()
 
         if (defaultSalaryPayments.length > 0) {
             await SalaryPayment.insertMany(defaultSalaryPayments);

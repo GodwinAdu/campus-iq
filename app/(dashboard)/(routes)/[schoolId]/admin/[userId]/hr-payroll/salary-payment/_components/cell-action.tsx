@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 
 
 interface CellActionProps {
-    data: { _id: string };
+    data: { _id: string,status: string};
 }
 
 export const CellAction: React.FC<CellActionProps> = ({ data }) => {
