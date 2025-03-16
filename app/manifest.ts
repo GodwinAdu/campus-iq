@@ -7,9 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
         description: 'A Progressive school management system',
         start_url: '/',
         display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#000000',
-        orientation: "portrait",
+        orientation: "any",
         icons: [
             {
                 src: '/icons/icon-192x192.png',

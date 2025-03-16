@@ -5,6 +5,8 @@ const withPWA = withPWAInit({
   dest: "public",
   cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
+  register: true,         // register the PWA service worker
+  disable: process.env.NODE_ENV === "development", // Disable PWA in development
 });
 
 /** @type {import("next").NextConfig} */

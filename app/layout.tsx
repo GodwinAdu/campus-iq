@@ -8,6 +8,9 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import IntroModal from "@/components/commons/IntroModal";
 import FeedbackModal from "@/components/commons/FeedbackModal";
+import InstallPWA from "@/components/InstallPwa";
+import RegisterServiceWorker from "@/components/RegiserServiceWorker";
+
 
 
 const geistSans = Geist({
@@ -45,7 +48,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
+  minimumScale: 1,
+  initialScale: 1,
+  width: "device-width",
+  viewportFit: "cover",
 };
 
 
@@ -84,6 +90,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+
+          <InstallPWA />
+          <RegisterServiceWorker />
           <Loader />
           {/* <UseCheckStoreExpired /> */}
           {children}
