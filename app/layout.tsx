@@ -8,8 +8,8 @@ import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import IntroModal from "@/components/commons/IntroModal";
 import FeedbackModal from "@/components/commons/FeedbackModal";
-import InstallPWA from "@/components/InstallPwa";
 import RegisterServiceWorker from "@/components/RegiserServiceWorker";
+import InstallPrompt from "@/components/InstallPwa";
 
 
 
@@ -91,7 +91,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
 
-          <InstallPWA />
+          <InstallPrompt />
           <RegisterServiceWorker />
           <Loader />
           {/* <UseCheckStoreExpired /> */}
