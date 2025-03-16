@@ -20,7 +20,8 @@ import {
   HistoryIcon,
   Trash,
   LucideReceiptText,
-  CalendarPlus
+  CalendarPlus,
+  HospitalIcon
 } from "lucide-react"
 import {
   Collapsible,
@@ -81,7 +82,7 @@ export function NavMain({ role, school }: NavMainProps) {
       isActive: false,
 
     },
- ,   // {
+    ,   // {
     //   title: "Admission Portal",
     //   url: `/${schoolId}/admin/${userId}/admissions`,
     //   icon:ListCheck,
@@ -91,7 +92,7 @@ export function NavMain({ role, school }: NavMainProps) {
     {
       title: "Events",
       url: `/${schoolId}/admin/${userId}/events`,
-      icon:CalendarPlus,
+      icon: CalendarPlus,
       isActive: false,
 
     },
@@ -165,11 +166,11 @@ export function NavMain({ role, school }: NavMainProps) {
       isActive: true,
       roleField: "classManagement",
       items: [
-        // {
-        //   title: "Assignments",
-        //   url: `/${schoolId}/admin/${userId}/class/assignment`,
-        //   roleField: "manageClass"
-        // },
+        {
+          title: "Assignments",
+          url: `/${schoolId}/admin/${userId}/class/assignment`,
+          roleField: "manageClass"
+        },
         {
           title: "Classes",
           url: `/${schoolId}/admin/${userId}/class/manage-classes`,
@@ -526,35 +527,65 @@ export function NavMain({ role, school }: NavMainProps) {
         },
       ],
     },
-    // proPlan && {
-    //   title: "Health Records",
-    //   url: "#",
-    //   icon: HospitalIcon,
-    //   roleField: "library",
-    //   items: [
-    //     {
-    //       title: "Books",
-    //       url: `/${schoolId}/admin/${userId}/library/manage-books`,
-    //       roleField: "manageHealth"
-    //     },
-    //     {
-    //       title: "Issue Books",
-    //       url: `/${schoolId}/admin/${userId}/library/manage-issue-books`,
-    //       roleField: "manageHealth"
-    //     },
-    //   ],
-    // },
+    proPlan && {
+      title: "Health Records",
+      url: "#",
+      icon: HospitalIcon,
+      roleField: "healthManagement",
+      items: [
+        {
+          title: "Admission Records",
+          url: `/${schoolId}/admin/${userId}/health/admissions`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Appointments",
+          url: `/${schoolId}/admin/${userId}/health/appointments`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Billing Records",
+          url: `/${schoolId}/admin/${userId}/health/billing`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Health Alerts",
+          url: `/${schoolId}/admin/${userId}/health/health-alerts`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Health Education",
+          url: `/${schoolId}/admin/${userId}/health/health-education`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Lab Results",
+          url: `/${schoolId}/admin/${userId}/health/lab-results`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Medications",
+          url: `/${schoolId}/admin/${userId}/health/medications`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Vaccinations",
+          url: `/${schoolId}/admin/${userId}/health/vaccinations`,
+          roleField: "manageHealth"
+        },
+        {
+          title: "Symptom Checker",
+          url: `/${schoolId}/admin/${userId}/health/symptom-checker`,
+          roleField: "manageHealth"
+        },
+      ],
+    },
     {
       title: "Deposit & Expenses",
       url: "#",
       icon: PiggyBank,
       roleField: "depositAndExpense",
       items: [
-        {
-          title: "Account Integration",
-          url: `/${schoolId}/admin/${userId}/deposit-expenses/`,
-          roleField: "manageAccount"
-        },
         {
           title: "Accounts",
           url: `/${schoolId}/admin/${userId}/deposit-expenses/accounts`,
@@ -580,7 +611,7 @@ export function NavMain({ role, school }: NavMainProps) {
     proPlan && {
       title: "Messaging Hub",
       url: "#",
-      icon:Mail,
+      icon: Mail,
       roleField: "message",
       items: [
         {
@@ -679,14 +710,14 @@ export function NavMain({ role, school }: NavMainProps) {
         setOpenGroup(group.title);
       }
     });
-  }, [pathname,]);
+  }, [pathname]);
 
 
   return (
 
-    <SidebarGroup>
+    <SidebarGroup className="scrollbar-hide">
       <SidebarGroupLabel>Nav links</SidebarGroupLabel>
-      <SidebarMenu>
+      <SidebarMenu >
         {navMain
           .filter((item): item is NavItem => item !== false)
           .filter((item) => !item.roleField || (role && role[item.roleField as keyof IRole]))

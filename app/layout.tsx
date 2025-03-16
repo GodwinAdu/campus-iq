@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -19,12 +19,36 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+const APP_NAME = "CampusIQ - Revolutionary School Management Software";
+const APP_DESCRIPTION = "CampusIQ is a cutting-edge school management system designed to streamline administrative tasks and enhance educational processes.";
 
 export const metadata: Metadata = {
-  title: "CampusIQ - Revolutionary School Management Software",
-  description:
-    "CampusIQ is a cutting-edge school management system designed to streamline administrative tasks and enhance educational processes.",
+  applicationName: APP_NAME,
+  title: {
+    default: APP_NAME,
+    template: "%s - PWA App",
+  },
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.ts",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_NAME,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/icons/icon-512x512.png", sizes: "180x180" }],
+  },
 };
+
+export const viewport: Viewport = {
+  themeColor: "#FFFFFF",
+};
+
+
 
 export default function RootLayout({
   children,
@@ -33,6 +57,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <style>{`
+            html, body, #__next {
+              height: 100%;
+            }
+            #__next {
+              margin: 0 auto;
+            }
+            h1 {
+              text-align: center;
+            }
+            `}</style>
+        {/* <script
+          crossOrigin="anonymous"
+          src="//unpkg.com/react-scan/dist/auto.global.js"
+          defer
+        /> */}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

@@ -3,6 +3,10 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "@/hooks/use-toast";
+import Link from "next/link";
+import { Loader2 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -20,9 +24,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-// import { useRouter } from "next/navigation";
-import { toast } from "@/hooks/use-toast";
-import Link from "next/link";
+
 import { loginUser } from "@/lib/actions/login.action";
 
 // Define a schema that ensures identifier and password validation
@@ -48,10 +50,11 @@ const LoginForm = () => {
         try {
             const user = await loginUser(values)
             const role = user.role.toLowerCase();
+            
             const schoolId = user.schoolId;
             const destination = `/${schoolId}/${role}/${user._id}`;
 
-            window.location.href = (destination)
+            window.location.assign(destination)
 
             toast({
                 title: "Welcome Back!",
@@ -132,6 +135,7 @@ const LoginForm = () => {
                 />
 
                 <Button disabled={isSubmitting} className="w-full text-center" type="submit">
+                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                     {isSubmitting ? "Signing in..." : "Log In"}
                 </Button>
             </form>

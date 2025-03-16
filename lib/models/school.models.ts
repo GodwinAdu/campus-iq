@@ -1,171 +1,237 @@
-import { Model, model, models, Schema } from "mongoose";
+import { CallbackError, Model, model, models, Schema } from "mongoose";
+import Account from "./account.models";
+import Mood from "./mood.models";
 
-const SchoolSchema: Schema<ISchool> = new Schema({
-    owner: {
-        type: Schema.Types.ObjectId,
-        ref: "Employee",
-        default: null,
-    },
-    schoolCode: {
+const PaymentProcessorSchema = new Schema({
+    name: { type: String, default: "Paystack", enum: ["Paystack", "Stripe"] },
+    apiKey: { type: String, default: "" },
+    secretKey: { type: String, default: "" },
+    enabled: { type: Boolean, default: false },
+});
+
+const PaymentMethodSchema = new Schema({
+    name: {
         type: String,
-        unique: true,
-        required: true,
     },
-    schoolLogo: {
-        type: String,
-        default: '',
+    enabled: {
+        type: Boolean,
+        default: false,
     },
-    establishedYear: {
+    processingFee: {
         type: Number,
-        default: ''
+        default: 0,
     },
-    affiliation: {
+    minimumAmount: {
+        type: Number,
+        default: 0,
+    },
+})
+
+
+const RecruitmentSchema = new Schema({
+    position: {
         type: String,
-        default: ""
     },
     category: {
         type: String,
-        enum: ["primary", "secondary", "college", "university"],
+        enum: ["essential", "recommended", "optional"],
+        default: "recommended",
     },
-    type: {
+    requiredCount: { type: Number, default: 1 },
+    currentCount: { type: Number, default: 0 },
+    status: {
         type: String,
-        enum: ["public", "private", "charter"],
-        required: true,
+        enum: ["needed", "filled", "pending"],
+        default: "needed",
     },
-    schoolName: {
-        type: String,
-        required: true,
-    },
-    motto: {
-        type: String,
-        default: '',
-    },
-    schoolPhone: {
-        type: String,
-        default: '',
-    },
-    schoolEmail: {
-        type: String,
-        unique: true,
-    },
-    website: {
-        type: String,
-        default: '',
-    },
+});
+
+// Define School Schema
+const SchoolSchema: Schema<ISchool> = new Schema({
+    owner: { type: Schema.Types.ObjectId, ref: "Employee", default: null },
+    schoolCode: { type: String, unique: true, required: true },
+    schoolLogo: { type: String, default: "" },
+    establishedYear: { type: Number, default: null },
+    affiliation: { type: String, default: "" },
+    schoolName: { type: String, required: true },
+    motto: { type: String, default: "" },
+    schoolPhone: { type: String, default: "" },
+    schoolEmail: { type: String, unique: true },
+    website: { type: String, default: "" },
+
     addresses: {
-        schoolAddress: {
-            type: String,
-            default: '',
-        },
-        schoolCity: {
-            type: String,
-            default: '',
-        },
-        schoolState: {
-            type: String,
-            default: '',
-        },
-        schoolZipcode: {
-            type: String,
-            default: '',
-        },
-        schoolCountry: {
-            type: String,
-            default: '',
-        },
+        schoolAddress: { type: String, default: "" },
+        schoolCity: { type: String, default: "" },
+        schoolState: { type: String, default: "" },
+        schoolZipcode: { type: String, default: "" },
+        schoolCountry: { type: String, default: "" },
+    },
+
+    // 🛠 School Settings
+    settings: {
+        maxStudents: { type: Number, default: 1000 }, // Max students allowed
+        maxTeachers: { type: Number, default: 50 }, // Max teachers allowed
+        admissionOpen: { type: Boolean, default: true }, // Is admission open?
+        allowGuestAccess: { type: Boolean, default: false }, // Allow guests to view school details
     },
     notifications: {
-    // 🔥 Subscription Alerts
-    overdueSubscriptionAlert: { type: Boolean, default: true },
-    subscriptionRenewalReminder: { type: Boolean, default: true },
-    paymentConfirmation: { type: Boolean, default: true },
-    invoiceGenerated: { type: Boolean, default: false },
+        overdueSubscriptionAlert: { type: Boolean, default: true },
+        subscriptionRenewalReminder: { type: Boolean, default: true },
+        paymentConfirmation: { type: Boolean, default: true },
+        invoiceGenerated: { type: Boolean, default: false },
 
-    // 🎓 Student & Parent Notifications
-    attendanceAlerts: { type: Boolean, default: false },
-    reportCardRelease: { type: Boolean, default: true },
-    examSchedule: { type: Boolean, default: true },
-    parentMeetingReminder: { type: Boolean, default: true },
+        attendanceAlerts: { type: Boolean, default: false },
+        reportCardRelease: { type: Boolean, default: false },
+        examSchedule: { type: Boolean, default: false },
+        parentMeetingReminder: { type: Boolean, default: false },
 
-    // 🏫 Staff Notifications
-    salaryPayment: { type: Boolean, default: false },
-    staffMeeting: { type: Boolean, default: true },
+        salaryPayment: { type: Boolean, default: false },
+        staffMeeting: { type: Boolean, default: false },
 
-    // 🔐 Security & System Alerts
-    unauthorizedLoginAttempt: { type: Boolean, default: false },
-    accountSuspension: { type: Boolean, default: false },
+        unauthorizedLoginAttempt: { type: Boolean, default: false },
+        accountSuspension: { type: Boolean, default: false },
 
-    // 🔔 General Email & Push Notifications
-    emailNotifications: { type: Boolean, default: true },
-    pushNotifications: { type: Boolean, default: true }
-
-},
+        emailNotifications: { type: Boolean, default: true },
+        pushNotifications: { type: Boolean, default: true }
+    },
+    // 📌 **Recruitment Needs**
+    recruitment: {
+        type: [RecruitmentSchema],
+    },
+    // 📅 Subscription Plan
     subscriptionPlan: {
-    period: {
-        frequency: {
+        period: {
+            frequency: { type: String, enum: ["monthly", "yearly", "term"], default: "monthly" },
+            value: { type: Number, default: 1 },
+            price: { type: Number, default: 0 }
+        },
+        renewDate: { type: Date },
+        expiryDate: { type: Date },
+        plan: { type: String, enum: ["basic", "pro", "custom"] },
+        currentStudent: { type: Number, default: 0 },
+    },
+
+    // 📊 Reporting & Analytics
+    reportSettings: {
+        enabledReports: {
+            type: [String],
+        },
+        reportTypes: {
+            type: [{
+                name: { type: String, },
+                frequency: { type: String, },
+                recipients: { type: [String] }
+            }],
+        },
+        dataRetentionPeriod: {
+            type: Number,
+            default: 1,
+        },
+        enableDataVisualization: {
+            type: Boolean,
+            default: true,
+        },
+        preferredChartTypes: {
+            type: [String],
+            default: ["bar"],
+        },
+        enableAlerts: {
+            type: Boolean,
+            default: false,
+        },
+        alertThresholds: [{
+            metric: { type: String, },
+            condition: { type: String, },
+            value: { type: Number },
+        }],
+        exportFormats: {
+            type: [String],
+            default: ["pdf", "csv", "xlsx"],
+        },
+        enableScheduling: {
+            type: Boolean,
+            default: false,
+        },
+        scheduledReportTime: {
             type: String,
-            enum: ["monthly", "yearly", "term"],
-            default: 'monthly',
         },
-        Value: {
-            type: Number,
-            default: 1
+    },
+    paymentSettings: {
+        paymentMethods: {
+            type: [PaymentMethodSchema],
+            default: [
+                { name: "Cash", enabled: true },
+                { name: "Credit Card", enabled: false },
+                { name: "Bank Transfer", enabled: false },
+                { name: "Mobile Money", enabled: false },
+            ],
         },
-        price: {
-            type: Number,
-            default: 0
-        }
+        paymentProcessors: {
+            type: [PaymentProcessorSchema],
+            default: [{ name: "Paystack", apiKey: "", secretKey: "", enabled: false }],
+        },
+        defaultCurrency: {
+            type: String,
+            default: "GHS",
+        },
+        acceptedCurrencies: {
+            type: [String],
+            default: ["GHS"],
+        },
+        partialPayments: {
+            type: Boolean,
+            default: false,
+        },
     },
-    renewDate: {
-        type: Date,
+
+    // 🔐 Security Settings
+    security: {
+        loginRestrictions: { type: Boolean, default: false }, // Restrict logins from unrecognized devices?
+        multiFactorAuth: { type: Boolean, default: false }, // Enable 2FA?
+        passwordResetTokenExpiry: { type: Number, default: 30 }, // Token expiry time in minutes
     },
-    expiryDate: {
-        type: Date,
+    globalTermAndSession: {
+        termId: { type: Schema.Types.ObjectId, ref: "Term", default: null },
+        sessionId: { type: Schema.Types.ObjectId, ref: "Session", default: null },
     },
-    plan: {
-        type: String,
-        enum: ['basic', 'pro', 'custom',],
-    },
-    currentStudent: {
-        type: Number,
-        default: 0,
-    }
-},
-    banned: {
-    type: Boolean,
-    default: false
-},
-    createdBy: {
-    type: Schema.Types.ObjectId,
-    ref: "Employee",
-    default: null,
-},
-    modifiedBy: {
-    type: Schema.Types.ObjectId,
-    ref: "Employee",
-    default: null,
-},
-    mod_flag: {
-    type: Boolean,
-    default: false,
-},
-    del_flag: {
-    type: Boolean,
-    default: false,
-},
-    action_type: {
-    type: String,
-    enum: ["create", "update", "delete"],
-    default: "create",
-},
+
+    // ❌ Banning & Deletion
+    banned: { type: Boolean, default: false },
+    createdBy: { type: Schema.Types.ObjectId, ref: "Employee", default: null },
+    modifiedBy: { type: Schema.Types.ObjectId, ref: "Employee", default: null },
+    mod_flag: { type: Boolean, default: false },
+    del_flag: { type: Boolean, default: false },
+    action_type: { type: String, enum: ["create", "update", "delete"], default: "create" },
 }, {
     timestamps: true,
-        versionKey: false,
-            toObject: { virtuals: true },
+    versionKey: false,
+    toObject: { virtuals: true },
     toJSON: { virtuals: true },
 });
 
-type SchoolModel = Model<ISchool>
+// 🗑 Auto-cleanup related data before school deletion
+SchoolSchema.pre("findOneAndDelete", async function (next) {
+    const schoolId = this.getQuery()._id; // Fixed from storeId to schoolId
+
+    try {
+        const collections = [
+            { model: Account, filter: { schoolId } },
+            { model: Mood, filter: { schoolId } },
+        ];
+
+        for (const { model, filter } of collections) {
+            await model.deleteMany(filter);
+        }
+
+        next();
+    } catch (error) {
+        console.error("Error cleaning up related data:", error);
+        next(error as CallbackError);
+    }
+});
+
+
+type SchoolModel = Model<ISchool>;
 
 const School: SchoolModel = models.School || model<ISchool>("School", SchoolSchema);
 

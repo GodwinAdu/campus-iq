@@ -65,7 +65,6 @@ export function NavUser({ school }: { school: ISchool }) {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{school.schoolName}</span>
-                <span className="truncate text-xs text-red-400 font-extrabold">Expired : {dayLeft(school?.subscriptionPlan?.expiryDate)} days left</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -84,7 +83,6 @@ export function NavUser({ school }: { school: ISchool }) {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{school.schoolName}</span>
-                  <span className="text-primary font-extrabold">{school.subscriptionPlan.plan} plan</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -94,30 +92,6 @@ export function NavUser({ school }: { school: ISchool }) {
                 <ModeToggle />
                 <p className="font-extrabold">Theme</p>
               </div>
-              <Link href={`/${storeId}/dashboard/${branchId}/settings`}>
-                <DropdownMenuItem>
-                  <Settings />
-                  Store Settings
-                </DropdownMenuItem>
-              </Link>
-
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <Link href={`/${storeId}/dashboard/${branchId}/branches`}>
-                <DropdownMenuItem>
-                  <House />
-                  Branch Settings
-                </DropdownMenuItem>
-              </Link>
-              <Link href={`/${storeId}/dashboard/${branchId}/support`}>
-                <DropdownMenuItem>
-                  <DockIcon />
-                  Support
-                </DropdownMenuItem>
-              </Link>
-              {/* <PaymentDialog school={school} />
-              <RatingDialog /> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
           </DropdownMenuContent>

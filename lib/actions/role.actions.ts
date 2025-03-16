@@ -16,11 +16,12 @@ export async function createRole(values: CreateRoleProps, path: string) {
         displayName,
         description,
         permissions
-    } = RoleSchema.parse(values);
+    } = values;
+
 
     try {
         const user = await currentUser();
-        const schoolId = user.schoolId
+        const schoolId = user?.schoolId
         await connectToDB();
         // Check if any existing role matches the provided name, display name, or description
         const existingRole = await Role.findOne({ schoolId, displayName, name });
@@ -35,9 +36,9 @@ export async function createRole(values: CreateRoleProps, path: string) {
             displayName,
             description,
             schoolId,
+            permissions,
             createdBy: user?._id,
             action_type: "create",
-            ...permissions
         });
 
         const history = new History({

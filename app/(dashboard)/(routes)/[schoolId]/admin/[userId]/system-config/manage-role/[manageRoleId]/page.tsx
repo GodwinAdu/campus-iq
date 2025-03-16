@@ -5,22 +5,21 @@ import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import DisplayRole from "../_component/DisplayRole";
 import { fetchRoleById } from "@/lib/actions/role.actions";
 import Heading from "@/components/commons/Header";
 import { currentUser } from "@/lib/helpers/current-user";
+import CreateRoleForm from "../_component/CreateRoleForm";
 
+type Props = Promise<{ schoolId: string, adminId: string, manageRoleId: string }>
+const page = async ({ params }: { params: Props}) => {
 
-type Params = Promise<{ schoolId: string, adminId: string, manageRoleId: string }>
-const page = async ({ params }: { params: Params }) => {
   const user = await currentUser();
 
   if (!user) {
     redirect("/")
   }
-  const { schoolId, adminId, manageRoleId } = await params;
 
-
+ const { schoolId,adminId,manageRoleId } = await params;
 
   const initialData = await fetchRoleById(manageRoleId)
 
@@ -29,8 +28,8 @@ const page = async ({ params }: { params: Params }) => {
     <>
       <div className="flex justify-between items-center">
         <Heading
-          title="Role Details"
-          description="Explore the role content"
+          title="Update Role"
+          description="manage role and update it"
         />
 
         <Link
@@ -42,7 +41,7 @@ const page = async ({ params }: { params: Params }) => {
         </Link>
       </div>
       <Separator />
-      <DisplayRole initialData={initialData} />
+      <CreateRoleForm type="update" initialData={initialData} />
     </>
   )
 }

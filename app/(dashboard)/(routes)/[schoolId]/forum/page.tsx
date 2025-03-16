@@ -24,6 +24,7 @@ const SetupPage = async ({ params }: { params: Props }) => {
 
   if (user.role === "student" || user.role === "parent") {
     // TODO : create a modal to show that they are not in any community yet
+    return <p> you cant create a modal</p>;
   }
 
   return <InitialModal school={school} />

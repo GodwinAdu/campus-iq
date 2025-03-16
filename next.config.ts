@@ -1,6 +1,15 @@
-import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+import withPWAInit from "@ducanh2912/next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  cacheOnFrontEndNav: true,
+  aggressiveFrontEndNavCaching: true,
+});
+
+/** @type {import("next").NextConfig} */
+export default withPWA({
+  reactStrictMode: true,
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -19,7 +28,5 @@ const nextConfig: NextConfig = {
 
       },
     ],
-  },
-};
-
-export default nextConfig;
+  }
+});

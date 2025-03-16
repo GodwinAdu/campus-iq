@@ -12,6 +12,7 @@ import { columns } from './_component/column'
 import { currentUser } from '@/lib/helpers/current-user'
 import { currentUserRole } from '@/lib/helpers/get-user-role'
 import { DataTable } from '@/components/table/data-table'
+import RolesDisplayPage from './_component/Roles'
 
 
 const page = async () => {
@@ -41,8 +42,8 @@ const page = async () => {
     <>
       <div className="flex justify-between items-center">
         <Heading
-          title="Role List"
-          description="Create roles and manage roles for all Users."
+          title="Role Management"
+          description="View and manage user roles and their permissions."
         />
         {addRole && (
           <Link
@@ -55,11 +56,14 @@ const page = async () => {
         )}
       </div>
       <Separator />
-      <DataTable
+      {/* <DataTable
         searchKey="displayName"
         columns={columns}
         data={values}
-      />
+      /> */}
+      <div className="">
+        <RolesDisplayPage roles={values} />
+      </div>
     </>
   )
 }

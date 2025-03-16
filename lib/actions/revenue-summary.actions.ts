@@ -1,5 +1,6 @@
 "use server"
 
+import mongoose from "mongoose";
 import { currentUser } from "../helpers/current-user";
 import RevenueSummary from "../models/revenue-summary.models";
 import { connectToDB } from "../mongoose";
@@ -42,7 +43,7 @@ export const totalRevenues = async () => {
     try {
         const user = await currentUser();
         if (!user) throw new Error("User not found");
-        
+
         const schoolId = user.schoolId;
         // const sessionAndTerm = await getCurrentSessionAndTerm();
         // if (!sessionAndTerm?.session?._id) throw new Error("Session ID not found");
@@ -51,7 +52,7 @@ export const totalRevenues = async () => {
         // const sessionId = sessionAndTerm.session?._id;
 
         const revenues = await RevenueSummary.find({ schoolId });
-        
+
         if (!revenues.length) {
             console.log("No revenues found.");
             return 0;
@@ -68,46 +69,40 @@ export const totalRevenues = async () => {
     }
 };
 
+
+
 export const fetchMonthlyRevenues = async () => {
     try {
         const user = await currentUser();
         if (!user) throw new Error("User not found");
 
-        const schoolId = user.schoolId;
-        // const sessionAndTerm = await getCurrentSessionAndTerm();
-        // if (!sessionAndTerm?.session?._id || !sessionAndTerm?.term?._id) {
-        //     throw new Error("Session or Term not found");
-        // }
-
         await connectToDB();
 
-        // Get current year
+        const schoolId = new mongoose.Types.ObjectId(user.schoolId);
         const currentYear = new Date().getFullYear();
-        const startOfYear = new Date(currentYear, 0, 1); // Jan 1st
-        const endOfYear = new Date(currentYear + 1, 0, 1); // Jan 1st of next year
+        const startOfYear = new Date(currentYear, 0, 1);
+        const endOfYear = new Date(currentYear + 1, 0, 1);
 
-        // Aggregate pipeline to sum revenue per month
         const monthlyRevenue = await RevenueSummary.aggregate([
             {
                 $match: {
                     schoolId,
-                    // sessionId: sessionAndTerm.session?._id,
-                    // termId: sessionAndTerm.term?._id,
                     date: { $gte: startOfYear, $lt: endOfYear },
                 },
             },
             {
                 $group: {
-                    _id: { $month: "$date" }, // Extracts the month (1 - 12)
+                    _id: { $month: "$date" },
                     totalRevenue: { $sum: "$totalRevenue" },
                 },
             },
             {
-                $sort: { "_id": 1 }, // Sort by month
+                $sort: { "_id": 1 },
             },
         ]);
 
-        // Initialize all months with revenue 0
+        console.log("Aggregated Monthly Revenue:", monthlyRevenue);
+
         const monthlyData = [
             { name: "Jan", revenue: 0 },
             { name: "Feb", revenue: 0 },
@@ -123,12 +118,11 @@ export const fetchMonthlyRevenues = async () => {
             { name: "Dec", revenue: 0 },
         ];
 
-        // Update revenues based on aggregation result
         monthlyRevenue.forEach(({ _id, totalRevenue }) => {
-            monthlyData[_id - 1].revenue = totalRevenue; // _id is 1-based (Jan = 1)
+            monthlyData[_id - 1].revenue = totalRevenue;
         });
 
-        console.log("Monthly Revenue Data:", monthlyData);
+        console.log("Final Monthly Revenue Data:", monthlyData);
         return monthlyData;
     } catch (error) {
         console.error("Error fetching monthly revenues:", error);

@@ -24,14 +24,13 @@ export default async function RootLayout({
     return (
         <TourProvider>
             <TourLayout>
-                <SidebarProvider>
+                <SidebarProvider className="sidebar">
                     <AppSidebarMain />
                     <SidebarInset>
                         <Navbar  user={user} />
                         <div className="relative">
                             <div id="main-content" className="py-4 px-4 overflow-hidden">
                                 {children}
-                                {/* <UseCheckStoreExpired /> */}
                             </div>
                         </div>
                     </SidebarInset>

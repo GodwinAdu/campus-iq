@@ -1,53 +1,47 @@
-import { models, Schema,model, Model } from "mongoose";
+import { models, Schema, model, Model } from "mongoose";
 
 
-const AssignmentSchema:Schema<IAssignment> = new Schema({
-    schoolId:{
-        type:Schema.Types.ObjectId,
-        ref:"School",
-        required:true
+const AssignmentSchema: Schema<IAssignment> = new Schema({
+    schoolId: {
+        type: Schema.Types.ObjectId,
+        ref: "School",
+        required: true
     },
-    classId:{
-        type:Schema.Types.ObjectId,
-        ref:"Class",
-        required:true
+    classId: {
+        type: Schema.Types.ObjectId,
+        ref: "Class",
+        required: true
     },
-    sessionId:{
-        type:Schema.Types.ObjectId,
-        ref:"Session",
-        required:true
+    sessionId: {
+        type: Schema.Types.ObjectId,
+        ref: "Session",
+        default: null,
     },
-    subjectId:{
-        type:Schema.Types.ObjectId,
-        ref:"Subject",
-        required:true
+    subjectId: {
+        type: Schema.Types.ObjectId,
+        ref: "Subject",
+        required: true
     },
-    termId:{
-        type:Schema.Types.ObjectId,
-        ref:"Term",
-        required:true
+    termId: {
+        type: Schema.Types.ObjectId,
+        ref: "Term",
+        default: null
     },
-    date:{
-        type:Date,
-        default:Date.now()
-    },
-    dateOfSubmission:{
-        type:Date,
-        required:true,
-    },
-    publishLater:{
-        type:Boolean,
-        default:false
-    },
-    scheduleDate:{
-        type:Date
-    },
-    homework:{
-        type:String,
-    },
-    attachmentFile:{
-        type:String
-    },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    dueDate: { type: Date, required: true },
+    totalMarks: { type: Number, required: true },
+    numberOfSubmission:{ type: Number, required: true },
+    assignmentType: { type: String, enum: ["homework", "classwork", "project", "quiz"], required: true },
+    status: { type: String, enum: ["active", "closed"], required: true },
+    submissionCount: [{
+        type: Schema.Types.ObjectId,
+        ref: "Student",
+        default: [],
+    }],
+    totalStudents: { type: Number, required: true },
+    createdAt: { type: Date, default: Date.now },
+    attachments: { type: [String], default: [] },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
@@ -84,6 +78,6 @@ const AssignmentSchema:Schema<IAssignment> = new Schema({
 type AssignmentModel = Model<IAssignment>
 
 
-const Assignment:AssignmentModel = models.Assignment || model<IAssignment>("Assignment", AssignmentSchema);
+const Assignment: AssignmentModel = models.Assignment || model<IAssignment>("Assignment", AssignmentSchema);
 
 export default Assignment

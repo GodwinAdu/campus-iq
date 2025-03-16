@@ -241,7 +241,7 @@ export function NavMain({ school }: NavMainProps) {
         },
         {
           title: "Forum",
-          url: `/${schoolId}/student/${userId}/payment-accounts/list-accounts`,
+          url: `/${schoolId}/forum`,
           // roleField: "manageListAccount"
         },
       ],

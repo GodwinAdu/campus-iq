@@ -533,63 +533,79 @@ const sidebarMenuButtonVariants = cva(
   }
 )
 
-const SidebarMenuButton = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<"button"> & {
-    asChild?: boolean
-    isActive?: boolean
-    tooltip?: string | React.ComponentProps<typeof TooltipContent>
-  } & VariantProps<typeof sidebarMenuButtonVariants>
->(
-  (
-    {
-      asChild = false,
-      isActive = false,
-      variant = "default",
-      size = "default",
-      tooltip,
-      className,
-      ...props
-    },
-    ref
-  ) => {
-    const Comp = asChild ? Slot : "button"
-    const { isMobile, state } = useSidebar()
 
-    const button = (
-      <Comp
-        ref={ref}
-        data-sidebar="menu-button"
-        data-size={size}
-        data-active={isActive}
-        className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
-        {...props}
-      />
-    )
+const SidebarMenuButton = React.memo(
+  React.forwardRef<
+    HTMLButtonElement,
+    React.ComponentProps<"button"> & {
+      asChild?: boolean
+      isActive?: boolean
+      tooltip?: string | React.ComponentProps<typeof TooltipContent>
+    } & VariantProps<typeof sidebarMenuButtonVariants>
+  >(
+    (
+      {
+        asChild = false,
+        isActive = false,
+        variant = "default",
+        size = "default",
+        tooltip,
+        className,
+        onClick,
+        ...props
+      },
+      ref
+    ) => {
+      const Comp = asChild ? Slot : "button"
+      const { isMobile, state } = useSidebar()
 
-    if (!tooltip) {
-      return button
-    }
+      // 🏆 Memoize event handler to prevent re-renders
+      const handleClick = React.useCallback(
+        (event: React.MouseEvent<HTMLButtonElement>) => {
+          if (onClick) onClick(event)
+        },
+        [onClick]
+      )
 
-    if (typeof tooltip === "string") {
-      tooltip = {
-        children: tooltip,
-      }
-    }
+      // 🏆 Avoid unnecessary object creation for tooltip props
+      const tooltipProps = React.useMemo(() => {
+        if (!tooltip) return null
+        return typeof tooltip === "string"
+          ? { children: tooltip }
+          : tooltip
+      }, [tooltip])
 
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>{button}</TooltipTrigger>
-        <TooltipContent
-          side="right"
-          align="center"
-          hidden={state !== "collapsed" || isMobile}
-          {...tooltip}
+      const button = (
+        <Comp
+          ref={ref}
+          data-sidebar="menu-button"
+          data-size={size}
+          data-active={isActive}
+          className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+          onClick={handleClick}
+          {...props}
         />
-      </Tooltip>
-    )
-  }
+      )
+
+      if (!tooltipProps) {
+        return button
+      }
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>{button}</TooltipTrigger>
+          <TooltipContent
+            side="right"
+            align="center"
+            hidden={state !== "collapsed" || isMobile}
+            {...tooltipProps}
+          />
+        </Tooltip>
+      )
+    }
+  )
 )
+
 SidebarMenuButton.displayName = "SidebarMenuButton"
 
 const SidebarMenuAction = React.forwardRef<

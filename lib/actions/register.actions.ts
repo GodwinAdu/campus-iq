@@ -226,6 +226,7 @@ export const registerUser = async (values: RegisterProps) => {
         const newRole = new Role({
             ...defaultRole,
             schoolId: newSchool._id,
+            userCount:[user._id],
             createdBy: user?._id,
             action_type: "create"
         });

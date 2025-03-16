@@ -11,8 +11,7 @@ interface AnnouncementData {
 export function Announcements() {
   const [announcements, setAnnouncements] = useState<AnnouncementData[]>([
     { id: '1', message: "Welcome to our new website! We've got a fresh new look." },
-    { id: '2', message: "Don't miss our summer sale! Up to 50% off on selected items." },
-    { id: '3', message: "New feature alert: Try our AI-powered product recommendations!" },
+
   ])
 
   const closeAnnouncement = (id: string) => {

@@ -69,9 +69,9 @@ export async function createSubject(values: CreateSubjectProps, path: string) {
 
         const history = new History({
             schoolId,
-            actionType:"SUBJECT_CREATED",
-            details:{
-                itemId:value._id
+            actionType: "SUBJECT_CREATED",
+            details: {
+                itemId: value._id
             },
             message: `${user.fullName} created new subject with (ID: ${value._id}) on ${new Date().toLocaleString()}.`,
             performedBy: user._id,
@@ -140,7 +140,7 @@ export async function fetchSubjectByClassId(classId: string) {
         if (!user) throw new Error('user not logged in');
         const schoolId = user.schoolId;
         await connectToDB();
-        const subject = await Subject.find({schoolId, classId});
+        const subject = await Subject.find({ schoolId, classId });
         if (!subject) throw new Error("subject not found");
 
         return JSON.parse(JSON.stringify(subject));
@@ -202,4 +202,26 @@ export async function deleteSubject(id: string) {
         throw error; // throw the error to handle it at a higher level if needed
     }
 
+}
+
+
+export async function fetchAllSubjectForStudent() {
+    try {
+        await connectToDB();
+        const user = await currentUser();
+        if (!user) throw new Error('user not logged in');
+        const schoolId = user.schoolId;
+        const classId = user.classId;
+        const subjects = await Subject.find({ classId, schoolId })
+        if (!subjects) {
+            console.log("Cant find subjects for student")
+            return [];
+        }
+        return JSON.parse(JSON.stringify(subjects));
+
+    } catch (error) {
+        console.error("Error fetching subjects for student:", error);
+        throw error; // throw the error to handle it at a higher level if needed
+
+    }
 }

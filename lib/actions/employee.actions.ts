@@ -14,8 +14,9 @@ import Department from "../models/department.models";
 import { generateUniqueStaffId } from "../helpers/generateStaffId";
 import { currentUser } from "../helpers/current-user";
 import History from "../models/history.models";
+import { cache } from "react";
 
-export const getEmployeeById = async (id: string) => {
+export const getEmployeeById = cache(async (id: string) => {
     try {
         await connectToDB();
 
@@ -30,7 +31,7 @@ export const getEmployeeById = async (id: string) => {
         console.error("Error while fetching employee", error);
         throw error;
     }
-}
+})
 
 
 

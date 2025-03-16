@@ -1,25 +1,22 @@
 import Heading from '@/components/commons/Header'
-import { buttonVariants } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { cn } from '@/lib/utils'
-import { PlusCircle } from 'lucide-react'
-import Link from 'next/link'
-import React from 'react'
+import AssignmentManagement from './_components/AssignmentForm'
+import { getAllClass } from '@/lib/actions/class.actions'
 
-const page = () => {
+const page = async () => {
+    const classes = await getAllClass() ?? []
     return (
         <>
             <div className="flex justify-between items-center">
-                <Heading title="Assignments" />
-                <Link
-                    href={`timetable/create`}
-                    className={cn(buttonVariants())}
-                >
-                    <PlusCircle className="w-4 h-4 mr-2" />
-                    Create
-                </Link>
+                <Heading
+                    title="Assignment Management"
+                    description='Create, manage, and grade assignments for your classes'
+                />
             </div>
             <Separator />
+            <div className="">
+                <AssignmentManagement classes={classes} />
+            </div>
         </>
     )
 }

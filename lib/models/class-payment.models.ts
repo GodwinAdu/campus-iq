@@ -1,10 +1,21 @@
 import { Schema, model, models } from "mongoose";
+import RevenueSummary from "./revenue-summary.models";
 
 const ClassPaymentSchema = new Schema({
     schoolId: {
         type: Schema.Types.ObjectId,
         ref: "School",
         required: true
+    },
+    sessionId: {
+        type: Schema.Types.ObjectId,
+        ref: "Session",
+        default: null
+    },
+    termId: {
+        type: Schema.Types.ObjectId,
+        ref: "Term",
+        default: null
     },
     payerId: {
         type: Schema.Types.ObjectId,
@@ -36,6 +47,23 @@ const ClassPaymentSchema = new Schema({
     timestamps: true,
     versionKey: false,
 });
+
+ClassPaymentSchema.post("save", async function (doc) {
+    try {
+        const { schoolId, sessionId, termId, createdAt } = doc;
+        if (!createdAt) throw new Error("createdAt is undefined");
+        const startOfMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 1);
+
+        await RevenueSummary.updateOne(
+            { schoolId, sessionId, termId, date: startOfMonth },
+            { $inc: { totalRevenue: doc.amount } },
+            { upsert: true }
+        );
+    } catch (error) {
+        console.error("Error updating revenue summary:", error);
+    }
+});
+
 
 const ClassPayment = models.ClassPayment || model("ClassPayment", ClassPaymentSchema);
 

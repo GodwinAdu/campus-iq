@@ -605,6 +605,11 @@ const RoleSchema: Schema<IRole> = new Schema({
             default: false
         },
     },
+    userCount: [{
+        type: Schema.Types.ObjectId,
+        ref: "Employee",
+        default: []
+    }],
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",

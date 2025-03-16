@@ -27,7 +27,7 @@ export function AppSidebar(props: AppSidebarProps) {
       <SidebarHeader>
         <TeamSwitcher user={user}  />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="">
         <SideContent school={school}  />
       </SidebarContent>
       <SidebarFooter>

@@ -24,15 +24,19 @@ import { useModalStore } from "@/hooks/use-store-intro"
 const IntroModal = () => {
     const { isOpen, lastOpened, openModal, closeModal, reset } = useModalStore();
     const [activeTab, setActiveTab] = useState("welcome");
-    
+
     useEffect(() => {
         const twentyFourHours = 24 * 60 * 60 * 1000;
         const now = Date.now();
 
         if (!lastOpened || now - lastOpened >= twentyFourHours) {
-            setTimeout(openModal, 3000);
+            setTimeout(() => {
+                openModal();
+                reset(); // Ensure lastOpened updates after opening
+            }, 3000);
         }
-    }, [lastOpened, openModal]);
+    }, [lastOpened, openModal, reset]);
+
 
     const features = [
         {
@@ -101,7 +105,7 @@ const IntroModal = () => {
                         </div>
 
                         <TabsContent value="welcome" className="mt-4 space-y-4">
-                        <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900 rounded-lg p-4 mt-6">
+                            <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900 rounded-lg p-4 mt-6">
                                 <div className="flex items-start gap-3">
                                     <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                                     <div>

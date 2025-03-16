@@ -41,6 +41,20 @@ interface ISchool extends Document {
     addresses?: Address;
     notifications: Notification;
     subscriptionPlan: Subscription;
+    reporting?: {
+        enabledReports?: string[];
+        schedule?: {
+            reportType?: string;
+            frequency?: string;
+            lastGenerated?: Date;
+        }[];
+    };
+    paymentProcessors?: {
+        name?: string;
+        apiKey?: string;
+        secretKey?: string;
+        enabled?: boolean;
+    }[];
     banned: boolean;
     createdBy?: Types.ObjectId | null;
     modifiedBy?: Types.ObjectId | null;
@@ -287,8 +301,8 @@ interface IParent extends Document {
     emergencyContact?: EmergencyContact;
     currentAddress?: string;
     permanentAddress?: string;
-    role:string;
-    relationship:string;
+    role: string;
+    relationship: string;
     children: Types.ObjectId[]; // References to Student IDs
     occupation?: string;
     workplace?: string;
@@ -1153,6 +1167,7 @@ interface IRole extends Document {
         manageStudentAttendance: boolean;
         manageEmployeeAttendance: boolean;
     };
+    userCount: Schema.Types.ObjectId[]
     createdBy?: Types.ObjectId | null;
     modifiedBy?: Types.ObjectId | null;
     deletedBy?: Types.ObjectId | null;
@@ -1166,27 +1181,30 @@ interface IRole extends Document {
 
 // Define the TypeScript interface for Assignment
 interface IAssignment extends Document {
-    _id?: string;
-    schoolId: Types.ObjectId;
-    classId: Types.ObjectId;
-    sessionId: Types.ObjectId;
-    subjectId: Types.ObjectId;
-    termId: Types.ObjectId;
-    date: Date;
-    dateOfSubmission: Date;
-    publishLater: boolean;
-    scheduleDate?: Date;
-    homework?: string;
-    attachmentFile?: string;
-    createdBy?: Types.ObjectId | null;
-    mod_flag: boolean;
-    del_flag: boolean;
-    modifiedBy?: Types.ObjectId | null;
-    deletedBy?: Types.ObjectId | null;
-    action_type?: string | null;
+    schoolId: Schema.Types.ObjectId;
+    classId: Schema.Types.ObjectId;
+    sessionId: Schema.Types.ObjectId;
+    subjectId: Schema.Types.ObjectId;
+    termId: Schema.Types.ObjectId;
+    title: string;
+    description: string;
+    dueDate: Date;
+    totalMarks: number;
+    numberOfSubmission: number;
+    assignmentType: "homework" | "classwork" | "project" | "quiz";
+    status: "active" | "closed";
+    submissionCount: number;
+    totalStudents: number;
     createdAt: Date;
-    updatedAt: Date;
+    attachments: string[];
+    createdBy?: Schema.Types.ObjectId | null;
+    mod_flag?: boolean;
+    del_flag?: boolean;
+    modifiedBy?: Schema.Types.ObjectId | null;
+    deletedBy?: Schema.Types.ObjectId | null;
+    action_type?: string | null;
 }
+
 
 
 

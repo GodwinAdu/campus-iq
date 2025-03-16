@@ -11,6 +11,7 @@ import Navbar from "@/components/admin/Navbar";
 import { getAllSessions } from "@/lib/actions/session.actions";
 import { ModalProvider } from "@/components/admin/modals/modal-provider";
 import IntroModal from "@/components/commons/IntroModal";
+import { Announcements } from "@/components/commons/Anouncements";
 
 
 export default async function RootLayout({
@@ -26,12 +27,13 @@ export default async function RootLayout({
             <TourLayout>
                 <SidebarProvider className="sidebar">
                     <AppSidebarMain />
-                    <SidebarInset>
+                    <SidebarInset >
                         <Navbar sessions={sessions} user={user} />
-                        <div className="relative">
-                            <div id="main-content" className="py-4 px-4 overflow-hidden">
+                        <div className="relative scrollbar-hide">
+                            <div id="main-content" className="py-4 px-4 overflow-hidden scrollbar-hide">
                                 {/* <IntroModal /> */}
                                 <ModalProvider />
+                                <Announcements  />
                                 {children}
                                 {/* <UseCheckStoreExpired /> */}
                             </div>

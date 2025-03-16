@@ -86,7 +86,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
                     </DropdownMenuItem>
                 ) : (
                     <>
-                        {role?.permissions.viewClass && (
+                        {role?.permissions.manageClass && (
                             <DropdownMenuItem asChild>
                                 <Link href={`/${schoolId}/admin/${userId}/class/manage-classes/${data._id}`}>
                                     <View className="mr-2 h-4 w-4" /> Details

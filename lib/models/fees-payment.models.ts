@@ -90,10 +90,11 @@ const FeesPaymentSchema: Schema<IFeesPayment> = new Schema({
 FeesPaymentSchema.post("save", async function (doc) {
     try {
         const { schoolId, sessionId, termId, createdAt } = doc;
-        const startOfMonth = new Date(createdAt?.getFullYear(), createdAt?.getMonth(), 1);
+        if (!createdAt) throw new Error("createdAt is undefined");
+        const startOfMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 1);
 
         // Calculate total paid amount
-        const totalPaid = doc.fees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+        const totalPaid = doc.fees.reduce((sum: number, fee: { paid?: number }) => sum + (fee.paid || 0), 0);
 
         await RevenueSummary.updateOne(
             { schoolId, sessionId, termId, date: startOfMonth },
@@ -112,9 +113,9 @@ FeesPaymentSchema.post("findOneAndUpdate", async function (doc) {
 
         const { schoolId, sessionId, termId, createdAt } = doc;
         const update = this.getUpdate();
-        const updatedFees = update?.$set?.fees || doc.fees;
-        const updatedPaidAmount = updatedFees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
-        const originalPaidAmount = doc.fees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+        const updatedFees = (update as { $set?: { fees?: typeof doc.fees } })?.$set?.fees || doc.fees;
+        const updatedPaidAmount = updatedFees.reduce((sum: number, fee: { paid?: number }) => sum + (fee.paid || 0), 0);
+        const originalPaidAmount = doc.fees.reduce((sum: number, fee: { paid?: number }) => sum + (fee.paid || 0), 0);
         const difference = updatedPaidAmount - originalPaidAmount;
 
         if (difference !== 0) {
@@ -136,7 +137,7 @@ FeesPaymentSchema.post("findOneAndDelete", async function (doc) {
         if (!doc) return;
 
         const { schoolId, sessionId, termId, createdAt } = doc;
-        const totalPaid = doc.fees.reduce((sum, fee) => sum + (fee.paid || 0), 0);
+        const totalPaid = doc.fees.reduce((sum: number, fee: { paid?: number }) => sum + (fee.paid || 0), 0);
         const startOfMonth = new Date(createdAt.getFullYear(), createdAt.getMonth(), 1);
 
         await RevenueSummary.updateOne(
