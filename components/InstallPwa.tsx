@@ -1,53 +1,59 @@
 "use client";
 import { useEffect, useState } from "react";
 
+interface BeforeInstallPromptEvent extends Event {
+    readonly platforms: string[];
+    readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+    prompt(): Promise<void>;
+}
+
 export default function InstallPrompt() {
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-    const [isIOS, setIsIOS] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
+    const [isIOS, setIsIOS] = useState(false);
 
     useEffect(() => {
-        // Detect iOS
-        setIsIOS(
-            /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
-        );
+        // Detect if the app is already installed
         setIsStandalone(window.matchMedia("(display-mode: standalone)").matches);
 
-        // Handle beforeinstallprompt for Android
-        const handleBeforeInstallPrompt = (event: any) => {
+        // Detect if it's iOS (because iOS doesn't support `beforeinstallprompt`)
+        setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window));
+
+        // Listen for the beforeinstallprompt event (for Windows and Android)
+        const handleBeforeInstallPrompt = (event: BeforeInstallPromptEvent) => {
             event.preventDefault();
             setDeferredPrompt(event);
+
+            // Automatically trigger install prompt after page load
+            setTimeout(() => {
+                event.prompt();
+                event.userChoice.then((choiceResult: { outcome: 'accepted' | 'dismissed' }) => {
+                    if (choiceResult.outcome === "accepted") {
+                        console.log("User installed the PWA");
+                    } else {
+                        console.log("User dismissed the install prompt");
+                    }
+                });
+            }, 2000); // Delay 2 seconds to ensure page loads fully
         };
 
-        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
 
         return () => {
-            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt as EventListener);
         };
     }, []);
 
-    if (isStandalone) {
-        return null; // Don't show install prompt if already installed
-    }
+    if (isStandalone) return null; // Don't show anything if already installed
 
     return (
-        <div className="p-4 border rounded shadow-md bg-white">
+        <div className="fixed bottom-4 left-4 p-3 bg-white shadow-md rounded-md">
             <h3 className="text-lg font-bold">Install App</h3>
-            {deferredPrompt && (
-                <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded"
-                    onClick={() => {
-                        deferredPrompt.prompt();
-                    }}
-                >
-                    Install Now
-                </button>
-            )}
             {isIOS && (
-                <p className="mt-2 text-gray-600">
-                    To install this app on your iOS device, tap the share button
-                    <span role="img" aria-label="share icon"> ⎋ </span> and then &quot;Add to Home Screen&quot;
-                    <span role="img" aria-label="plus icon"> ➕ </span>.
+                <p className="text-gray-600">
+                    On iOS, tap the share button
+                    <span role="img" aria-label="share"> ⎋ </span> and select &quot;Add to Home Screen&quot;
+                    <span role="img" aria-label="plus"> ➕ </span>.
                 </p>
             )}
         </div>
