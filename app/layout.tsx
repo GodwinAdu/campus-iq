@@ -9,7 +9,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import IntroModal from "@/components/commons/IntroModal";
 import FeedbackModal from "@/components/commons/FeedbackModal";
 import RegisterServiceWorker from "@/components/RegiserServiceWorker";
-import InstallPrompt from "@/components/InstallPwa";
 
 
 
@@ -90,8 +89,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-
-          <InstallPrompt />
           <RegisterServiceWorker />
           <Loader />
           {/* <UseCheckStoreExpired /> */}
