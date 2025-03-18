@@ -248,6 +248,7 @@ interface IClass extends Document {
     schoolId: Types.ObjectId;
     name: string;
     code: string;
+    room:string;
     subjects: Types.ObjectId[]; // Array of Subject IDs
     students: Types.ObjectId[]; // Array of Student IDs
     teachers: Types.ObjectId[]; // Array of Teacher IDs
@@ -585,6 +586,7 @@ interface ISubject extends Document {
     status?: boolean;
     code: string;
     classId?: Types.ObjectId;
+    syllabus:string[];
     createdBy?: Types.ObjectId | null;
     mod_flag?: boolean;
     del_flag?: boolean;
@@ -1193,6 +1195,7 @@ interface IAssignment extends Document {
     numberOfSubmission: number;
     assignmentType: "homework" | "classwork" | "project" | "quiz";
     status: "active" | "closed";
+    allowLateSubmission:boolean;
     submissionCount: number;
     totalStudents: number;
     createdAt: Date;

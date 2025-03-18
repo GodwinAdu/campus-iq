@@ -31,7 +31,7 @@ const AssignmentSchema: Schema<IAssignment> = new Schema({
     description: { type: String, required: true },
     dueDate: { type: Date, required: true },
     totalMarks: { type: Number, required: true },
-    numberOfSubmission:{ type: Number, required: true },
+    numberOfSubmission: { type: Number, required: true },
     assignmentType: { type: String, enum: ["homework", "classwork", "project", "quiz"], required: true },
     status: { type: String, enum: ["active", "closed"], required: true },
     submissionCount: [{
@@ -40,6 +40,10 @@ const AssignmentSchema: Schema<IAssignment> = new Schema({
         default: [],
     }],
     totalStudents: { type: Number, required: true },
+    allowLateSubmission: {
+        type: Boolean,
+        default: false,
+    },
     createdAt: { type: Date, default: Date.now },
     attachments: { type: [String], default: [] },
     createdBy: {

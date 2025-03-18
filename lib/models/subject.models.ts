@@ -2,7 +2,7 @@ import { Schema, model, models, Model } from "mongoose";
 
 // Define the Subject schema
 const SubjectSchema: Schema<ISubject> = new Schema({
-    schoolId:{
+    schoolId: {
         type: Schema.Types.ObjectId,
         ref: "School",
         required: true,
@@ -37,6 +37,9 @@ const SubjectSchema: Schema<ISubject> = new Schema({
     classId: {
         type: Schema.Types.ObjectId,
         ref: "Class"
+    },
+    syllabus: {
+        type: [String]
     },
     createdBy: {
         type: Schema.Types.ObjectId,

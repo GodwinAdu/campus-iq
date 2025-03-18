@@ -19,6 +19,9 @@ const ClassSchema:Schema<IClass> = new Schema({
         index: true,
         unique: true,
     },
+    room:{
+        type: String,
+    },
     subjects: [{
         type: Schema.Types.ObjectId,
         ref: 'Subject',

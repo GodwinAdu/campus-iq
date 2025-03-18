@@ -167,6 +167,11 @@ export function NavMain({ role, school }: NavMainProps) {
       roleField: "classManagement",
       items: [
         {
+          title: "Attendances",
+          url: `/${schoolId}/admin/${userId}/class/attendance`,
+          roleField: "manageClass"
+        },
+        {
           title: "Assignments",
           url: `/${schoolId}/admin/${userId}/class/assignment`,
           roleField: "manageClass"
