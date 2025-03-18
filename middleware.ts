@@ -15,7 +15,7 @@ const publicRoutes = [
     '/',
     '/demo',
     '/contact',
-    '/download',
+    '/documentation',
     '/pricing',
     '/features',
     '/api/uploadthing'

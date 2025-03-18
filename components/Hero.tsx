@@ -21,24 +21,25 @@ export default function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center relative z-10"
+        className="text-center relative z-10 space-y-8"
       >
-        <h1 className="text-6xl font-bold mb-4 text-white">Campus<span className="text-blue-500">IQ</span></h1>
+        <h1 className="text-3xl md:text-6xl font-bold mb-4 text-white">Campus<span className="text-blue-500">IQ</span></h1>
         <TypewriterEffect words={words} />
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.5 }}
+          className="inline-flex flex-col md:flex-row items-center gap-4"
         >
           <Link
             href="/features"
-            className="mt-8 inline-block bg-blue-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300"
           >
             Explore Features
           </Link>
           <Link
             href="/sign-in"
-            className="mt-8 ml-5 inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition duration-300"
+            className="inline-block bg-green-600 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-700 transition duration-300"
           >
             Sign In
           </Link>

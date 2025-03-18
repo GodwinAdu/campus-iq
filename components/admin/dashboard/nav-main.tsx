@@ -191,11 +191,11 @@ export function NavMain({ role, school }: NavMainProps) {
           url: `/${schoolId}/admin/${userId}/class/class-fees`,
           roleField: "manageClass"
         },
-        // {
-        //   title: "Promote Student",
-        //   url: `/${schoolId}/admin/${userId}/class/promotion`,
-        //   roleField: "manageSubject"
-        // },
+        {
+          title: "Promote Student",
+          url: `/${schoolId}/admin/${userId}/class/promotion`,
+          roleField: "manageSubject"
+        },
       ],
     },
     {

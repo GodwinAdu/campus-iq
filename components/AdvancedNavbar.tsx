@@ -12,7 +12,7 @@ const navItems = [
   { name: "Demo", link: "/demo" },
   { name: "Pricing", link: "/pricing" },
   { name: "Contact", link: "/contact" },
-  { name: "Download", link: "/download" },
+  { name: "Docs", link: "/documentation" },
 ]
 
 export default function AdvancedNavbar() {
@@ -46,7 +46,7 @@ export default function AdvancedNavbar() {
         initial={{ opacity: 0, y: -100 }}
         animate={{ opacity: isOpen ? 1 : 0, y: isOpen ? 0 : -100 }}
         transition={{ duration: 0.3 }}
-        className={cn("absolute top-16 inset-x-0 bg-black bg-opacity-95 py-4", isOpen ? "block" : "hidden")}
+        className={cn("absolute top-16 inset-x-0 bg-black  py-4", isOpen ? "block" : "hidden")}
       >
         {navItems.map((item) => (
           <Link
