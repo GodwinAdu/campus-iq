@@ -7,6 +7,9 @@ import { connectToDB } from "../mongoose";
 import Class from "../models/class.models";
 import { currentUser } from "../helpers/current-user";
 import History from "../models/history.models";
+import QuestionBank from "../models/question-bank.models";
+import Question from "../models/questions.models";
+import mongoose from "mongoose";
 
 interface CreateSubjectProps {
     subjectName: string;
@@ -223,5 +226,101 @@ export async function fetchAllSubjectForStudent() {
         console.error("Error fetching subjects for student:", error);
         throw error; // throw the error to handle it at a higher level if needed
 
+    }
+}
+
+
+
+// export async function fetchSubjectByClassIdForQuestionBank(classId: string) {
+//     try {
+//         await connectToDB();
+//         const user = await currentUser();
+//         if (!user) throw new Error('User not logged in');
+
+//         const schoolId = user.schoolId;
+
+//         // Fetch subjects
+//         const subjects = await Subject.find({ classId, schoolId });
+//         if (!subjects || subjects.length === 0) {
+//             console.log("Can't find subjects for student");
+//             return [];
+//         }
+
+//         // Fetch total question banks and total questions for each subject
+//         const subjectsWithCounts = await Promise.all(subjects.map(async (subject) => {
+//             const totalQuestionBanks = await QuestionBank.countDocuments({ subjectId: subject._id, schoolId });
+//             const totalQuestions = await Question.countDocuments({ subjectId: subject._id, schoolId });
+
+//             return {
+//                 ...subject.toObject(),
+//                 totalQuestionBanks,
+//                 totalQuestions,
+//             };
+//         }));
+
+//         return JSON.parse(JSON.stringify(subjectsWithCounts));
+//     } catch (error) {
+//         console.error("Error fetching subjects for student:", error);
+//         throw error;
+//     }
+// }
+
+
+export async function fetchSubjectByClassIdForQuestionBank(classId: string) {
+    try {
+        await connectToDB();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
+        const schoolId = user.schoolId;
+
+        // Convert IDs to ObjectId if necessary
+        const classObjectId = new mongoose.Types.ObjectId(classId);
+        const schoolObjectId = new mongoose.Types.ObjectId(schoolId);
+
+        // Fetch subjects with total question banks and total questions using aggregation
+        const subjectsWithCounts = await Subject.aggregate([
+            {
+                $match: { classId: classObjectId, schoolId: schoolObjectId }
+            },
+            {
+                $lookup: {
+                    from: "questionbanks",
+                    localField: "_id",
+                    foreignField: "subjectId",
+                    as: "questionBanks"
+                }
+            },
+            {
+                $lookup: {
+                    from: "questions",
+                    localField: "_id",
+                    foreignField: "subjectId",
+                    as: "questions"
+                }
+            },
+            {
+                $addFields: {
+                    totalQuestionBanks: { $size: "$questionBanks" },
+                    totalQuestions: { $size: "$questions" }
+                }
+            },
+            {
+                $project: {
+                    questionBanks: 0,
+                    questions: 0
+                }
+            }
+        ]);
+
+        if (!subjectsWithCounts.length) {
+            console.log("No subjects found for the given classId and schoolId.");
+            return [];
+        }
+
+        return JSON.parse(JSON.stringify(subjectsWithCounts));
+    } catch (error) {
+        console.error("Error fetching subjects for student:", error);
+        throw error;
     }
 }

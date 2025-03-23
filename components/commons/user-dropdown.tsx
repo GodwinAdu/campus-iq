@@ -30,7 +30,7 @@ export default function UserDropdown({ username, avatarUrl, email, notificationC
   const router = useRouter();
   const params = useParams();
 
-  const { storeId, branchId } = params;
+  const { schoolId, userId } = params;
 
   const handleLogout = async () => {
     try {
@@ -96,10 +96,10 @@ export default function UserDropdown({ username, avatarUrl, email, notificationC
           <DropdownMenuSeparator className="bg-card-foreground" />
 
           <DropdownMenuGroup className="space-y-1">
-            <MenuItem icon={User}  label="Profile" href={`/${storeId}/dashboard/${branchId}/profile`} />
-            <MenuItem icon={Beaker} disabled label="Try New Features" href={`/${storeId}/dashboard/${branchId}/new_features`} />
-            <MenuItem icon={Send} disabled label="Feedback" href={`/${storeId}/dashboard/${branchId}/feedback`} />
-            <MenuItem icon={Settings} label="Support" href={`/${storeId}/dashboard/${branchId}/support`} />
+            <MenuItem icon={User} label="Profile" href={`/${schoolId}/admin/${userId}/profile`} />
+            <MenuItem icon={Beaker} disabled label="Try New Features" href={`/${schoolId}/admin/${userId}/new_features`} />
+            <MenuItem icon={Send} disabled label="Feedback" href={`/${schoolId}/admin/${userId}/feedback`} />
+            <MenuItem icon={Settings} label="Support" href={`/${schoolId}/admin/${userId}/support`} />
             <MenuItem icon={LogOut} label="Sign Out" onClick={handleLogout} />
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -111,7 +111,7 @@ export default function UserDropdown({ username, avatarUrl, email, notificationC
 
 function MenuItem({ icon: Icon, label, hasChevron, onClick, disabled, href }: { icon: LucideIcon; label: string; hasChevron?: boolean, onClick?: () => void, disabled?: boolean, href?: string }) {
   return (
-    <DropdownMenuItem disabled={disabled}  onClick={onClick}>
+    <DropdownMenuItem disabled={disabled} onClick={onClick}>
       <Link href={href || '#'} className="flex items-center px-2 py-2  rounded-md cursor-pointer" >
         <Icon className="h-5 w-5 mr-3" />
         <span className="flex-grow">{label}</span>

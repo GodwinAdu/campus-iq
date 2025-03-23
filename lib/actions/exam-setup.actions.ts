@@ -14,13 +14,14 @@ interface ExamSetupProp {
     termId: string;
     sessionId: string;
     examType: string;
+    markType: string;
     markDistributions?: string[];
     nextTerm?: string;
     publish?: boolean
 }
 export async function createExamSetup(values: ExamSetupProp, path: string) {
     try {
-        const { name, termId, sessionId, examType, markDistributions, nextTerm, publish } = values;
+        const { name, termId, sessionId, examType,markType, markDistributions, nextTerm, publish } = values;
         const user = await currentUser();
         if(!user) throw new Error('user not logged in');
         const schoolId = user.schoolId;
@@ -37,6 +38,7 @@ export async function createExamSetup(values: ExamSetupProp, path: string) {
             termId,
             sessionId,
             examType,
+            markType,
             markDistributions,
             nextTerm,
             publish,

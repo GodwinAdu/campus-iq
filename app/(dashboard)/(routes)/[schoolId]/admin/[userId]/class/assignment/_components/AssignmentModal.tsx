@@ -18,6 +18,7 @@ import { toast } from "@/hooks/use-toast"
 import { fetchSubjectByClassId } from "@/lib/actions/subject.actions"
 import { useRouter } from "next/navigation"
 import { createAssignment } from "@/lib/actions/assignment.actions"
+import { Checkbox } from "@/components/ui/checkbox"
 
 // Form schemas
 const assignmentFormSchema = z.object({
@@ -33,6 +34,7 @@ const assignmentFormSchema = z.object({
     assignmentType: z.enum(["homework", "project", "quiz", "classwork"], {
         required_error: "Please select an assignment type",
     }),
+    allowLateSubmission: z.coerce.boolean().default(false),
     attachments: z.array(z.string()).optional(),
     instructions: z.string().optional(),
 });
@@ -61,6 +63,7 @@ const AssignmentModal = ({ classes, type, initialData }: ModalProps) => {
             assignmentType: "homework",
             attachments: [],
             instructions: "",
+            allowLateSubmission: false,
         },
     });
 
@@ -356,6 +359,25 @@ const AssignmentModal = ({ classes, type, initialData }: ModalProps) => {
                             )}
                         />
 
+                        <FormField
+                            control={form.control}
+                            name="allowLateSubmission"
+                            render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 shadow">
+                                    <FormControl>
+                                        <Checkbox
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                        <FormLabel>
+                                            Allow late submission of assigments
+                                        </FormLabel>
+                                    </div>
+                                </FormItem>
+                            )}
+                        />
                         <div>
                             <FormLabel>Attachments</FormLabel>
                             <div className="mt-2 p-4 border border-dashed rounded-md text-center">

@@ -331,6 +331,11 @@ export function NavMain({ role, school }: NavMainProps) {
       roleField: "examsManagement",
       items: [
         {
+          title: "Questions Bank",
+          url: `/${schoolId}/admin/${userId}/exam/questions`,
+          roleField: "manageExam"
+        },
+        {
           title: "Exams Hall",
           url: `/${schoolId}/admin/${userId}/exam/exams-hall`,
           roleField: "manageExam"

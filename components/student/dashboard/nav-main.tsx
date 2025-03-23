@@ -189,7 +189,7 @@ export function NavMain({ school }: NavMainProps) {
       items: [
         {
           title: "Book List",
-          url: `/${schoolId}/student/${userId}/exams/list-examss`,
+          url: `/${schoolId}/student/${userId}/exams/exam`,
         },
         {
           title: "Issued Book",
