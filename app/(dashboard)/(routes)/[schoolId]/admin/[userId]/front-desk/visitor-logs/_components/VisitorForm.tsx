@@ -23,21 +23,25 @@ import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 const formSchema = z.object({
-    sender: z.string({
-        required_error: "Please enter sender and is required.",
+    visitorName: z.string().min(3, {
+        message: "Name must be atleast 3 characters"
     }),
-    receiver: z.string().min(2, {
-        message: "receiver name must be at least 2 characters.",
+    visitorMobile: z.string().min(10, {
+        message: "Mobile number must be atleast 10 characters"
     }),
-    postalType: z.string().optional(),
-    referenceNo: z.string().min(2, {
-        message: "reference number must be at least 2 characters.",
+    visitorEmail: z.string().email().optional(),
+    visitorAddress: z.string().optional(),
+    visitorType: z.string().optional(),
+    visitorPurpose: z.string().min(3, {
+        message: "Purpose must be atleast 3 characters"
     }),
-    address: z.string().min(2, {
-        message: "address must be at least 2 characters.",
+    visitorInTime: z.string(),
+    visitorOutTime: z.string().optional(),
+    visitorDetails: z.string().optional(),
+    numberOfVisitors: z.number().min(1, {
+        message: "Number of visitors must be atleast 1",
     }),
-    date: z.coerce.date(),
-    postalDetails: z.string().optional(),
+    idCard: z.string().optional(),
     attachmentFile: z.string().optional(),
     confidential: z.boolean().optional(),
 })
@@ -46,12 +50,17 @@ const VisitorForm = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            sender: "",
-            receiver: "",
-            postalType: "",
-            referenceNo: "",
-            address: "",
-            postalDetails: "",
+            visitorName: "",
+            visitorMobile: "",
+            visitorEmail: "",
+            visitorAddress: "",
+            visitorType: "",
+            visitorPurpose: "",
+            visitorInTime: "",
+            visitorOutTime: "",
+            visitorDetails: "",
+            numberOfVisitors: 1,
+            idCard: "",
             attachmentFile: "",
             confidential: false,
         },
@@ -78,10 +87,10 @@ const VisitorForm = () => {
                     <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
                         <FormField
                             control={form.control}
-                            name="postalType"
+                            name="visitorType"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Postal Type</FormLabel>
+                                    <FormLabel>Visitor Type</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
                                             <SelectTrigger>
@@ -89,8 +98,11 @@ const VisitorForm = () => {
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                            <SelectItem value="dispatch">Dispatch</SelectItem>
-                                            <SelectItem value="receive">Receive</SelectItem>
+                                            {['parent', 'teacher', 'student', 'staff', 'visitor'].map((type) => (
+                                                <SelectItem key={type} value={type}>
+                                                    {type}
+                                                </SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -99,10 +111,10 @@ const VisitorForm = () => {
                         />
                         <FormField
                             control={form.control}
-                            name="sender"
+                            name="visitorName"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Enter Sender</FormLabel>
+                                    <FormLabel>Visitor Name</FormLabel>
                                     <FormControl>
                                         <Input placeholder="eg. John Doe..." {...field} />
                                     </FormControl>
@@ -112,12 +124,12 @@ const VisitorForm = () => {
                         />
                         <FormField
                             control={form.control}
-                            name="receiver"
+                            name="visitorMobile"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Enter Receiver</FormLabel>
+                                    <FormLabel>Visitor Number</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="eg. David Doe..." {...field} />
+                                        <Input placeholder="eg. 02345..." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -125,12 +137,12 @@ const VisitorForm = () => {
                         />
                         <FormField
                             control={form.control}
-                            name="referenceNo"
+                            name="visitorEmail"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Reference Number (Optional)</FormLabel>
+                                    <FormLabel>Visitor Email</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="eg. xxxxxxxxxxx..." {...field} />
+                                        <Input placeholder="eg. johndoe@gmail.com..." {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -138,45 +150,114 @@ const VisitorForm = () => {
                         />
                         <FormField
                             control={form.control}
-                            name="date"
+                            name="visitorAddress"
                             render={({ field }) => (
-                                <FormItem className="flex flex-col">
-                                    <FormLabel>Date</FormLabel>
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <FormControl>
-                                                <Button
-                                                    variant={"outline"}
-                                                    className={cn(
-                                                        " pl-3 text-left font-normal",
-                                                        !field.value && "text-muted-foreground"
-                                                    )}
-                                                >
-                                                    {field.value ? (
-                                                        format(field.value, "PPP")
-                                                    ) : (
-                                                        <span>Pick a date</span>
-                                                    )}
-                                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                                                </Button>
-                                            </FormControl>
-                                        </PopoverTrigger>
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                disabled={(date) =>
-                                                    date > new Date() || date < new Date("1900-01-01")
-                                                }
-                                                initialFocus
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
+                                <FormItem>
+                                    <FormLabel>Visitor Address</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="eg. Kathmandu..." {...field} />
+                                    </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+                        
+                        <FormField
+                            control={form.control}
+                            name="visitorPurpose"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Visitor Purpose</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="eg. Meeting..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="visitorInTime"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Visitor In Time</FormLabel>
+                                    <FormControl>
+                                        <Popover>
+                                            <PopoverTrigger>
+                                                <Input
+                                                    placeholder="eg. 12:00 PM..."
+                                                    {...field}
+                                                    readOnly
+                                                />
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <Calendar
+                                                    onSelect={(date) => {
+                                                        form.setValue("visitorInTime", format(date, "hh:mm a"))
+                                                    }}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="visitorOutTime"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Visitor Out Time</FormLabel>
+                                    <FormControl>
+                                        <Popover>
+                                            <PopoverTrigger>
+                                                <Input
+                                                    placeholder="eg. 12:00 PM..."
+                                                    {...field}
+                                                    readOnly
+                                                />
+                                            </PopoverTrigger>
+                                            <PopoverContent>
+                                                <Calendar
+                                                    onSelect={(date) => {
+                                                        form.setValue("visitorOutTime", format(date, "hh:mm a"))
+                                                    }}
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="numberOfVisitors"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Number of Visitors</FormLabel>
+                                    <FormControl>
+                                        <Input type="number" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="idCard"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>ID Card</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="eg. xxxxxxx..." {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
                         <FormField
                             control={form.control}
                             name="confidential"
@@ -198,20 +279,7 @@ const VisitorForm = () => {
                         />
                         <FormField
                             control={form.control}
-                            name="address"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Addres</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="eg. xxxxxxxxxxx..." {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="postalDetails"
+                            name="visitorDetails"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Details</FormLabel>

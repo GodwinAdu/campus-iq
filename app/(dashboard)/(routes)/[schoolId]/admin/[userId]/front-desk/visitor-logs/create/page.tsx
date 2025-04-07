@@ -1,6 +1,7 @@
 import Heading from '@/components/commons/Header'
 import { Separator } from '@/components/ui/separator'
 import React from 'react'
+import VisitorForm from '../_components/VisitorForm'
 
 
 const page = () => {
@@ -10,9 +11,9 @@ const page = () => {
                 <Heading title="Add Visitor Log" />
             </div>
             <Separator />
-            {/* Add Postal Form */}
+
             <div className="py-4">
-                {/* <PostalForm /> */}
+                <VisitorForm />
             </div>
         </>
     )

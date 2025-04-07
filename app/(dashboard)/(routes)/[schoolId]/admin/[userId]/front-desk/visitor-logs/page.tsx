@@ -6,7 +6,7 @@ import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-const page = () => {
+const page = async () => {
   return (
     <>
     <div className="flex justify-between items-center">

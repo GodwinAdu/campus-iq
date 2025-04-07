@@ -194,7 +194,84 @@ const SchoolSchema: Schema<ISchool> = new Schema({
         termId: { type: Schema.Types.ObjectId, ref: "Term", default: null },
         sessionId: { type: Schema.Types.ObjectId, ref: "Session", default: null },
     },
-
+    modules: {
+        dashboard: {
+            type: Boolean,
+            default: true
+        },
+        systemConfig: {
+            type: Boolean,
+            default: true
+        },
+        classManagement: {
+            type: Boolean,
+            default: true
+        },
+        studentManagement: {
+            type: Boolean,
+            default: true
+        },
+        employeeManagement: {
+            type: Boolean,
+            default: true
+        },
+        manageAttendance: {
+            type: Boolean,
+            default: false
+        },
+        onlineLearning: {
+            type: Boolean,
+            default: false
+        },
+        examsManagement: {
+            type: Boolean,
+            default: false
+        },
+        inventory: {
+            type: Boolean,
+            default: false
+        },
+        hostelManagement: {
+            type: Boolean,
+            default: false
+        },
+        library: {
+            type: Boolean,
+            default: false
+        },
+        depositAndExpense: {
+            type: Boolean,
+            default: false
+        },
+        message: {
+            type: Boolean,
+            default: false
+        },
+        report: {
+            type: Boolean,
+            default: false
+        },
+        canteenManagement: {
+            type: Boolean,
+            default: false
+        },
+        transportManagement: {
+            type: Boolean,
+            default: false
+        },
+        feesManagement: {
+            type: Boolean,
+            default: false
+        },
+        hrManagement: {
+            type: Boolean,
+            default: false
+        },
+        healthManagement: {
+            type: Boolean,
+            default: false
+        },
+    },
     // ❌ Banning & Deletion
     banned: { type: Boolean, default: false },
     createdBy: { type: Schema.Types.ObjectId, ref: "Employee", default: null },

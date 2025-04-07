@@ -169,6 +169,14 @@ const EmployeeSchema: Schema<IEmployee> = new Schema({
         ref: 'SalaryStructure',
         default: null
     },
+    resetPasswordToken: {
+        type: String,
+        default: null,
+    },
+    resetPasswordExpiry: {
+        type: Date,
+        default: null,
+    },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",

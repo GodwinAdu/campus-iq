@@ -7,8 +7,7 @@ import { connectToDB } from "../mongoose";
 import Class from "../models/class.models";
 import { currentUser } from "../helpers/current-user";
 import History from "../models/history.models";
-import QuestionBank from "../models/question-bank.models";
-import Question from "../models/questions.models";
+
 import mongoose from "mongoose";
 
 interface CreateSubjectProps {

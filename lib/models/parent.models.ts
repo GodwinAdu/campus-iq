@@ -43,6 +43,8 @@ const ParentSchema = new Schema<IParent>(
             socialSecurityNumber: { type: String },
             taxIdentificationNumber: { type: String },
         },
+        resetPasswordToken: { type: String },
+        resetPasswordExpiry: { type: Date },
 
         createdBy: { type: Schema.Types.ObjectId, ref: "Employee" },
 

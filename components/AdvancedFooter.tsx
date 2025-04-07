@@ -19,20 +19,26 @@ export default function AdvancedFooter() {
                 </Link>
               </li>
               <li>
-                <Link href="#features" className="text-gray-400 hover:text-white transition duration-300">
+                <Link href="/features" className="text-gray-400 hover:text-white transition duration-300">
                   Features
                 </Link>
               </li>
               <li>
-                <Link href="#pricing" className="text-gray-400 hover:text-white transition duration-300">
+                <Link href="/pricing" className="text-gray-400 hover:text-white transition duration-300">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="text-gray-400 hover:text-white transition duration-300">
+                <Link href="/contact" className="text-gray-400 hover:text-white transition duration-300">
                   Contact
                 </Link>
               </li>
+              <li>
+                <Link href="support" className="text-gray-400 hover:text-white transition duration-300">
+                  Support
+                </Link>
+              </li>
+              
             </ul>
           </div>
           <div>
@@ -46,6 +52,21 @@ export default function AdvancedFooter() {
               <li>
                 <Link href="/terms" className="text-gray-400 hover:text-white transition duration-300">
                   Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/subcription_agreement" className="text-gray-400 hover:text-white transition duration-300">
+                Subscription Agreement
+                </Link>
+              </li>
+              <li>
+                <Link href="/refund" className="text-gray-400 hover:text-white transition duration-300">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/schedule-demo" className="text-gray-400 hover:text-white transition duration-300">
+                  Schedule a Demo
                 </Link>
               </li>
             </ul>

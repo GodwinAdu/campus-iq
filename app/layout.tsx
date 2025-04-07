@@ -9,6 +9,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import IntroModal from "@/components/commons/IntroModal";
 import FeedbackModal from "@/components/commons/FeedbackModal";
 import RegisterServiceWorker from "@/components/RegiserServiceWorker";
+import { CookieBanner } from "@/components/cookies-banner";
 
 
 
@@ -93,6 +94,7 @@ export default function RootLayout({
           <Loader />
           {/* <UseCheckStoreExpired /> */}
           {children}
+          <CookieBanner />
           <IntroModal />
           <Analytics />
           <SpeedInsights />

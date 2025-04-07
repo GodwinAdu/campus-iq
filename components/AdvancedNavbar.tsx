@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react"
 
 const navItems = [
   { name: "Home", link: "/" },
+  { name: "Blogs", link: "/blog" },
   { name: "Features", link: "/features" },
   { name: "Demo", link: "/demo" },
   { name: "Pricing", link: "/pricing" },
@@ -59,7 +60,7 @@ export default function AdvancedNavbar() {
           </Link>
         ))}
         <div className="px-4 py-2">
-          <Link href="/contact">
+          <Link href="/sign-up">
             <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition duration-300">
               Get Started
             </button>

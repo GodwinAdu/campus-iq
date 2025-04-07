@@ -9,16 +9,27 @@ if (!SECRET_KEY) {
 
 const encoder = new TextEncoder().encode(SECRET_KEY);
 
+// Public routes that don't require authentication
 const publicRoutes = [
-    '/sign-in',
-    '/sign-up',
-    '/',
-    '/demo',
-    '/contact',
-    '/documentation',
-    '/pricing',
-    '/features',
-    '/api/uploadthing'
+    "/sign-in",
+    "/sign-up",
+    "/",
+    "/demo",
+    "/contact",
+    "/documentation",
+    "/pricing",
+    "/features",
+    "/forgot_password",
+    "/reset_password",
+    "/privacy",
+    "/terms",
+    "/subcription_agreement",
+    "/refund",
+    "/support",
+    "/schedule-demo",
+    /^\/documentation\/.*/, // All API routes are public
+    /^\/reset_password\/[^/]+$/, // Matches dynamic reset_password routes like /reset_password/abc123
+    /^\/api\/.*/, // All API routes are public
 ];
 
 // Function to verify JWT and extract payload
@@ -39,9 +50,15 @@ export async function middleware(request: NextRequest) {
 
     const token = request.cookies.get('token')?.value;
 
-    if (publicRoutes.includes(pathname)) {
-        return NextResponse.next();
+    // Check if the requested path is public
+    const isPublic = publicRoutes.some((route) =>
+        route instanceof RegExp ? route.test(pathname) : route === pathname
+    );
+
+    if (isPublic) {
+        return NextResponse.next(); // Allow access without authentication
     }
+
 
     if (!token) {
         console.warn('No token found, redirecting to /sign-in');

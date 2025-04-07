@@ -97,7 +97,7 @@ const LoginForm = () => {
                             <div className="flex items-center">
                                 <FormLabel className="font-bold" htmlFor="password">Password</FormLabel>
                                 <Link
-                                    href="/forget_password"
+                                    href="/forgot_password"
                                     className="ml-auto text-sm underline-offset-2 hover:underline"
                                 >
                                     Forgot your password?

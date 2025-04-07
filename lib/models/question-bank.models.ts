@@ -21,8 +21,6 @@ const QuestionBankSchema = new Schema({
     difficulty: { type: String, enum: ['easy', 'medium', 'hard', 'mixed'], required: true },
     lastUpdated: { type: Date, default: Date.now },
     status: { type: String, enum: ['draft', 'published', 'archived'], required: true },
-    shared: { type: Boolean, default: false },
-    tags: { type: [String], default: [] },
     createdBy: { type: Schema.Types.ObjectId, ref: 'Employee', required: true },
 }, {
     timestamps: true,

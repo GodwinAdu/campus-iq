@@ -135,6 +135,8 @@ interface IEmployee extends Document {
     };
     medicalHistory?: MedicalHistory;
     salaryId?: Schema.Types.ObjectId;
+    resetPasswordToken?: string;
+    resetPasswordExpiry?: Date;
     createdBy?: Schema.Types.ObjectId;
     mod_flag?: boolean;
     del_flag?: boolean;
@@ -184,6 +186,8 @@ interface IStudent extends Document {
     },
     permissions: StudentPermissions;
     studentStatus: string;
+    resetPasswordToken?: string;
+    resetPasswordExpiry?: Date;
     createdBy?: Types.ObjectId;
     mod_flag?: boolean;
     del_flag?: boolean;
@@ -308,6 +312,8 @@ interface IParent extends Document {
     occupation?: string;
     workplace?: string;
     identification?: IIdentification;
+    resetPasswordToken?: string;
+    resetPasswordExpiry?: Date;
     createdBy?: Types.ObjectId;
     mod_flag?: boolean;
     del_flag?: boolean;

@@ -213,7 +213,7 @@ export default function BasicInfoForm({ school }: { school: ISchool }) {
                             name="addresses.schoolState"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Enter City</FormLabel>
+                                    <FormLabel>Enter State</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Enter school state" {...field} value={field.value ?? ''} />
                                     </FormControl>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
     BookOpen,
@@ -68,6 +68,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 import { fetchSubjectByClassIdForQuestionBank } from "@/lib/actions/subject.actions"
 import { fetchQuestionBankBySubjectIdAndClassId } from "@/lib/actions/questions-bank.actions"
+import { BankQuestionForm } from "./BankQuestionForm"
 
 // Types
 interface Course {
@@ -431,7 +432,7 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
     const [aiGeneratedQuestions, setAiGeneratedQuestions] = useState<Question[]>([])
     const [selectedClass, setSelectedClass] = useState(classes[0]?._id);
     const [subjects, setSubjects] = useState([]);
-    const [questionBanks,setQuestionBanks] = useState([]);
+    const [questionBanks, setQuestionBanks] = useState([]);
 
     // Add these new state variables after the existing state declarations (around line 500)
     const [showPreviewDialog, setShowPreviewDialog] = useState(false)
@@ -443,8 +444,15 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
     const [newTag, setNewTag] = useState("")
 
 
-    useEffect(()=>{
-        if(!selectedClass) return;
+    const params = useParams();
+    const { schoolId, userId } = params;
+
+
+    const selectedSubject = subjects.filter((subject) => subject._id === selectedCourse?._id);
+
+
+    useEffect(() => {
+        if (!selectedClass) return;
 
         const fetchData = async () => {
             try {
@@ -457,16 +465,16 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
 
         fetchData()
 
-    },[selectedClass])
+    }, [selectedClass])
 
 
 
-    useEffect(()=>{
-        if(!selectedCourse) return;
+    useEffect(() => {
+        if (!selectedCourse) return;
 
         const fetchData = async () => {
             try {
-                const questionBanks = await fetchQuestionBankBySubjectIdAndClassId(selectedCourse._id,selectedClass as string);
+                const questionBanks = await fetchQuestionBankBySubjectIdAndClassId(selectedCourse._id, selectedClass as string);
                 setQuestionBanks(questionBanks);
             } catch (error) {
                 console.error("Error fetching question banks for student:", error);
@@ -475,7 +483,7 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
 
         fetchData()
 
-    },[selectedCourse])
+    }, [selectedCourse])
     // Filter and sort question banks
     const filteredBanks = questionBanks
         .filter((bank) => {
@@ -521,6 +529,7 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
 
     // Handle course selection
     const handleCourseSelect = (course: Course) => {
+        console.log(course, "subject")
         setSelectedCourse(course)
         setSelectedBank(null)
         setActiveTab("banks")
@@ -628,55 +637,6 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
         }, 1000)
     }
 
-    // Handle bulk selection
-    const handleBulkSelect = (questionId: string) => {
-        if (bulkSelectedQuestions.includes(questionId)) {
-            setBulkSelectedQuestions(bulkSelectedQuestions.filter((id) => id !== questionId))
-        } else {
-            setBulkSelectedQuestions([...bulkSelectedQuestions, questionId])
-        }
-    }
-
-    // Handle select all
-    const handleSelectAll = () => {
-        if (bulkSelectedQuestions.length === filteredQuestions.length) {
-            setBulkSelectedQuestions([])
-        } else {
-            setBulkSelectedQuestions(filteredQuestions.map((q) => q.id))
-        }
-    }
-
-    // Handle bulk delete
-    const handleBulkDelete = () => {
-        // Simulate API call
-        setTimeout(() => {
-            const updatedQuestions = questions.filter((q) => !bulkSelectedQuestions.includes(q.id))
-            setQuestions(updatedQuestions)
-
-            // Update question counts in banks
-            const updatedBanks = questionBanks.map((bank) => {
-                const deletedCount = questions.filter(
-                    (q) => q.bankId === bank.id && bulkSelectedQuestions.includes(q.id),
-                ).length
-
-                if (deletedCount > 0) {
-                    return {
-                        ...bank,
-                        questionCount: bank.questionCount - deletedCount,
-                        lastUpdated: new Date().toISOString(),
-                    }
-                }
-                return bank
-            })
-
-            setQuestionBanks(updatedBanks)
-            if (selectedBank) {
-                setSelectedBank(updatedBanks.find((bank) => bank.id === selectedBank.id) || null)
-            }
-
-            setBulkSelectedQuestions([])
-        }, 500)
-    }
 
     // Handle AI question generation
     const handleAIGenerate = () => {
@@ -964,31 +924,7 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
         }
     }
 
-    // Get question type icon
-    const getQuestionTypeIcon = (type: Question["type"]) => {
-        switch (type) {
-            case "multiple-choice":
-                return <CheckCircle2 className="h-4 w-4" />
-            case "true-false":
-                return <CheckCircle2 className="h-4 w-4" />
-            case "essay":
-                return <FileText className="h-4 w-4" />
-            case "short-answer":
-                return <FileText className="h-4 w-4" />
-            case "matching":
-                return <Layers className="h-4 w-4" />
-            case "fill-blanks":
-                return <FileText className="h-4 w-4" />
-            case "drag-drop":
-                return <Layers className="h-4 w-4" />
-            case "hotspot":
-                return <Layers className="h-4 w-4" />
-            case "code-execution":
-                return <FileText className="h-4 w-4" />
-            default:
-                return <FileText className="h-4 w-4" />
-        }
-    }
+
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -999,48 +935,6 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
                             <label className="font-bold text-sm hidden lg:block">Select Class</label>
                             <ClassSelection selectedClass={(value) => setSelectedClass(value)} classes={classes} />
                         </div>
-                        <div className="flex items-center gap-2">
-                            {activeTab === "banks" && (
-                                <>
-                                    <Button onClick={() => setShowCreateBankDialog(true)}>
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        New Question Bank
-                                    </Button>
-                                </>
-                            )}
-                            {activeTab === "questions" && selectedBank && (
-                                <div className="flex justify-end gap-4">
-                                    <Button variant="ghost" onClick={() => setShowImportDialog(true)}>
-                                        <Upload className="mr-2 h-4 w-4" />
-                                        Import
-                                    </Button>
-                                    <Button variant="outline" onClick={() => setShowAIDialog(true)}>
-                                        <Sparkles className="mr-2 h-4 w-4" />
-                                        AI Generate
-                                    </Button>
-                                    <Button onClick={() => setShowCreateQuestionDialog(true)}>
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        New Question
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="courses">Courses</TabsTrigger>
-                        <TabsTrigger value="banks" disabled={activeTab === "courses"}>
-                            Question Banks
-                        </TabsTrigger>
-                        <TabsTrigger value="questions" disabled={!selectedBank}>
-                            Questions
-                        </TabsTrigger>
-                    </TabsList>
-
-                    {/* Courses Tab */}
-                    <TabsContent value="courses" className="space-y-4">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Button variant="outline" size="sm">
@@ -1058,490 +952,49 @@ export default function QuestionBanksPage({ classes }: { classes: IClass[] }) {
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="icon">
-                                    <Layers className="h-4 w-4" />
-                                </Button>
-                                <Button variant="outline" size="icon">
-                                    <BarChart2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {subjects.map((course) => (
-                                <Card
-                                    key={course._id}
-                                    className="cursor-pointer transition-all hover:shadow-md space-y-6"
-                                    onClick={() => handleCourseSelect(course)}
-                                >
-                                    <CardHeader className="pb-2">
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="text-xl">{course.subjectName}</CardTitle>
-                                            <Badge variant="outline">{course.code}</Badge>
-                                        </div>
-                                        {/* <CardDescription>{course.department}</CardDescription> */}
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="flex flex-col">
-                                                <span className="text-sm text-muted-foreground">Question Banks</span>
-                                                <span className="text-2xl font-bold">{course.totalQuestionBanks}</span>
-                                            </div>
-                                            <div className="flex flex-col">
-                                                <span className="text-sm text-muted-foreground">Total Questions</span>
-                                                <span className="text-2xl font-bold">{course.totalQuestions}</span>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </TabsContent>
-
-                    {/* Question Banks Tab */}
-                    <TabsContent value="banks" className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Button variant="outline" size="sm">
-                                    <Filter className="mr-2 h-4 w-4" />
-                                    Filter
-                                </Button>
-                                <Select value={sortBy} onValueChange={(value) => setSortBy(value as any)}>
-                                    <SelectTrigger className="w-[180px]">
-                                        <SelectValue placeholder="Sort by" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="name">Name</SelectItem>
-                                        <SelectItem value="updated">Last Updated</SelectItem>
-                                        <SelectItem value="questions">Question Count</SelectItem>
-                                        <SelectItem value="difficulty">Difficulty</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <Button variant="ghost" size="sm" onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
-                                    {sortOrder === "asc" ? <FileUp className="h-4 w-4" /> : <FileDown className="h-4 w-4" />}
-                                </Button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant={viewMode === "grid" ? "default" : "outline"}
-                                    size="icon"
-                                    onClick={() => setViewMode("grid")}
-                                >
-                                    <Layers className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant={viewMode === "list" ? "default" : "outline"}
-                                    size="icon"
-                                    onClick={() => setViewMode("list")}
-                                >
-                                    <BarChart2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-
-                        {viewMode === "grid" ? (
-                            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                                {filteredBanks.map((bank) => (
-                                    <Card
-                                        key={bank.id}
-                                        className="cursor-pointer transition-all hover:shadow-md"
-                                        onClick={() => handleBankSelect(bank)}
-                                    >
-                                        <CardHeader className="pb-2">
-                                            <div className="flex items-center justify-between">
-                                                <CardTitle className="text-xl">{bank.name}</CardTitle>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                handleBankSelect(bank)
-                                                            }}
-                                                        >
-                                                            <Eye className="mr-2 h-4 w-4" />
-                                                            View Questions
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                                                            <Edit className="mr-2 h-4 w-4" />
-                                                            Edit
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                setShowExportDialog(true)
-                                                            }}
-                                                        >
-                                                            <Download className="mr-2 h-4 w-4" />
-                                                            Export
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                setShowShareDialog(true)
-                                                            }}
-                                                        >
-                                                            <Users className="mr-2 h-4 w-4" />
-                                                            Share
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuSeparator />
-                                                        <DropdownMenuItem
-                                                            onClick={(e) => {
-                                                                e.stopPropagation()
-                                                                setShowDeleteDialog(true)
-                                                            }}
-                                                            className="text-destructive"
-                                                        >
-                                                            <Trash2 className="mr-2 h-4 w-4" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                            <CardDescription className="line-clamp-2">{bank.description}</CardDescription>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm text-muted-foreground">Questions</span>
-                                                    <span className="text-2xl font-bold">{bank.questionCount}</span>
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className="text-sm text-muted-foreground">Usage</span>
-                                                    <span className="text-2xl font-bold">{bank.usageCount}</span>
-                                                </div>
-                                            </div>
-                                            <div className="mt-4 flex flex-wrap gap-2">
-                                                <Badge variant="outline" className={getDifficultyColor(bank.difficulty)}>
-                                                    {bank.difficulty.charAt(0).toUpperCase() + bank.difficulty.slice(1)}
-                                                </Badge>
-                                                <Badge variant="outline" className={getStatusColor(bank.status)}>
-                                                    {bank.status.charAt(0).toUpperCase() + bank.status.slice(1)}
-                                                </Badge>
-                                                {bank.shared && (
-                                                    <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-600">
-                                                        Shared
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </CardContent>
-                                        <CardFooter className="flex justify-between pt-2">
-                                            <div className="flex flex-wrap gap-1">
-                                                {bank.tags.slice(0, 2).map((tag) => (
-                                                    <Badge key={tag} variant="secondary" className="text-xs">
-                                                        {tag}
-                                                    </Badge>
-                                                ))}
-                                                {bank.tags.length > 2 && (
-                                                    <Badge variant="secondary" className="text-xs">
-                                                        +{bank.tags.length - 2}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <span className="text-xs text-muted-foreground">Updated {formatDate(bank.lastUpdated)}</span>
-                                        </CardFooter>
-                                    </Card>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="rounded-md border">
-                                <div className="grid grid-cols-12 gap-4 p-4 font-medium border-b">
-                                    <div className="col-span-4">Name</div>
-                                    <div className="col-span-2">Questions</div>
-                                    <div className="col-span-2">Difficulty</div>
-                                    <div className="col-span-2">Status</div>
-                                    <div className="col-span-2">Last Updated</div>
-                                </div>
-                                {filteredBanks.map((bank) => (
-                                    <div
-                                        key={bank.id}
-                                        className="grid grid-cols-12 gap-4 p-4 hover:bg-muted/50 cursor-pointer border-b last:border-0"
-                                        onClick={() => handleBankSelect(bank)}
-                                    >
-                                        <div className="col-span-4">
-                                            <div className="font-medium">{bank.name}</div>
-                                            <div className="text-sm text-muted-foreground line-clamp-1">{bank.description}</div>
-                                        </div>
-                                        <div className="col-span-2 flex items-center">{bank.questionCount}</div>
-                                        <div className="col-span-2 flex items-center">
-                                            <Badge variant="outline" className={getDifficultyColor(bank.difficulty)}>
-                                                {bank.difficulty.charAt(0).toUpperCase() + bank.difficulty.slice(1)}
-                                            </Badge>
-                                        </div>
-                                        <div className="col-span-2 flex items-center">
-                                            <Badge variant="outline" className={getStatusColor(bank.status)}>
-                                                {bank.status.charAt(0).toUpperCase() + bank.status.slice(1)}
-                                            </Badge>
-                                        </div>
-                                        <div className="col-span-2 flex items-center text-sm text-muted-foreground">
-                                            {formatDate(bank.lastUpdated)}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </TabsContent>
-
-                    {/* Questions Tab */}
-                    <TabsContent value="questions" className="space-y-4">
-                        {selectedBank && (
-                            <>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="sm">
-                                            <Filter className="mr-2 h-4 w-4" />
-                                            Filter
-                                        </Button>
-                                        <Select defaultValue="updated">
-                                            <SelectTrigger className="w-[180px]">
-                                                <SelectValue placeholder="Sort by" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="updated">Last Updated</SelectItem>
-                                                <SelectItem value="difficulty">Difficulty</SelectItem>
-                                                <SelectItem value="type">Question Type</SelectItem>
-                                                <SelectItem value="usage">Usage Count</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        {bulkSelectedQuestions.length > 0 ? (
-                                            <>
-                                                <span className="text-sm text-muted-foreground">{bulkSelectedQuestions.length} selected</span>
-                                                <Button variant="outline" size="sm" onClick={() => setBulkSelectedQuestions([])}>
-                                                    <X className="mr-2 h-4 w-4" />
-                                                    Clear
-                                                </Button>
-                                                <Button variant="outline" size="sm">
-                                                    <Tag className="mr-2 h-4 w-4" />
-                                                    Tag
-                                                </Button>
-                                                <Button variant="outline" size="sm">
-                                                    <Copy className="mr-2 h-4 w-4" />
-                                                    Copy
-                                                </Button>
-                                                <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
-                                                    <Trash2 className="mr-2 h-4 w-4" />
-                                                    Delete
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Button variant="outline" size="sm" onClick={() => setShowExportDialog(true)}>
-                                                    <Download className="mr-2 h-4 w-4" />
-                                                    Export
-                                                </Button>
-                                                <Button variant="outline" size="sm" onClick={() => setShowImportDialog(true)}>
-                                                    <Upload className="mr-2 h-4 w-4" />
-                                                    Import
-                                                </Button>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="rounded-md border">
-                                    <div className="grid grid-cols-12 gap-4 p-4 font-medium border-b">
-                                        <div className="col-span-1 flex items-center">
-                                            <Checkbox
-                                                checked={
-                                                    bulkSelectedQuestions.length === filteredQuestions.length && filteredQuestions.length > 0
-                                                }
-                                                onCheckedChange={handleSelectAll}
-                                            />
-                                        </div>
-                                        <div className="col-span-5">Question</div>
-                                        <div className="col-span-2">Type</div>
-                                        <div className="col-span-1">Difficulty</div>
-                                        <div className="col-span-1">Points</div>
-                                        <div className="col-span-2">Actions</div>
-                                    </div>
-
-                                    {filteredQuestions.length > 0 ? (
-                                        filteredQuestions.map((question) => (
-                                            <div
-                                                key={question.id}
-                                                className="grid grid-cols-12 gap-4 p-4 hover:bg-muted/50 border-b last:border-0"
-                                            >
-                                                <div className="col-span-1 flex items-center">
-                                                    <Checkbox
-                                                        checked={bulkSelectedQuestions.includes(question.id)}
-                                                        onCheckedChange={() => handleBulkSelect(question.id)}
-                                                    />
-                                                </div>
-                                                <div className="col-span-5">
-                                                    <div className="font-medium line-clamp-2">{question.text}</div>
-                                                    <div className="mt-1 flex flex-wrap gap-1">
-                                                        {question.tags.slice(0, 3).map((tag) => (
-                                                            <Badge key={tag} variant="secondary" className="text-xs">
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
-                                                        {question.tags.length > 3 && (
-                                                            <Badge variant="secondary" className="text-xs">
-                                                                +{question.tags.length - 3}
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-2 flex items-center">
-                                                    <div className="flex items-center gap-2">
-                                                        {getQuestionTypeIcon(question.type)}
-                                                        <span className="text-sm">
-                                                            {question.type
-                                                                .split("-")
-                                                                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                                                                .join(" ")}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div className="col-span-1 flex items-center">
-                                                    <Badge variant="outline" className={getDifficultyColor(question.difficulty)}>
-                                                        {question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
-                                                    </Badge>
-                                                </div>
-                                                <div className="col-span-1 flex items-center">{question.points}</div>
-                                                <div className="col-span-2 flex items-center gap-2">
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handlePreviewQuestion(question)}>
-                                                        <Eye className="h-4 w-4" />
-                                                    </Button>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditQuestion(question)}>
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end">
-                                                            <DropdownMenuItem onClick={() => handleDuplicateQuestion(question)}>
-                                                                <Copy className="mr-2 h-4 w-4" />
-                                                                Duplicate
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleManageTags(question)}>
-                                                                <Tag className="mr-2 h-4 w-4" />
-                                                                Manage Tags
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem>
-                                                                <BarChart2 className="mr-2 h-4 w-4" />
-                                                                View Analytics
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuSeparator />
-                                                            <DropdownMenuItem className="text-destructive"
-                                                                onClick={() => {
-                                                                    setCurrentQuestion(question)
-                                                                    setShowDeleteDialog(true)
-                                                                }}>
-                                                                <Trash2 className="mr-2 h-4 w-4" />
-                                                                Delete
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
-                                                </div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="p-8 text-center">
-                                            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-                                                <FileText className="h-10 w-10 text-muted-foreground" />
-                                            </div>
-                                            <h3 className="mt-4 text-lg font-medium">No questions yet</h3>
-                                            <p className="mt-2 text-sm text-muted-foreground">
-                                                Get started by creating your first question or importing questions from another bank.
-                                            </p>
-                                            <div className="mt-4 flex items-center justify-center gap-2">
-                                                <Button onClick={() => setShowCreateQuestionDialog(true)}>
-                                                    <Plus className="mr-2 h-4 w-4" />
-                                                    New Question
-                                                </Button>
-                                                <Button variant="outline" onClick={() => setShowImportDialog(true)}>
-                                                    <Upload className="mr-2 h-4 w-4" />
-                                                    Import Questions
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </TabsContent>
-                </Tabs>
-            </div>
-
-            {/* Create Question Bank Dialog */}
-            <Dialog open={showCreateBankDialog} onOpenChange={setShowCreateBankDialog}>
-                <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>Create New Question Bank</DialogTitle>
-                        <DialogDescription>
-                            Create a new question bank to organize your questions for a specific course or topic.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="bank-name">Name</Label>
-                            <Input
-                                id="bank-name"
-                                placeholder="Enter question bank name"
-                                value={newBankName}
-                                onChange={(e) => setNewBankName(e.target.value)}
-                            />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="bank-course">Course</Label>
-                            <Select value={newBankCourse} onValueChange={setNewBankCourse}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a course" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {subjects.map((course) => (
-                                        <SelectItem key={course._id} value={course._id}>
-                                            {course.subjectName} ({course.code})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="bank-description">Description</Label>
-                            <Textarea
-                                id="bank-description"
-                                placeholder="Enter a description for this question bank"
-                                value={newBankDescription}
-                                onChange={(e) => setNewBankDescription(e.target.value)}
-                            />
                         </div>
                     </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowCreateBankDialog(false)}>
-                            Cancel
-                        </Button>
-                        <Button onClick={handleCreateBank} disabled={isCreatingBank || !newBankName || !newBankCourse}>
-                            {isCreatingBank ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Creating...
-                                </>
-                            ) : (
-                                "Create Question Bank"
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </div>
 
+
+
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {subjects.map((course) => (
+                        <Link key={course._id} href={`/${schoolId}/admin/${userId}/exam/questions/${selectedClass}-${course._id}`}>
+                            <Card
+                                className="cursor-pointer transition-all hover:shadow-md space-y-6"
+                            >
+                                <CardHeader className="pb-2">
+                                    <div className="flex items-center justify-between">
+                                        <CardTitle className="text-xl">{course.subjectName}</CardTitle>
+                                        <Badge variant="outline">{course.code}</Badge>
+                                    </div>
+                                    {/* <CardDescription>{course.department}</CardDescription> */}
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm text-muted-foreground">Question Banks</span>
+                                            <span className="text-2xl font-bold">{course.totalQuestionBanks}</span>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-sm text-muted-foreground">Total Questions</span>
+                                            <span className="text-2xl font-bold">{course.totalQuestions}</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+
+            </div>
             {/* Create Question Dialog */}
             <Dialog open={showCreateQuestionDialog} onOpenChange={setShowCreateQuestionDialog}>
                 <DialogContent className="sm:max-w-[700px] h-[85%] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Create New Question</DialogTitle>
-                        <DialogDescription>Add a new question to the "{selectedBank?.name}" question bank.</DialogDescription>
+                        <DialogDescription>Add a new question to the &quot;{selectedBank?.name}&quot; question bank.</DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                         <div className="grid gap-2">

@@ -160,6 +160,14 @@ const StudentSchema: Schema<IStudent> = new Schema({
             default: false
         }
     },
+    resetPasswordToken: {
+        type: String,
+        default: null,
+    },
+    resetPasswordExpiry: {
+        type: Date,
+        default: null,
+    },
     createdBy: {
         type: Schema.Types.ObjectId,
         ref: "Employee",
