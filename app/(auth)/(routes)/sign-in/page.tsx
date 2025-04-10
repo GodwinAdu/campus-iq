@@ -4,6 +4,7 @@
 import Image from 'next/image'
 import React from 'react'
 import LoginForm from './_components/LoginForm'
+import Link from 'next/link'
 
 const page = () => {
     return (
@@ -18,15 +19,9 @@ const page = () => {
                     </div>
                     <LoginForm />
                     <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-                        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-                        and <a href="#">Privacy Policy</a>.
+                        By clicking continue, you agree to our <Link href="/terms">Terms of Service</Link>{" "}
+                        and <Link href="/privacy">Privacy Policy</Link>.
                     </div>
-                    {/* <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="underline">
-              Sign up
-            </Link>
-          </div> */}
                 </div>
             </div>
             <div className="hidden bg-muted lg:block">

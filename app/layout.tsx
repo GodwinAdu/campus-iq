@@ -10,6 +10,7 @@ import IntroModal from "@/components/commons/IntroModal";
 import FeedbackModal from "@/components/commons/FeedbackModal";
 import RegisterServiceWorker from "@/components/RegiserServiceWorker";
 import { CookieBanner } from "@/components/cookies-banner";
+import { Hotkeys } from "@/hooks/use-hotkeys-hook";
 
 
 
@@ -94,6 +95,7 @@ export default function RootLayout({
           <Loader />
           {/* <UseCheckStoreExpired /> */}
           {children}
+          <Hotkeys />
           <CookieBanner />
           <IntroModal />
           <Analytics />

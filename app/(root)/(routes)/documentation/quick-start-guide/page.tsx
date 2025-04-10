@@ -6,29 +6,24 @@ import { PageHeader } from "@/components/page-header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { CheckCircle2, Clock, Lightbulb, AlertTriangle } from "lucide-react"
+import { DocsLayout } from "@/components/docs-layout"
 
 export default function QuickStartGuidePage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-        <DocsSidebar className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block" />
-        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+    <DocsLayout>
+        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_100px]">
           <div className="mx-auto w-full min-w-0">
-            <PageHeader
-              title="Quick Start Guide"
-              description="Get up and running with SchoolSync in minutes"
-              breadcrumbs={[{ title: "Quick Start Guide", href: "/quick-start-guide" }]}
-            />
+          <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Quick Start Guide</h1>
 
             <div className="flex items-center space-x-2 pt-4">
               <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                 <span>Last updated:</span>
-                <time dateTime="2023-05-05">May 5, 2023</time>
+                <time dateTime="2023-05-05">April 8, 2025</time>
               </div>
             </div>
 
             <div className="pb-12 pt-8">
-              <div className="prose prose-slate dark:prose-invert max-w-none">
+              <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
                 <div className="flex items-center space-x-2 rounded-md bg-primary/10 p-4 mb-6">
                   <Clock className="h-5 w-5 text-primary" />
                   <p className="m-0 text-sm">
@@ -36,9 +31,9 @@ export default function QuickStartGuidePage() {
                   </p>
                 </div>
 
-                <h2 id="overview">Overview</h2>
+                <h2 className="font-bold text-2xl" id="overview">Overview</h2>
                 <p>
-                  This quick start guide will help you get up and running with SchoolSync quickly. We'll cover the
+                  This quick start guide will help you get up and running with CampusIQ quickly. We'll cover the
                   essential features you need to know to start using the system effectively.
                 </p>
 
@@ -52,7 +47,7 @@ export default function QuickStartGuidePage() {
                     <TabsContent value="admin" className="p-4 border rounded-md mt-2">
                       <h3 className="text-lg font-medium mb-2">For Administrators</h3>
                       <p className="text-muted-foreground mb-4">
-                        Follow these steps to set up your school in SchoolSync.
+                        Follow these steps to set up your school in CampusIQ.
                       </p>
                       <ol className="space-y-2 ml-4 list-decimal">
                         <li>Complete the initial setup wizard</li>
@@ -77,7 +72,7 @@ export default function QuickStartGuidePage() {
                     </TabsContent>
                     <TabsContent value="parent" className="p-4 border rounded-md mt-2">
                       <h3 className="text-lg font-medium mb-2">For Parents/Students</h3>
-                      <p className="text-muted-foreground mb-4">Learn how to access and use SchoolSync features.</p>
+                      <p className="text-muted-foreground mb-4">Learn how to access and use CampusIQ features.</p>
                       <ol className="space-y-2 ml-4 list-decimal">
                         <li>Activate your account using the invitation email</li>
                         <li>Set up your profile and preferences</li>
@@ -89,10 +84,10 @@ export default function QuickStartGuidePage() {
                   </Tabs>
                 </div>
 
-                <h2 id="first-login">First Login</h2>
+                <h2 className="font-bold text-2xl" id="first-login">First Login</h2>
                 <p>
                   After your account has been created, you'll receive an email with login instructions. Follow these
-                  steps to access SchoolSync for the first time:
+                  steps to access CampusIQ for the first time:
                 </p>
 
                 <ol>
@@ -139,9 +134,9 @@ export default function QuickStartGuidePage() {
                   </Card>
                 </div>
 
-                <h2 id="dashboard-overview">Dashboard Overview</h2>
+                <h2 className="font-bold text-2xl" id="dashboard-overview">Dashboard Overview</h2>
                 <p>
-                  The dashboard is your central hub for accessing all SchoolSync features. Here's a quick overview of
+                  The dashboard is your central hub for accessing all CampusIQ features. Here's a quick overview of
                   what you'll find:
                 </p>
 
@@ -198,10 +193,10 @@ export default function QuickStartGuidePage() {
                   </div>
                 </div>
 
-                <h2 id="essential-tasks">Essential Tasks</h2>
-                <p>Here are some essential tasks you'll want to perform to get the most out of SchoolSync:</p>
+                <h2 className="font-bold text-2xl" id="essential-tasks">Essential Tasks</h2>
+                <p>Here are some essential tasks you'll want to perform to get the most out of CampusIQ:</p>
 
-                <h3 id="profile-setup">Profile Setup</h3>
+                <h3 className="font-bold text-xl" id="profile-setup">Profile Setup</h3>
                 <p>Complete your profile to ensure all your information is up-to-date:</p>
                 <ol>
                   <li>Click on your profile picture in the top-right corner</li>
@@ -211,7 +206,7 @@ export default function QuickStartGuidePage() {
                   <li>Save your changes</li>
                 </ol>
 
-                <h3 id="notification-settings">Notification Settings</h3>
+                <h3 className="font-bold text-xl" id="notification-settings">Notification Settings</h3>
                 <p>Configure your notification preferences to stay informed about important updates:</p>
                 <ol>
                   <li>Go to "Settings" from your profile dropdown</li>
@@ -234,11 +229,11 @@ export default function QuickStartGuidePage() {
                   </div>
                 </div>
 
-                <h2 id="next-steps">Next Steps</h2>
+                <h2 className="font-bold text-2xl" id="next-steps">Next Steps</h2>
                 <p>Now that you're familiar with the basics, here are some next steps to explore:</p>
 
                 <div className="not-prose my-6 grid gap-4 md:grid-cols-3">
-                  <Link href="/dashboard-overview" className="block">
+                  <Link href="/documentation/dashboard-overview" className="block">
                     <Card className="h-full transition-colors hover:bg-muted/50">
                       <CardHeader>
                         <CardTitle>Dashboard Overview</CardTitle>
@@ -247,7 +242,7 @@ export default function QuickStartGuidePage() {
                     </Card>
                   </Link>
 
-                  <Link href="/user-management" className="block">
+                  <Link href="/documentation/user-management" className="block">
                     <Card className="h-full transition-colors hover:bg-muted/50">
                       <CardHeader>
                         <CardTitle>User Management</CardTitle>
@@ -256,11 +251,11 @@ export default function QuickStartGuidePage() {
                     </Card>
                   </Link>
 
-                  <Link href="/advanced-configuration" className="block">
+                  <Link href="/documentation/advanced-configuration" className="block">
                     <Card className="h-full transition-colors hover:bg-muted/50">
                       <CardHeader>
                         <CardTitle>Advanced Configuration</CardTitle>
-                        <CardDescription>Customize SchoolSync for your needs</CardDescription>
+                        <CardDescription>Customize CampusIQ for your needs</CardDescription>
                       </CardHeader>
                     </Card>
                   </Link>
@@ -274,16 +269,14 @@ export default function QuickStartGuidePage() {
                     </p>
                   </div>
                   <Button className="mt-4 md:mt-0" asChild>
-                    <Link href="/dashboard-overview">Dashboard Overview</Link>
+                    <Link href="/documentation/dashboard-overview">Dashboard Overview</Link>
                   </Button>
                 </div>
               </div>
             </div>
           </div>
-          <DocsToc className="hidden text-sm xl:block" />
         </main>
-      </div>
-    </div>
+     </DocsLayout>
   )
 }
 

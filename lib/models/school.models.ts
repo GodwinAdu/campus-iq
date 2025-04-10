@@ -51,13 +51,14 @@ const SchoolSchema: Schema<ISchool> = new Schema({
     owner: { type: Schema.Types.ObjectId, ref: "Employee", default: null },
     schoolCode: { type: String, unique: true, required: true },
     schoolLogo: { type: String, default: "" },
-    establishedYear: { type: Number, default: null },
+    foundedYear: { type: Number, default: null },
     affiliation: { type: String, default: "" },
     schoolName: { type: String, required: true },
     motto: { type: String, default: "" },
     schoolPhone: { type: String, default: "" },
     schoolEmail: { type: String, unique: true },
     website: { type: String, default: "" },
+    description: { type: String, default: "" },
 
     addresses: {
         schoolAddress: { type: String, default: "" },
@@ -270,6 +271,14 @@ const SchoolSchema: Schema<ISchool> = new Schema({
         healthManagement: {
             type: Boolean,
             default: false
+        },
+        history: {
+            type: Boolean,
+            default: false,
+        },
+        trash: {
+            type: Boolean,
+            default: false, 
         },
     },
     // ❌ Banning & Deletion

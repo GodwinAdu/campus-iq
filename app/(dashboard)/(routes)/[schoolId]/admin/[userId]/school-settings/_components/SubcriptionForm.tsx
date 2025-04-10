@@ -31,7 +31,9 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog"
+import UpgradeDialog from "./UpgradeDialog"
 
 const storeFormSchema = z.object({
     subscriptionPlan: z.object({
@@ -86,48 +88,70 @@ const paymentHistory = [
         status: "paid",
         method: "Bank Transfer",
     },
-]
+];
 
-// Mock data for plan comparison
-const planFeatures = {
-    basic: {
-        name: "Basic",
-        price: 599,
-        period: "month",
-        maxStudents: 100,
-        features: ["Student Management", "Basic Reporting", "Email Support"],
-    },
-    standard: {
-        name: "Standard",
-        price: 1200,
-        period: "month",
-        maxStudents: 500,
-        features: [
-            "Student Management",
-            "Advanced Reporting",
-            "Email & Phone Support",
-            "Staff Management",
-            "Attendance Tracking",
-        ],
-    },
-    premium: {
-        name: "Premium",
-        price: 2499,
-        period: "month",
-        maxStudents: 2000,
-        features: [
-            "Student Management",
-            "Advanced Reporting",
-            "Priority Support",
-            "Staff Management",
-            "Attendance Tracking",
-            "Financial Management",
-            "Custom Branding",
-        ],
-    },
+const calculatePricing = (numberOfStudent: number, plan: string) => {
+    let price = 0;
+
+    switch (plan) {
+        case "basic":
+            price = 5 * numberOfStudent;
+            break;
+        case "pro":
+            price = 10 * numberOfStudent;
+            break;
+        case "custom":
+            price = 30 * numberOfStudent;
+            break;
+        default:
+            price = 0;
+    }
+
+    return price * numberOfStudent;
+
 }
 
+
+
+
+
 const SubscriptionForm = ({ school }: { school: ISchool }) => {
+    const currentPlan = school.subscriptionPlan.plan.toLowerCase()
+    // Mock data for plan comparison
+    const planFeatures = {
+        basic: {
+            name: "Basic",
+            price: calculatePricing(school.subscriptionPlan.currentStudent, currentPlan),
+            period: "month",
+            features: ["Student Management", "Basic Reporting", "Email Support"],
+        },
+        pro: {
+            name: "Pro",
+            price: calculatePricing(school.subscriptionPlan.currentStudent, currentPlan),
+            period: "month",
+            features: [
+                "Student Management",
+                "Advanced Reporting",
+                "Email & Phone Support",
+                "Staff Management",
+                "Attendance Tracking",
+            ],
+        },
+        custom: {
+            name: "Custom",
+            price: calculatePricing(school.subscriptionPlan.currentStudent, currentPlan),
+            period: "month",
+            features: [
+                "Student Management",
+                "Advanced Reporting",
+                "Priority Support",
+                "Staff Management",
+                "Attendance Tracking",
+                "Financial Management",
+                "Custom Branding",
+            ],
+        },
+    }
     const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
     const defaultValues: Partial<StoreFormValues> = {
         subscriptionPlan: school.subscriptionPlan,
@@ -138,7 +162,6 @@ const SubscriptionForm = ({ school }: { school: ISchool }) => {
         defaultValues,
     })
 
-    const currentPlan = school.subscriptionPlan.plan.toLowerCase()
     const daysRemaining = differenceInDays(school.subscriptionPlan.expiryDate, new Date())
     const subscriptionStatus = daysRemaining > 30 ? "active" : daysRemaining > 0 ? "expiring" : "expired"
     const percentageUsed = Math.min(
@@ -224,16 +247,16 @@ const SubscriptionForm = ({ school }: { school: ISchool }) => {
                                                 <div className="flex items-center gap-2">
                                                     <Package className="h-5 w-5 text-primary" />
                                                     <h3 className="text-lg font-medium">
-                                                        {planFeatures[currentPlan as keyof typeof planFeatures]?.name || "Standard"} Plan
+                                                        {planFeatures[currentPlan as keyof typeof planFeatures]?.name} Plan
                                                     </h3>
                                                 </div>
 
                                                 <div className="flex items-baseline gap-1">
                                                     <span className="text-3xl font-bold">
-                                                        ${planFeatures[currentPlan as keyof typeof planFeatures]?.price || 1200}
+                                                        ${planFeatures[currentPlan as keyof typeof planFeatures]?.price}
                                                     </span>
                                                     <span className="text-muted-foreground">
-                                                        /{planFeatures[currentPlan as keyof typeof planFeatures]?.period || "month"}
+                                                        /{planFeatures[currentPlan as keyof typeof planFeatures]?.period}
                                                     </span>
                                                 </div>
 
@@ -250,9 +273,12 @@ const SubscriptionForm = ({ school }: { school: ISchool }) => {
                                                     </p>
                                                 </div>
 
-                                                <Button className="w-full" onClick={() => setShowUpgradeDialog(true)}>
-                                                    Upgrade Plan
-                                                </Button>
+                                                <UpgradeDialog
+                                                    school={school}
+                                                    percentageUsed={percentageUsed}
+                                                    planFeatures={planFeatures}
+                                                    currentPlan={currentPlan}
+                                                />
                                             </div>
 
                                             <div className="space-y-4">
@@ -511,69 +537,7 @@ const SubscriptionForm = ({ school }: { school: ISchool }) => {
                 </form>
             </Form>
 
-            <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-                <DialogContent className="sm:max-w-[600px]">
-                    <DialogHeader>
-                        <DialogTitle>Upgrade Your Subscription</DialogTitle>
-                        <DialogDescription>Choose a plan that best fits your school&apos;s needs</DialogDescription>
-                    </DialogHeader>
 
-                    <div className="space-y-4 py-4">
-                        <div className="space-y-2">
-                            <h3 className="font-medium">
-                                Current Plan: {planFeatures[currentPlan as keyof typeof planFeatures]?.name}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                                You are currently using {school.subscriptionPlan.currentStudent} out of{" "}
-                                {planFeatures[currentPlan as keyof typeof planFeatures]?.maxStudents} student slots.
-                            </p>
-                            <Progress value={percentageUsed} className="h-2" />
-                        </div>
-
-                        <Separator />
-
-                        <div className="space-y-4">
-                            <h3 className="font-medium">Available Plans</h3>
-
-                            {Object.keys(planFeatures)
-                                .filter((plan) => plan !== currentPlan)
-                                .map((plan) => {
-                                    const planData = planFeatures[plan as keyof typeof planFeatures]
-                                    const isUpgrade =
-                                        planData.price > (planFeatures[currentPlan as keyof typeof planFeatures]?.price || 0)
-
-                                    return (
-                                        <div key={plan} className="flex items-center justify-between p-4 border rounded-lg">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h4 className="font-medium">{planData.name} Plan</h4>
-                                                    {isUpgrade ? (
-                                                        <Badge className="bg-green-100 text-green-800">Upgrade</Badge>
-                                                    ) : (
-                                                        <Badge variant="outline">Downgrade</Badge>
-                                                    )}
-                                                </div>
-                                                <p className="text-sm text-muted-foreground">
-                                                    ${planData.price}/{planData.period} • Up to {planData.maxStudents} students
-                                                </p>
-                                            </div>
-                                            <Button variant={isUpgrade ? "default" : "outline"} size="sm">
-                                                Select
-                                            </Button>
-                                        </div>
-                                    )
-                                })}
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowUpgradeDialog(false)}>
-                            Cancel
-                        </Button>
-                        <Button type="submit">Continue to Payment</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </div>
     )
 }

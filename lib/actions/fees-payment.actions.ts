@@ -332,3 +332,82 @@ export async function updateFullyPayment(paymentId: string, data: any) {
         throw error;
     }
 }
+
+export async function monthlyGroupFeePaymentWithAllClass() {
+    try {
+        await connectToDB();
+        const user = await currentUser();
+        if (!user) throw new Error("User not logged in");
+
+        const schoolId = user.schoolId;
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+        const allClasses = await Class.find({ schoolId });
+
+        const results = await Promise.all(
+            allClasses.map(async (cls) => {
+                const [collectedResult] = await FeesPayment.aggregate([
+                    {
+                        $match: {
+                            classId: cls._id,
+                            schoolId,
+                            status: "Fully Paid",
+                            createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            total: { $sum: { $sum: "$fees.amount" } }, // sum over fees array
+                        },
+                    },
+                ]);
+
+                const [pendingResult] = await FeesPayment.aggregate([
+                    {
+                        $match: {
+                            classId: cls._id,
+                            schoolId,
+                            status: { $in: ["Unpaid", "Partly Paid"] },
+                            createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            total: { $sum: { $sum: "$fees.amount" } },
+                        },
+                    },
+                ]);
+
+                return {
+                    name: cls.name,
+                    collected: collectedResult?.total || 0,
+                    pending: pendingResult?.total || 0,
+                };
+            })
+        );
+
+        // 👉 Sum across all classes
+        const overall = results.reduce(
+            (acc, curr) => {
+                acc.collected += curr.collected;
+                acc.pending += curr.pending;
+                return acc;
+            },
+            { collected: 0, pending: 0 }
+        );
+
+        return {
+            chartData: results,  // Data for the frontend chart
+            totalCollected: overall.collected,
+            totalPending: overall.pending,
+        };
+
+    } catch (error) {
+        console.error("Failed to fetch class fee summary:", error);
+        throw error;
+    }
+}

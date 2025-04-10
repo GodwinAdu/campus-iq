@@ -17,10 +17,48 @@ type RegisterProps = {
     email: string;
     fullName: string;
     password: string;
-    plan: string;
+    plan:"basic" | "pro" | "custom";
     schoolAddress: string;
     schoolName: string;
     type: string;
+    position: string;
+    phoneNumber: string;
+    addresses:{
+        schoolAddress: string;
+        schoolCity: string;
+        schoolState: string;
+        schoolZipcode: string;
+        schoolCountry: string;
+    },
+    schoolPhone: string;
+    website: string;
+    foundedYear: string;
+    description: string;
+    modules: {
+        dashboard: boolean;
+        systemConfig: boolean;
+        classManagement: boolean;
+        studentManagement: boolean;
+        employeeManagement: boolean;
+        manageAttendance: boolean;
+        onlineLearning: boolean;
+        examsManagement: boolean;
+        inventory: boolean;
+        hostelManagement: boolean;
+        library: boolean;
+        depositAndExpense: boolean;
+        message: boolean;
+        report: boolean;
+        canteenManagement: boolean;
+        transportManagement: boolean;
+        feesManagement: boolean;
+        hrManagement: boolean;
+        healthManagement: boolean;
+        history: boolean;
+        trash: boolean;
+    },
+    acceptedTerms: boolean;
+
 }
 
 const defaultRole = {
@@ -182,7 +220,7 @@ export const registerUser = async (values: RegisterProps) => {
     try {
         const today = new Date();
 
-        const { schoolName, schoolAddress, fullName, email, password, confirmPassword, type, plan } = values;
+        const { schoolName,schoolPhone, schoolAddress, fullName, email, password, confirmPassword, type, plan, position, phoneNumber,foundedYear,modules,addresses } = values;
 
         if (password !== confirmPassword) throw new Error(`Invalid password`);
 
@@ -197,11 +235,14 @@ export const registerUser = async (values: RegisterProps) => {
         const rawStaffId = generateUniqueStaffId()
 
         const newSchool = new School({
-            category: "primary",
             schoolCode: rawCode,
             schoolAddress,
             schoolName,
+            schoolPhone,
             type,
+            modules,
+            foundedYear,
+            addresses,
             subscriptionPlan: {
                 plan,
                 renewDate: today,
@@ -212,6 +253,8 @@ export const registerUser = async (values: RegisterProps) => {
         const user = new Employee({
             fullName,
             email,
+            phone: phoneNumber,
+            position,
             password: hPassword,
             username: rawUsername,
             schoolId: newSchool._id,
@@ -226,7 +269,7 @@ export const registerUser = async (values: RegisterProps) => {
         const newRole = new Role({
             ...defaultRole,
             schoolId: newSchool._id,
-            userCount:[user._id],
+            userCount: [user._id],
             createdBy: user?._id,
             action_type: "create"
         });

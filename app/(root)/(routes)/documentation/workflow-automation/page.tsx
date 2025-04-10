@@ -14,11 +14,7 @@ export default function WorkflowAutomationPage() {
   return (
     <DocsLayout>
       <div className="space-y-8">
-        <PageHeader
-          title="Workflow Automation"
-          description="Automate routine tasks and processes to save time and ensure consistency"
-          breadcrumbs={[{ title: "Workflow Automation", href: "/workflow-automation" }]}
-        />
+      <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Workflow Automation</h1>
 
         <div className="flex items-center space-x-2 pt-4">
           <div className="flex items-center space-x-1 text-sm text-muted-foreground">

@@ -145,3 +145,95 @@ export async function deleteExpenses(id: string) {
         throw error;
     }
 }
+
+
+export async function updateExpenses(id: string, values: AccountProps) {
+    try {
+        const { accountId, expenseAmount, expenseDate, expenseName, payVia, reference } = values;
+
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
+        // const schoolId = user.schoolId;
+
+        await connectToDB()
+
+        const account = await Account.findById(accountId);
+        if (!account) throw new Error(`Account not found`);
+
+        const expenses = await Expense.findById(id);
+        if (!expenses) throw new Error(`Expense not found`);
+
+        if (account.balance + expenses.expenseAmount < expenseAmount) {
+            throw new Error("Insufficient balance in the account");
+        }
+
+        expenses.accountId = accountId;
+        expenses.expenseAmount = expenseAmount;
+        expenses.expenseDate = expenseDate;
+        expenses.expenseName = expenseName;
+        expenses.reference = reference;
+        expenses.payVia = payVia;
+
+        account.balance += expenses.expenseAmount as number;
+        account.balance -= expenseAmount as number;
+
+        await Promise.all([
+            expenses.save(),
+            account.save()
+        ]);
+
+    } catch (error) {
+        console.error("Error updating Deposit", error);
+        throw error;
+    }
+}
+
+
+export async function getExpenseById(id: string) {
+    try {
+        const user = await currentUser();
+        if (!user) throw new Error('User not logged in');
+        await connectToDB();
+
+        const expenses = await Expense.findById(id);
+        if (!expenses) {
+            throw new Error('Expense not found');
+        }
+        return JSON.parse(JSON.stringify(expenses));
+    } catch (error) {
+        console.error('Error getting expense by ID', error);
+        throw error;
+    }
+}
+
+
+export async function totalExpenses(): Promise<number> {
+    try {
+        const user = await currentUser();
+        if (!user || !user.schoolId) {
+            throw new Error("User not logged in or missing schoolId.");
+        }
+
+        await connectToDB();
+
+        const [result] = await Expense.aggregate([
+            {
+                $match: { schoolId: user.schoolId },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalExpense: { $sum: "$expenseAmount" },
+                },
+            },
+        ]);
+
+        const total = result?.totalExpense ?? 0;
+        console.log("Total Expense:", total);
+
+        return total;
+    } catch (error) {
+        console.error("Failed to calculate total expenses:", error);
+        return 0; // Optional: return 0 instead of throwing to avoid app crashing
+    }
+}

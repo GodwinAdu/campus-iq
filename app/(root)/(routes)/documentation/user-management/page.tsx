@@ -1,36 +1,27 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { DocsSidebar } from "@/components/docs-sidebar"
-import { DocsToc } from "@/components/docs-toc"
-import { PageHeader } from "@/components/page-header"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Users, UserCog, ShieldCheck, UserX, FileSpreadsheet, AlertTriangle } from "lucide-react"
+import { DocsLayout } from '@/components/docs-layout';
 
 export default function UserManagementPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-        <DocsSidebar className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block" />
-        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+    <DocsLayout>
+        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_100px]">
           <div className="mx-auto w-full min-w-0">
-            <PageHeader
-              title="User Management"
-              description="Managing users, roles, and permissions in SchoolSync"
-              breadcrumbs={[{ title: "User Management", href: "/user-management" }]}
-            />
-
+            <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">User Management</h1>
             <div className="flex items-center space-x-2 pt-4">
               <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                 <span>Last updated:</span>
-                <time dateTime="2023-05-05">May 5, 2023</time>
+                <time dateTime="2025-04-08">April 8, 2025</time>
               </div>
             </div>
 
             <div className="pb-12 pt-8">
-              <div className="prose prose-slate dark:prose-invert max-w-none">
-                <h2 id="introduction">Introduction</h2>
+              <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
+                <h2 className="font-bold text-2xl" id="introduction">Introduction</h2>
                 <p>
                   User management in SchoolSync allows you to create, modify, and organize user accounts for
                   administrators, teachers, students, and parents. This guide will help you understand how to
@@ -46,7 +37,7 @@ export default function UserManagementPage() {
                   </AlertDescription>
                 </Alert>
 
-                <h2 id="user-types">User Types and Roles</h2>
+                <h2 className="font-bold text-2xl" id="user-types">User Types and Roles</h2>
                 <p>SchoolSync supports different types of users, each with specific roles and permissions:</p>
 
                 <div className="not-prose my-6">
@@ -148,7 +139,7 @@ export default function UserManagementPage() {
                   </Tabs>
                 </div>
 
-                <h2 id="creating-users">Creating User Accounts</h2>
+                <h2 className="font-bold text-2xl" id="creating-users">Creating User Accounts</h2>
                 <p>There are several ways to create user accounts in SchoolSync:</p>
 
                 <h3 id="individual-users">Creating Individual Users</h3>
@@ -217,7 +208,7 @@ export default function UserManagementPage() {
                   <li>Click "Send Invitations"</li>
                 </ol>
 
-                <h2 id="managing-users">Managing Existing Users</h2>
+                <h2 className="font-bold text-2xl" id="managing-users">Managing Existing Users</h2>
                 <p>Once users are created, you can manage their accounts in various ways:</p>
 
                 <div className="not-prose my-6 grid gap-4 md:grid-cols-2">
@@ -258,7 +249,7 @@ export default function UserManagementPage() {
                   </Card>
                 </div>
 
-                <h2 id="roles-permissions">Roles and Permissions</h2>
+                <h2 className="font-bold text-2xl" id="roles-permissions">Roles and Permissions</h2>
                 <p>
                   SchoolSync uses a role-based permission system to control what users can access and do within the
                   system.
@@ -308,7 +299,7 @@ export default function UserManagementPage() {
                   <li>Click "Save Changes"</li>
                 </ol>
 
-                <h2 id="user-groups">User Groups</h2>
+                <h2 className="font-bold text-2xl" id="user-groups">User Groups</h2>
                 <p>
                   User groups allow you to organize users and apply permissions or settings to multiple users at once.
                 </p>
@@ -333,7 +324,7 @@ export default function UserManagementPage() {
                   <li>Click "Save Changes"</li>
                 </ol>
 
-                <h2 id="user-data-export">User Data Export</h2>
+                <h2 className="font-bold text-2xl" id="user-data-export">User Data Export</h2>
                 <p>You can export user data for reporting or backup purposes:</p>
                 <ol>
                   <li>Go to "Users" in the administration menu</li>
@@ -370,10 +361,8 @@ export default function UserManagementPage() {
               </div>
             </div>
           </div>
-          <DocsToc className="hidden text-sm xl:block" />
         </main>
-      </div>
-    </div>
+        </DocsLayout>
   )
 }
 

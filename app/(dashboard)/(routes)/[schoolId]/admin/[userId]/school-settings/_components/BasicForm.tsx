@@ -29,7 +29,7 @@ const storeFormSchema = z.object({
     }),
     schoolPhone: z.string().nullable(),
     motto: z.string(),
-    establishYear: z.number(),
+    foundedYear: z.number(),
     affiliation: z.string().optional(),
     website: z.string().optional(),
     addresses: z.object({
@@ -53,7 +53,7 @@ export default function BasicInfoForm({ school }: { school: ISchool }) {
         schoolEmail: "",
         schoolPhone: "",
         motto: "",
-        establishYear: null,
+        foundedYear: null,
         affiliation: "",
         website: "",
         addresses: {
@@ -158,7 +158,7 @@ export default function BasicInfoForm({ school }: { school: ISchool }) {
                         />
                         <FormField
                             control={form.control}
-                            name="establishYear"
+                            name="foundedYear"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Establish Year</FormLabel>
@@ -236,7 +236,7 @@ export default function BasicInfoForm({ school }: { school: ISchool }) {
                         />
                         <FormField
                             control={form.control}
-                            name="addresses.zipCode"
+                            name="addresses.schoolZipcode"
                             render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Enter Zipcode</FormLabel>

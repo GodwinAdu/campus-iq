@@ -17,32 +17,27 @@ import {
   Settings,
   HelpCircle,
 } from "lucide-react"
+import { DocsLayout } from "@/components/docs-layout"
 
 export default function DashboardOverviewPage() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-        <DocsSidebar className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block" />
-        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+    <DocsLayout>
+        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_100px]">
           <div className="mx-auto w-full min-w-0">
-            <PageHeader
-              title="Dashboard Overview"
-              description="Understanding the SchoolSync dashboard and its features"
-              breadcrumbs={[{ title: "Dashboard Overview", href: "/dashboard-overview" }]}
-            />
+          <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Dashboard Overview</h1>
 
             <div className="flex items-center space-x-2 pt-4">
               <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                 <span>Last updated:</span>
-                <time dateTime="2023-05-05">May 5, 2023</time>
+                <time dateTime="2023-05-05">April 8, 2025</time>
               </div>
             </div>
 
             <div className="pb-12 pt-8">
-              <div className="prose prose-slate dark:prose-invert max-w-none">
+              <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
                 <h2 id="introduction">Introduction</h2>
                 <p>
-                  The SchoolSync dashboard is your command center for accessing all system features and getting a quick
+                  The CampusIQ dashboard is your command center for accessing all system features and getting a quick
                   overview of important information. This guide will help you understand the dashboard layout and how to
                   navigate through the various features.
                 </p>
@@ -52,7 +47,7 @@ export default function DashboardOverviewPage() {
                   <div className="p-4 bg-slate-50 dark:bg-slate-900">
                     <div className="aspect-video rounded-lg bg-white dark:bg-slate-800 border shadow-sm p-4 flex flex-col">
                       <div className="h-12 border-b flex items-center justify-between px-4 mb-4">
-                        <div className="font-bold">SchoolSync</div>
+                        <div className="font-bold">Campus<span className="text-blue-500">IQ</span></div>
                         <div className="flex items-center gap-4">
                           <Bell className="h-5 w-5 text-slate-500" />
                           <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700"></div>
@@ -119,7 +114,7 @@ export default function DashboardOverviewPage() {
 
                 <h2 id="dashboard-layout">Dashboard Layout</h2>
                 <p>
-                  The SchoolSync dashboard is organized into several key sections to help you quickly access information
+                  The CampusIQ dashboard is organized into several key sections to help you quickly access information
                   and features:
                 </p>
 
@@ -139,7 +134,7 @@ export default function DashboardOverviewPage() {
                         <h3 className="text-lg font-medium">Navigation Menu</h3>
                       </div>
                       <p className="text-muted-foreground mb-4">
-                        The left sidebar contains links to all major sections of SchoolSync. The menu adapts based on
+                        The left sidebar contains links to all major sections of CampusIQ. The menu adapts based on
                         your user role and permissions.
                       </p>
                       <div className="space-y-2">
@@ -330,7 +325,7 @@ export default function DashboardOverviewPage() {
 
                 <h2 id="customizing-dashboard">Customizing Your Dashboard</h2>
                 <p>
-                  SchoolSync allows you to personalize your dashboard to show the information that's most relevant to
+                  CampusIQ allows you to personalize your dashboard to show the information that's most relevant to
                   you:
                 </p>
 
@@ -356,7 +351,7 @@ export default function DashboardOverviewPage() {
                 </ol>
 
                 <h2 id="role-specific-dashboards">Role-Specific Dashboards</h2>
-                <p>SchoolSync provides different dashboard views based on your role in the system:</p>
+                <p>CampusIQ provides different dashboard views based on your role in the system:</p>
 
                 <div className="not-prose my-6 grid gap-4 md:grid-cols-3">
                   <Card>
@@ -409,7 +404,7 @@ export default function DashboardOverviewPage() {
                 </div>
 
                 <h2 id="keyboard-shortcuts">Keyboard Shortcuts</h2>
-                <p>SchoolSync offers keyboard shortcuts to help you navigate the dashboard more efficiently:</p>
+                <p>CampusIQ offers keyboard shortcuts to help you navigate the dashboard more efficiently:</p>
 
                 <div className="not-prose my-6 overflow-hidden rounded-lg border">
                   <div className="bg-muted px-4 py-3 font-medium">Keyboard Shortcuts</div>
@@ -471,20 +466,18 @@ export default function DashboardOverviewPage() {
                   <div>
                     <h3 className="text-xl font-bold">Ready to learn about user management?</h3>
                     <p className="text-slate-700 dark:text-slate-400">
-                      Discover how to manage users and permissions in SchoolSync.
+                      Discover how to manage users and permissions in CampusIQ.
                     </p>
                   </div>
                   <Button className="mt-4 md:mt-0" asChild>
-                    <Link href="/user-management">User Management</Link>
+                    <Link href="/documentation/user-management">User Management</Link>
                   </Button>
                 </div>
               </div>
             </div>
           </div>
-          <DocsToc className="hidden text-sm xl:block" />
         </main>
-      </div>
-    </div>
+      </DocsLayout>
   )
 }
 

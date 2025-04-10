@@ -3,6 +3,7 @@
 import {
   ChevronsUpDown,
   DockIcon,
+  Keyboard,
   Settings,
 } from "lucide-react"
 
@@ -93,6 +94,12 @@ export function NavUser({ school }: { school: ISchool }) {
                 <ModeToggle />
                 <p className="font-extrabold">Theme</p>
               </div>
+              <Link href={`/${schoolId}/admin/${userId}/keyboard-shortcuts`}>
+                <DropdownMenuItem>
+                  <Keyboard />
+                  Keyboard shortcuts
+                </DropdownMenuItem>
+              </Link>
               <Link href={`/${schoolId}/admin/${userId}/school-settings`}>
                 <DropdownMenuItem>
                   <Settings />

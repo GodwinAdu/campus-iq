@@ -6,6 +6,9 @@ const EmployeeSchema: Schema<IEmployee> = new Schema({
         ref: "School",
         required: true
     },
+    position:{
+        type:String
+    },
     username: {
         type: String,
         required: true,

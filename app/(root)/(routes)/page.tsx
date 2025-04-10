@@ -21,7 +21,7 @@ export default function Home() {
       <AnimatedStatsGrid />
       <Features />
       <RotatingFeatures />
-      <InteractiveDemo />
+      {/* <InteractiveDemo /> */}
       <SuccessStories />
       <Testimonials />
       <Pricing />

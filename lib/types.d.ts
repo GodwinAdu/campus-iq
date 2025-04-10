@@ -29,8 +29,9 @@ interface ISchool extends Document {
     owner: Types.ObjectId;
     schoolCode: string; // Unique identifier for each school
     schoolLogo?: string; // URL for the school's logo
-    establishedYear?: number; // Year the school was established
+    foundedYear?: number; // Year the school was established
     affiliation?: string; // Affiliated education boards
+    description:string;
     category?: "primary" | "secondary" | "college" | "university"; // School category
     type: "public" | "private" | "charter";
     schoolName: string;
@@ -71,6 +72,7 @@ interface IEmployee extends Document {
     schoolId: Schema.Types.ObjectId;
     username: string;
     fullName: string;
+    position: string;
     imgUrl?: string;
     dob?: Date;
     email: string;

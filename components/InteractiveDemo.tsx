@@ -25,7 +25,7 @@ const demoTabs = [
     value: "finance",
     content: (
       <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-white bg-gradient-to-br from-blue-700 to-cyan-900">
-        <p>Streamline financial processes and gain insights into your school's finances.</p>
+        <p>Streamline financial processes and gain insights into your school&apos;s finances.</p>
       </div>
     ),
   },

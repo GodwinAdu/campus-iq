@@ -29,10 +29,12 @@ import {
     FileText,
     Settings,
     CreditCard,
+    Youtube,
+    Lock,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -41,17 +43,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
+import { motion } from 'framer-motion';
+import { registerUser } from "@/lib/actions/register.actions"
+import { toast } from "@/hooks/use-toast"
 
 // Form schemas for each step
 const schoolInfoSchema = z.object({
     schoolName: z.string().min(3, { message: "School name must be at least 3 characters" }),
-    schoolType: z.string().min(1, { message: "Please select school type" }),
-    address: z.string().min(5, { message: "Address must be at least 5 characters" }),
-    city: z.string().min(2, { message: "City is required" }),
-    state: z.string().min(2, { message: "State/Province is required" }),
-    zipCode: z.string().min(1, { message: "Zip/Postal code is required" }),
-    country: z.string().min(2, { message: "Country is required" }),
-    phone: z.string().min(5, { message: "Phone number is required" }),
+    type: z.string().min(1, { message: "Please select school type" }),
+    addresses: z.object({
+        schoolAddress: z.string().min(2, { message: "Address must be at least 2 characters" }),
+        schoolCity: z.string().min(2, { message: "Address must be at least 2 characters" }),
+        schoolState: z.string().min(2, { message: "Address must be at least 2 characters" }),
+        schoolZipcode: z.string().min(2, { message: "Address must be at least 2 characters" }),
+        schoolCountry: z.string().min(2, { message: "Address must be at least 5 characters" }),
+    }),
+    schoolPhone: z.string().min(5, { message: "Phone number is required" }),
     website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
     foundedYear: z.string().regex(/^\d{4}$/, { message: "Please enter a valid year (YYYY)" }),
     description: z.string().max(500, { message: "Description must be less than 500 characters" }).optional(),
@@ -59,8 +67,7 @@ const schoolInfoSchema = z.object({
 
 const adminInfoSchema = z
     .object({
-        firstName: z.string().min(2, { message: "First name must be at least 2 characters" }),
-        lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
+        fullName: z.string().min(2, { message: "Full name must be at least 2 characters" }),
         email: z.string().email({ message: "Please enter a valid email address" }),
         password: z
             .string()
@@ -79,22 +86,33 @@ const adminInfoSchema = z
     })
 
 const modulesSchema = z.object({
-    studentManagement: z.boolean().default(true),
-    staffManagement: z.boolean().default(true),
-    attendanceTracking: z.boolean().default(false),
-    gradeManagement: z.boolean().default(false),
-    communicationTools: z.boolean().default(false),
-    reportGeneration: z.boolean().default(false),
-    financialManagement: z.boolean().default(false),
-    systemConfiguration: z.boolean().default(false),
+    modules: z.object({
+        dashboard: z.boolean().default(true),
+        systemConfig: z.boolean().default(true),
+        classManagement: z.boolean().default(true),
+        studentManagement: z.boolean().default(true),
+        employeeManagement: z.boolean().default(true),
+        examsManagement: z.boolean().default(false),
+        inventory: z.boolean().default(false),
+        hostelManagement: z.boolean().default(false),
+        library: z.boolean().default(false),
+        depositAndExpense: z.boolean().default(false),
+        message: z.boolean().default(false),
+        report: z.boolean().default(false),
+        canteenManagement: z.boolean().default(false),
+        transportManagement: z.boolean().default(false),
+        feesManagement: z.boolean().default(false),
+        hrManagement: z.boolean().default(false),
+        healthManagement: z.boolean().default(false),
+        history: z.boolean().default(true),
+        trash: z.boolean().default(true),
+    })
+
 })
 
 const planSchema = z.object({
-    plan: z.enum(["basic", "standard", "premium"], {
+    plan: z.enum(["basic", "pro", "custom"], {
         required_error: "Please select a subscription plan",
-    }),
-    billingCycle: z.enum(["monthly", "annual"], {
-        required_error: "Please select a billing cycle",
     }),
     acceptTerms: z.literal(true, {
         errorMap: () => ({ message: "You must accept the terms and conditions" }),
@@ -109,58 +127,25 @@ type PlanValues = z.infer<typeof planSchema>
 
 // Module descriptions for the form
 const moduleDescriptions = {
-    studentManagement: "Manage student profiles, enrollments, and academic records",
-    staffManagement: "Manage staff profiles, assignments, and performance",
-    attendanceTracking: "Track student and staff attendance with reports",
-    gradeManagement: "Record, calculate, and report student grades and performance",
-    communicationTools: "Internal messaging, announcements, and parent communication",
-    reportGeneration: "Generate custom reports for academics, attendance, and more",
-    financialManagement: "Manage fees, payments, expenses, and financial reports",
-    systemConfiguration: "Customize system settings, roles, and permissions",
-}
-
-// Plan details for the form
-const planDetails = {
-    basic: {
-        name: "Basic",
-        price: { monthly: "$49", annual: "$470" },
-        features: [
-            "Up to 500 students",
-            "Student & Staff Management",
-            "Basic Attendance Tracking",
-            "Email Support",
-            "1 Admin User",
-        ],
-        recommended: false,
-    },
-    standard: {
-        name: "Standard",
-        price: { monthly: "$99", annual: "$950" },
-        features: [
-            "Up to 1,500 students",
-            "All Basic features",
-            "Grade Management",
-            "Communication Tools",
-            "Report Generation",
-            "Priority Support",
-            "5 Admin Users",
-        ],
-        recommended: true,
-    },
-    premium: {
-        name: "Premium",
-        price: { monthly: "$199", annual: "$1,990" },
-        features: [
-            "Unlimited students",
-            "All Standard features",
-            "Financial Management",
-            "Advanced System Configuration",
-            "API Access",
-            "24/7 Premium Support",
-            "Unlimited Admin Users",
-        ],
-        recommended: false,
-    },
+    dashboard: "Dashboard",
+    systemConfig: "System Configuration",
+    classManagement: "Class Management",
+    studentManagement: "Student Management",
+    employeeManagement: "Employee Management",
+    examsManagement: "Exams Management",
+    inventory: "Inventory Management",
+    hostelManagement: "Hostel Management",
+    library: "Library Management",
+    depositAndExpense: "Deposit and Expense Management",
+    message: "Messaging System",
+    report: "Reporting and Analytics",
+    canteenManagement: "Canteen Management",
+    transportManagement: "Transport Management",
+    feesManagement: "Fees Management",
+    hrManagement: "HR Management",
+    healthManagement: "Health Management",
+    history: "History Tracking",
+    trash: "Trash Management"
 }
 
 export default function SchoolRegistrationForm() {
@@ -169,20 +154,21 @@ export default function SchoolRegistrationForm() {
     const [formData, setFormData] = useState<SchoolInfoValues & AdminInfoValues & ModulesValues & PlanValues>({
         // School Info
         schoolName: "",
-        schoolType: "",
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "",
-        phone: "",
+        type: "",
+        addresses: {
+            schoolAddress: "",
+            schoolCity: "",
+            schoolState: "",
+            schoolZipcode: "",
+            schoolCountry: "",
+        },
+        schoolPhone: "",
         website: "",
         foundedYear: "",
         description: "",
 
         // Admin Info
-        firstName: "",
-        lastName: "",
+        fullName: "",
         email: "",
         password: "",
         confirmPassword: "",
@@ -190,40 +176,45 @@ export default function SchoolRegistrationForm() {
         phoneNumber: "",
 
         // Modules
-        studentManagement: true,
-        staffManagement: true,
-        attendanceTracking: false,
-        gradeManagement: false,
-        communicationTools: false,
-        reportGeneration: false,
-        financialManagement: false,
-        systemConfiguration: false,
+        modules: {
+            dashboard: true,
+            systemConfig: true,
+            classManagement: true,
+            studentManagement: true,
+            employeeManagement: true,
+            examsManagement: false,
+            inventory: false,
+            hostelManagement: false,
+            library: false,
+            depositAndExpense: false,
+            message: false,
+            report: false,
+            canteenManagement: false,
+            transportManagement: false,
+            feesManagement: false,
+            hrManagement: false,
+            healthManagement: false,
+            history: true,
+            trash: true,
+        },
+
 
         // Plan
-        plan: "standard" as const,
-        billingCycle: "annual" as const,
-        acceptTerms: true,
+        plan: "basic" as const,
+        acceptTerms: false,
     })
 
     const [showPassword, setShowPassword] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [logoPreview, setLogoPreview] = useState<string | null>(null)
-    const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
-    const fileInputRef = useRef<HTMLInputElement>(null)
-    const avatarInputRef = useRef<HTMLInputElement>(null)
 
     // Form for step 1 - School Information
     const schoolInfoForm = useForm<SchoolInfoValues>({
         resolver: zodResolver(schoolInfoSchema),
         defaultValues: {
             schoolName: formData.schoolName,
-            schoolType: formData.schoolType,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zipCode: formData.zipCode,
-            country: formData.country,
-            phone: formData.phone,
+            type: formData.type,
+            addresses: formData.addresses,
+            schoolPhone: formData.schoolPhone,
             website: formData.website,
             foundedYear: formData.foundedYear,
             description: formData.description,
@@ -234,8 +225,7 @@ export default function SchoolRegistrationForm() {
     const adminInfoForm = useForm<AdminInfoValues>({
         resolver: zodResolver(adminInfoSchema),
         defaultValues: {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
+            fullName: formData.fullName,
             email: formData.email,
             password: formData.password,
             confirmPassword: formData.confirmPassword,
@@ -248,14 +238,28 @@ export default function SchoolRegistrationForm() {
     const modulesForm = useForm<ModulesValues>({
         resolver: zodResolver(modulesSchema),
         defaultValues: {
-            studentManagement: formData.studentManagement,
-            staffManagement: formData.staffManagement,
-            attendanceTracking: formData.attendanceTracking,
-            gradeManagement: formData.gradeManagement,
-            communicationTools: formData.communicationTools,
-            reportGeneration: formData.reportGeneration,
-            financialManagement: formData.financialManagement,
-            systemConfiguration: formData.systemConfiguration,
+            modules: {
+                dashboard: formData.modules.dashboard,
+                systemConfig: formData.modules.systemConfig,
+                classManagement: formData.modules.classManagement,
+                studentManagement: formData.modules.studentManagement,
+                employeeManagement: formData.modules.employeeManagement,
+                examsManagement: formData.modules.examsManagement,
+                inventory: formData.modules.inventory,
+                hostelManagement: formData.modules.hostelManagement,
+                library: formData.modules.library,
+                depositAndExpense: formData.modules.depositAndExpense,
+                message: formData.modules.message,
+                report: formData.modules.report,
+                canteenManagement: formData.modules.canteenManagement,
+                transportManagement: formData.modules.transportManagement,
+                feesManagement: formData.modules.feesManagement,
+                hrManagement: formData.modules.hrManagement,
+                healthManagement: formData.modules.healthManagement,
+                history: formData.modules.history,
+                trash: formData.modules.trash,
+
+            }
         },
     })
 
@@ -264,10 +268,11 @@ export default function SchoolRegistrationForm() {
         resolver: zodResolver(planSchema),
         defaultValues: {
             plan: formData.plan,
-            billingCycle: formData.billingCycle,
             acceptTerms: formData.acceptTerms,
         },
-    })
+    });
+
+    // const acceptTerms = planForm.watch("acceptTerms")
 
     // Calculate password strength
     const calculatePasswordStrength = (password: string) => {
@@ -284,30 +289,6 @@ export default function SchoolRegistrationForm() {
     }
 
     const passwordStrength = calculatePasswordStrength(adminInfoForm.watch("password") || "")
-
-    // Handle logo upload
-    const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setLogoPreview(e.target?.result as string)
-            }
-            reader.readAsDataURL(file)
-        }
-    }
-
-    // Handle avatar upload
-    const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onload = (e) => {
-                setAvatarPreview(e.target?.result as string)
-            }
-            reader.readAsDataURL(file)
-        }
-    }
 
     // Handle step 1 submission - School Information
     const onSchoolInfoSubmit = (data: SchoolInfoValues) => {
@@ -342,10 +323,12 @@ export default function SchoolRegistrationForm() {
 
         // Simulate API call
         try {
-            await new Promise((resolve) => setTimeout(resolve, 2000))
             console.log("Form submitted:", completeFormData)
-            
-
+            await registerUser(completeFormData);
+            toast({
+                title: "Registration Successful",
+                description: "Your school has been registered successfully.",
+            })
             // Navigate to success page or show success state
             setStep(5)
             window.scrollTo(0, 0)
@@ -373,7 +356,7 @@ export default function SchoolRegistrationForm() {
                 <div className="flex items-center justify-center h-12 w-12 rounded-full bg-primary/10">
                     <School className="h-6 w-6 text-primary" />
                 </div>
-                <h1 className="text-3xl font-bold  text-muted">School Management System</h1>
+                <h1 className="text-3xl font-bold  text-foreground">CampusIQ Sign up</h1>
                 <p className="text-muted-foreground max-w-md">
                     Complete the registration process to set up your school management system
                 </p>
@@ -421,69 +404,12 @@ export default function SchoolRegistrationForm() {
             )}
 
             <Card className="w-full shadow-lg mt-12">
-                <CardHeader>
-                    <CardTitle className="text-2xl font-bold">
-                        {step === 1 && "School Information"}
-                        {step === 2 && "Administrator Account"}
-                        {step === 3 && "Module Selection"}
-                        {step === 4 && "Subscription Plan"}
-                        {step === 5 && "Registration Complete"}
-                    </CardTitle>
-                    <CardDescription>
-                        {step === 1 && "Provide details about your educational institution"}
-                        {step === 2 && "Create an administrator account to manage the system"}
-                        {step === 3 && "Select the modules you want to use in your system"}
-                        {step === 4 && "Choose a subscription plan that fits your needs"}
-                        {step === 5 && "Your school management system is ready to use"}
-                    </CardDescription>
-                </CardHeader>
 
-                <CardContent>
+                <CardContent className="pt-12">
                     {/* Step 1: School Information */}
                     {step === 1 && (
                         <Form {...schoolInfoForm}>
                             <form onSubmit={schoolInfoForm.handleSubmit(onSchoolInfoSubmit)} className="space-y-6">
-                                <div className="flex flex-col items-center justify-center mb-6">
-                                    <div
-                                        className="w-32 h-32 rounded-lg border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors mb-2"
-                                        onClick={() => fileInputRef.current?.click()}
-                                    >
-                                        {logoPreview ? (
-                                            <div className="relative w-full h-full">
-                                                <Image
-                                                    src={logoPreview || "/placeholder.svg"}
-                                                    alt="School logo preview"
-                                                    fill
-                                                    className="object-contain p-2"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        setLogoPreview(null)
-                                                        if (fileInputRef.current) fileInputRef.current.value = ""
-                                                    }}
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                                                <p className="text-xs text-muted-foreground text-center">Upload school logo</p>
-                                            </>
-                                        )}
-                                    </div>
-                                    <input
-                                        type="file"
-                                        ref={fileInputRef}
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleLogoUpload}
-                                    />
-                                    <p className="text-xs text-muted-foreground">Recommended: 400x400px, PNG or JPG</p>
-                                </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <FormField
@@ -502,7 +428,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={schoolInfoForm.control}
-                                        name="schoolType"
+                                        name="type"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>School Type*</FormLabel>
@@ -546,7 +472,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={schoolInfoForm.control}
-                                        name="phone"
+                                        name="schoolPhone"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Phone Number*</FormLabel>
@@ -581,7 +507,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={schoolInfoForm.control}
-                                        name="address"
+                                        name="addresses.schoolAddress"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Street Address*</FormLabel>
@@ -596,7 +522,7 @@ export default function SchoolRegistrationForm() {
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <FormField
                                             control={schoolInfoForm.control}
-                                            name="city"
+                                            name="addresses.schoolCity"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>City*</FormLabel>
@@ -610,7 +536,7 @@ export default function SchoolRegistrationForm() {
 
                                         <FormField
                                             control={schoolInfoForm.control}
-                                            name="state"
+                                            name="addresses.schoolState"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>State/Province*</FormLabel>
@@ -624,7 +550,7 @@ export default function SchoolRegistrationForm() {
 
                                         <FormField
                                             control={schoolInfoForm.control}
-                                            name="zipCode"
+                                            name="addresses.schoolZipcode"
                                             render={({ field }) => (
                                                 <FormItem>
                                                     <FormLabel>Zip/Postal Code*</FormLabel>
@@ -639,7 +565,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={schoolInfoForm.control}
-                                        name="country"
+                                        name="addresses.schoolCountry"
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>Country*</FormLabel>
@@ -650,11 +576,14 @@ export default function SchoolRegistrationForm() {
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        <SelectItem value="us">United States</SelectItem>
-                                                        <SelectItem value="ca">Canada</SelectItem>
-                                                        <SelectItem value="uk">United Kingdom</SelectItem>
                                                         <SelectItem value="au">Australia</SelectItem>
+                                                        <SelectItem value="ca">Canada</SelectItem>
+                                                        <SelectItem value="fr">France</SelectItem>
+                                                        <SelectItem value="de">Germany</SelectItem>
+                                                        <SelectItem value="gh">Ghana</SelectItem>
                                                         <SelectItem value="in">India</SelectItem>
+                                                        <SelectItem value="uk">United Kingdom</SelectItem>
+                                                        <SelectItem value="us">United States</SelectItem>
                                                         <SelectItem value="other">Other</SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -696,71 +625,16 @@ export default function SchoolRegistrationForm() {
                     {step === 2 && (
                         <Form {...adminInfoForm}>
                             <form onSubmit={adminInfoForm.handleSubmit(onAdminInfoSubmit)} className="space-y-6">
-                                <div className="flex flex-col items-center justify-center mb-6">
-                                    <div
-                                        className="w-24 h-24 rounded-full border-2 border-dashed border-muted-foreground/25 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 transition-colors mb-2 overflow-hidden"
-                                        onClick={() => avatarInputRef.current?.click()}
-                                    >
-                                        {avatarPreview ? (
-                                            <div className="relative w-full h-full">
-                                                <Image
-                                                    src={avatarPreview || "/placeholder.svg"}
-                                                    alt="Admin avatar preview"
-                                                    fill
-                                                    className="object-cover"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    className="absolute top-0 right-0 bg-destructive text-destructive-foreground rounded-full p-1"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation()
-                                                        setAvatarPreview(null)
-                                                        if (avatarInputRef.current) avatarInputRef.current.value = ""
-                                                    }}
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <Upload className="h-6 w-6 text-muted-foreground mb-1" />
-                                                <p className="text-xs text-muted-foreground text-center">Upload photo</p>
-                                            </>
-                                        )}
-                                    </div>
-                                    <input
-                                        type="file"
-                                        ref={avatarInputRef}
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handleAvatarUpload}
-                                    />
-                                    <p className="text-xs text-muted-foreground">Administrator profile photo</p>
-                                </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <FormField
                                         control={adminInfoForm.control}
-                                        name="firstName"
+                                        name="fullName"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>First Name*</FormLabel>
+                                                <FormLabel>Full Name*</FormLabel>
                                                 <FormControl>
                                                     <Input placeholder="John" {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={adminInfoForm.control}
-                                        name="lastName"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Last Name*</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="Smith" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -910,15 +784,72 @@ export default function SchoolRegistrationForm() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <FormField
                                         control={modulesForm.control}
-                                        name="studentManagement"
+                                        name="modules.dashboard"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
                                                 <FormControl>
-                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormControl>
                                                 <div className="space-y-1 leading-none">
                                                     <div className="flex items-center">
                                                         <Users className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Dashboard</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">{moduleDescriptions.dashboard}</FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.systemConfig"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Users className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">System Configuration</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">{moduleDescriptions.systemConfig}</FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.classManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Calendar className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Academics Management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">{moduleDescriptions.classManagement}</FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.studentManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <BarChart3 className="h-4 w-4 text-primary mr-2" />
                                                         <FormLabel className="font-medium">Student Management</FormLabel>
                                                     </div>
                                                     <FormDescription className="text-xs">{moduleDescriptions.studentManagement}</FormDescription>
@@ -929,75 +860,18 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={modulesForm.control}
-                                        name="staffManagement"
+                                        name="modules.employeeManagement"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
                                                 <FormControl>
-                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                                <div className="space-y-1 leading-none">
-                                                    <div className="flex items-center">
-                                                        <Users className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">Staff Management</FormLabel>
-                                                    </div>
-                                                    <FormDescription className="text-xs">{moduleDescriptions.staffManagement}</FormDescription>
-                                                </div>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={modulesForm.control}
-                                        name="attendanceTracking"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
-                                                <FormControl>
-                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                                <div className="space-y-1 leading-none">
-                                                    <div className="flex items-center">
-                                                        <Calendar className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">Attendance Tracking</FormLabel>
-                                                    </div>
-                                                    <FormDescription className="text-xs">{moduleDescriptions.attendanceTracking}</FormDescription>
-                                                </div>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={modulesForm.control}
-                                        name="gradeManagement"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
-                                                <FormControl>
-                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                                </FormControl>
-                                                <div className="space-y-1 leading-none">
-                                                    <div className="flex items-center">
-                                                        <BarChart3 className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">Grade Management</FormLabel>
-                                                    </div>
-                                                    <FormDescription className="text-xs">{moduleDescriptions.gradeManagement}</FormDescription>
-                                                </div>
-                                            </FormItem>
-                                        )}
-                                    />
-
-                                    <FormField
-                                        control={modulesForm.control}
-                                        name="communicationTools"
-                                        render={({ field }) => (
-                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
-                                                <FormControl>
-                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormControl>
                                                 <div className="space-y-1 leading-none">
                                                     <div className="flex items-center">
                                                         <MessageSquare className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">Communication Tools</FormLabel>
+                                                        <FormLabel className="font-medium">Employee Management</FormLabel>
                                                     </div>
-                                                    <FormDescription className="text-xs">{moduleDescriptions.communicationTools}</FormDescription>
+                                                    <FormDescription className="text-xs">{moduleDescriptions.employeeManagement}</FormDescription>
                                                 </div>
                                             </FormItem>
                                         )}
@@ -1005,7 +879,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={modulesForm.control}
-                                        name="reportGeneration"
+                                        name="modules.examsManagement"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
                                                 <FormControl>
@@ -1014,9 +888,9 @@ export default function SchoolRegistrationForm() {
                                                 <div className="space-y-1 leading-none">
                                                     <div className="flex items-center">
                                                         <FileText className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">Report Generation</FormLabel>
+                                                        <FormLabel className="font-medium">Exams Management</FormLabel>
                                                     </div>
-                                                    <FormDescription className="text-xs">{moduleDescriptions.reportGeneration}</FormDescription>
+                                                    <FormDescription className="text-xs">{moduleDescriptions.examsManagement}</FormDescription>
                                                 </div>
                                             </FormItem>
                                         )}
@@ -1024,7 +898,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={modulesForm.control}
-                                        name="financialManagement"
+                                        name="modules.inventory"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
                                                 <FormControl>
@@ -1033,10 +907,10 @@ export default function SchoolRegistrationForm() {
                                                 <div className="space-y-1 leading-none">
                                                     <div className="flex items-center">
                                                         <CreditCard className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">Financial Management</FormLabel>
+                                                        <FormLabel className="font-medium">Inventory Management</FormLabel>
                                                     </div>
                                                     <FormDescription className="text-xs">
-                                                        {moduleDescriptions.financialManagement}
+                                                        {moduleDescriptions.inventory}
                                                     </FormDescription>
                                                 </div>
                                             </FormItem>
@@ -1045,7 +919,7 @@ export default function SchoolRegistrationForm() {
 
                                     <FormField
                                         control={modulesForm.control}
-                                        name="systemConfiguration"
+                                        name="modules.hostelManagement"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
                                                 <FormControl>
@@ -1054,10 +928,230 @@ export default function SchoolRegistrationForm() {
                                                 <div className="space-y-1 leading-none">
                                                     <div className="flex items-center">
                                                         <Settings className="h-4 w-4 text-primary mr-2" />
-                                                        <FormLabel className="font-medium">System Configuration</FormLabel>
+                                                        <FormLabel className="font-medium">Hostel management</FormLabel>
                                                     </div>
                                                     <FormDescription className="text-xs">
-                                                        {moduleDescriptions.systemConfiguration}
+                                                        {moduleDescriptions.hostelManagement}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.library"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Library management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.library}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.depositAndExpense"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Manage Deposit and Expenses</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.depositAndExpense}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.canteenManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Canteen management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.canteenManagement}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.feesManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Fees management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.feesManagement}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.transportManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Transport management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.transportManagement}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.hrManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">HR management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.hrManagement}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.healthManagement"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Health management</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.healthManagement}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.message"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Messaging System</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.message}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.report"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">View Reports</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.report}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.history"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">View History</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.history}
+                                                    </FormDescription>
+                                                </div>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={modulesForm.control}
+                                        name="modules.trash"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 hover:bg-accent/5 transition-colors">
+                                                <FormControl>
+                                                    <Checkbox disabled checked={field.value} onCheckedChange={field.onChange} />
+                                                </FormControl>
+                                                <div className="space-y-1 leading-none">
+                                                    <div className="flex items-center">
+                                                        <Settings className="h-4 w-4 text-primary mr-2" />
+                                                        <FormLabel className="font-medium">Access Trash</FormLabel>
+                                                    </div>
+                                                    <FormDescription className="text-xs">
+                                                        {moduleDescriptions.trash}
                                                     </FormDescription>
                                                 </div>
                                             </FormItem>
@@ -1080,74 +1174,48 @@ export default function SchoolRegistrationForm() {
                     {/* Step 4: Plan Selection */}
                     {step === 4 && (
                         <Form {...planForm}>
-                            <form onSubmit={planForm.handleSubmit(onPlanSubmit)} className="space-y-6">
-                                <FormField
-                                    control={planForm.control}
-                                    name="billingCycle"
-                                    render={({ field }) => (
-                                        <FormItem className="space-y-1">
-                                            <FormLabel>Billing Cycle</FormLabel>
-                                            <div className="flex items-center justify-center space-x-4 rounded-lg border p-1">
-                                                <Button
-                                                    type="button"
-                                                    variant={field.value === "monthly" ? "default" : "outline"}
-                                                    className={`w-full ${field.value === "monthly" ? "" : "bg-transparent"}`}
-                                                    onClick={() => field.onChange("monthly")}
-                                                >
-                                                    Monthly
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    variant={field.value === "annual" ? "default" : "outline"}
-                                                    className={`w-full ${field.value === "annual" ? "" : "bg-transparent"}`}
-                                                    onClick={() => field.onChange("annual")}
-                                                >
-                                                    Annual (Save 20%)
-                                                </Button>
-                                            </div>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
+                            <form onSubmit={planForm.handleSubmit(onPlanSubmit)} className="space-y-6 mt-10">
                                 <FormField
                                     control={planForm.control}
                                     name="plan"
                                     render={({ field }) => (
-                                        <FormItem className="space-y-3">
+                                        <FormItem>
                                             <FormLabel>Subscription Plan</FormLabel>
                                             <FormControl>
                                                 <RadioGroup
                                                     onValueChange={field.onChange}
                                                     defaultValue={field.value}
-                                                    className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                                                    className="flex flex-col space-y-2"
                                                 >
-                                                    {Object.entries(planDetails).map(([planId, plan]) => (
-                                                        <div key={planId} className="relative">
-                                                            <RadioGroupItem value={planId} id={planId} className="absolute top-4 left-4 z-10" />
-                                                            <label
-                                                                htmlFor={planId}
-                                                                className={`flex flex-col h-full rounded-lg border-2 p-4 cursor-pointer hover:border-primary transition-colors ${field.value === planId ? "border-primary" : ""
-                                                                    } ${plan.recommended ? "ring-2 ring-primary ring-offset-2" : ""}`}
+                                                    {[
+                                                        {
+                                                            value: "basic",
+                                                            label: "Basic Plan",
+                                                            price: "Gh₵5 per student/month",
+
+                                                        },
+                                                        {
+                                                            value: "pro",
+                                                            label: "Pro Plan",
+                                                            price: "Gh₵10 per student/month",
+
+                                                        }
+                                                    ].map((plan) => (
+                                                        <FormItem key={plan.value} className="flex items-center space-x-3 space-y-0">
+                                                            <FormControl>
+                                                                <RadioGroupItem value={plan.value} />
+                                                            </FormControl>
+                                                            <motion.div
+                                                                className="flex-1 p-4 border rounded-md"
+                                                                whileHover={{ scale: 1.02 }}
+                                                                transition={{ type: "spring", stiffness: 300 }}
                                                             >
-                                                                {plan.recommended && <Badge className="self-start mb-2">Recommended</Badge>}
-                                                                <div className="font-bold text-xl mb-1">{plan.name}</div>
-                                                                <div className="text-3xl font-bold mb-4">
-                                                                    {plan.price[planForm.watch("billingCycle") || "monthly"]}
-                                                                    <span className="text-sm font-normal text-muted-foreground">
-                                                                        /{planForm.watch("billingCycle") === "monthly" ? "mo" : "yr"}
-                                                                    </span>
-                                                                </div>
-                                                                <ul className="space-y-2 mb-4 flex-grow">
-                                                                    {plan.features.map((feature, index) => (
-                                                                        <li key={index} className="flex items-start">
-                                                                            <CheckCircle2 className="h-4 w-4 text-primary mr-2 mt-0.5 shrink-0" />
-                                                                            <span className="text-sm">{feature}</span>
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </label>
-                                                        </div>
+                                                                <FormLabel className="font-semibold text-lg">{plan.label} {""} {plan.value === "pro" && <span className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-medium px-2 py-1 rounded-full shadow-md">
+                                                                    Recommended
+                                                                </span>}</FormLabel>
+                                                                <p className="text-sm text-gray-600 mb-2">{plan.price}</p>
+                                                            </motion.div>
+                                                        </FormItem>
                                                     ))}
                                                 </RadioGroup>
                                             </FormControl>
@@ -1155,6 +1223,15 @@ export default function SchoolRegistrationForm() {
                                         </FormItem>
                                     )}
                                 />
+                                <p className="text-lg text-foreground font-medium mt-4">
+                                    Check the{" "}
+                                    <Link
+                                        href="/pricing"
+                                        className="text-primary/90 hover:text-primary font-semibold underline decoration-dashed underline-offset-4 transition-all duration-300"
+                                    >
+                                        pricing page
+                                    </Link>
+                                </p>
 
                                 <FormField
                                     control={planForm.control}
@@ -1167,17 +1244,17 @@ export default function SchoolRegistrationForm() {
                                             <div className="space-y-1 leading-none">
                                                 <FormLabel>
                                                     I accept the{" "}
-                                                    <a href="#" className="text-primary underline">
+                                                    <Link href="/term" className="text-primary underline">
                                                         Terms of Service
-                                                    </a>
+                                                    </Link>
                                                     ,{" "}
-                                                    <a href="#" className="text-primary underline">
+                                                    <Link href="/privacy" className="text-primary underline">
                                                         Privacy Policy
-                                                    </a>
+                                                    </Link>
                                                     , and{" "}
-                                                    <a href="#" className="text-primary underline">
+                                                    <Link href="/subscription_agreement" className="text-primary underline">
                                                         Subscription Agreement
-                                                    </a>
+                                                    </Link>
                                                 </FormLabel>
                                                 <FormMessage />
                                             </div>
@@ -1189,7 +1266,7 @@ export default function SchoolRegistrationForm() {
                                     <Button type="button" variant="outline" onClick={handleBack}>
                                         <ChevronLeft className="mr-2 h-4 w-4" /> Back
                                     </Button>
-                                    <Button type="submit" disabled={isSubmitting}>
+                                    <Button type="submit" disabled={isSubmitting || !planForm.watch("acceptTerms")}>
                                         {isSubmitting ? (
                                             <>
                                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -1237,12 +1314,9 @@ export default function SchoolRegistrationForm() {
                                     </div>
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">Plan:</span>
-                                        <span className="font-medium">{planDetails[formData.plan].name}</span>
+                                        <span className="font-medium">{formData.plan}</span>
                                     </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-muted-foreground">Billing:</span>
-                                        <span className="font-medium capitalize">{formData.billingCycle}</span>
-                                    </div>
+
                                 </div>
                             </div>
 
@@ -1252,11 +1326,13 @@ export default function SchoolRegistrationForm() {
                                 </p>
 
                                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                    <Button onClick={() => router.push("/dashboard")} className="flex-1 sm:flex-initial">
-                                        Go to Dashboard
+                                    <Button onClick={() => router.push("/sign-in")} className="flex-1 sm:flex-initial">
+                                        <Lock className="w-4 h-4" />
+                                        Go to Sign In
                                     </Button>
                                     <Button variant="outline" onClick={() => router.push("/help")} className="flex-1 sm:flex-initial">
-                                        View Documentation
+                                        <Youtube className="w-4 h-4" />
+                                        Watch Tutorials
                                     </Button>
                                 </div>
                             </div>

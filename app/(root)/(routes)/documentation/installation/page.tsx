@@ -8,13 +8,9 @@ import { DocsLayout } from "@/components/docs-layout"
 export default function InstallationPage() {
   return (
     <DocsLayout>
-      <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+      <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_100px]">
         <div className="mx-auto w-full min-w-0">
-          <PageHeader
-            title="Installation Guide"
-            description="Step-by-step instructions for setting up SchoolSync"
-            breadcrumbs={[{ title: "Installation", href: "/installation" }]}
-          />
+        <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Installation</h1>
           <div className="flex items-center space-x-2 pt-4">
             <div className="flex items-center space-x-1 text-sm text-muted-foreground">
               <span>Last updated:</span>
@@ -22,16 +18,16 @@ export default function InstallationPage() {
             </div>
           </div>
           <div className="pb-12 pt-8">
-            <div className="prose prose-slate dark:prose-invert max-w-none">
-              <h2 id="overview">Overview</h2>
+            <div className="prose prose-slate dark:prose-invert max-w-none space-y-4">
+              <h2 className="font-bold text-2xl" id="overview">Overview</h2>
               <p>
-                SchoolSync is a cloud-based solution, so there's no need for complex installation. Simply follow these
+                CampusIQ is a cloud-based solution, so there's no need for complex installation. Simply follow these
                 steps to get started:
               </p>
 
-              <h2 id="step-1-sign-up">Step 1: Sign Up for an Account</h2>
+              <h2 className="font-bold text-2xl" id="step-1-sign-up">Step 1: Sign Up for an Account</h2>
               <p>
-                Visit the SchoolSync website and click on the "Sign Up" button. Fill in your school's information and
+                Visit the CampusIQ website and click on the "Sign Up" button. Fill in your school's information and
                 create an administrator account.
               </p>
               <ol>
@@ -58,7 +54,7 @@ export default function InstallationPage() {
                 </div>
               </div>
 
-              <h2 id="step-2-setup-wizard">Step 2: Complete the Setup Wizard</h2>
+              <h2 className="font-bold text-2xl" id="step-2-setup-wizard">Step 2: Complete the Setup Wizard</h2>
               <p>
                 After signing up, you'll be guided through a setup wizard to configure your school's profile, academic
                 year, departments, and initial user accounts.
@@ -82,7 +78,7 @@ export default function InstallationPage() {
                 </div>
               </div>
 
-              <h2 id="step-3-data-import">Step 3: Import Your Data</h2>
+              <h2 className="font-bold text-2xl" id="step-3-data-import">Step 3: Import Your Data</h2>
               <p>
                 Use our data import tools to migrate existing information from spreadsheets or other school management
                 systems.
@@ -129,7 +125,7 @@ export default function InstallationPage() {
                 </div>
               </div>
 
-              <p>SchoolSync supports importing the following types of data:</p>
+              <p>CampusIQ supports importing the following types of data:</p>
               <ul>
                 <li>Student information</li>
                 <li>Staff and teacher information</li>
@@ -138,8 +134,8 @@ export default function InstallationPage() {
                 <li>Historical grades and attendance (optional)</li>
               </ul>
 
-              <h2 id="step-4-configuration">Step 4: Configure System Settings</h2>
-              <p>Customize SchoolSync to match your school's specific needs:</p>
+              <h2 className="font-bold text-2xl" id="step-4-configuration">Step 4: Configure System Settings</h2>
+              <p>Customize CampusIQ to match your school's specific needs:</p>
               <ul>
                 <li>Set up grading scales and reporting periods</li>
                 <li>Configure attendance codes and policies</li>
@@ -148,8 +144,8 @@ export default function InstallationPage() {
                 <li>Configure integration with other systems (optional)</li>
               </ul>
 
-              <h2 id="step-5-training">Step 5: User Training</h2>
-              <p>Before fully deploying SchoolSync, we recommend training your staff:</p>
+              <h2 className="font-bold text-2xl" id="step-5-training">Step 5: User Training</h2>
+              <p>Before fully deploying CampusIQ, we recommend training your staff:</p>
               <ul>
                 <li>Schedule administrator training sessions</li>
                 <li>Conduct teacher training workshops</li>
@@ -157,9 +153,9 @@ export default function InstallationPage() {
                 <li>Utilize our training videos and documentation</li>
               </ul>
 
-              <h2 id="self-hosted-option">Self-Hosted Installation (Optional)</h2>
+              <h2 className="font-bold text-2xl" id="self-hosted-option">Self-Hosted Installation (Optional)</h2>
               <p>
-                For schools that prefer to host SchoolSync on their own servers, we offer a self-hosted option. Please
+                For schools that prefer to host CampusIQ on their own servers, we offer a self-hosted option. Please
                 contact our sales team for detailed installation instructions and requirements.
               </p>
 
@@ -167,7 +163,7 @@ export default function InstallationPage() {
                 <div>
                   <h3 className="text-xl font-bold">Ready to get started?</h3>
                   <p className="text-slate-700 dark:text-slate-400">
-                    Check out our quick start guide to begin using SchoolSync.
+                    Check out our quick start guide to begin using CampusIQ.
                   </p>
                 </div>
                 <Button className="mt-4 md:mt-0" asChild>

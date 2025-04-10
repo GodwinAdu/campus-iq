@@ -29,11 +29,7 @@ export default function TroubleshootingPage() {
   return (
     <DocsLayout>
       <div className="space-y-8">
-        <PageHeader
-          title="Troubleshooting"
-          description="Diagnose and resolve common issues with SchoolSync"
-          breadcrumbs={[{ title: "Troubleshooting", href: "/troubleshooting" }]}
-        />
+      <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Troubleshooting</h1>
 
         <div className="flex items-center space-x-2 pt-4">
           <div className="flex items-center space-x-1 text-sm text-muted-foreground">

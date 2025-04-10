@@ -14,11 +14,7 @@ export default function CustomFieldsPage() {
   return (
     <DocsLayout>
       <div className="space-y-8">
-        <PageHeader
-          title="Custom Fields"
-          description="Extend your school management system with custom fields to capture and manage additional data specific to your institution's needs."
-          breadcrumbs={[{ title: "Custom Fields", href: "/custom-fields" }]}
-        />
+      <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Custom Fields</h1>
 
         <div className="flex items-center space-x-2 pt-4">
           <div className="flex items-center space-x-1 text-sm text-muted-foreground">

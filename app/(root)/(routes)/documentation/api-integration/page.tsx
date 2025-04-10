@@ -14,11 +14,7 @@ export default function ApiIntegrationPage() {
   return (
     <DocsLayout>
       <div className="space-y-8">
-        <PageHeader
-          title="API Integration"
-          description="Connect SchoolSync with external systems using our comprehensive REST API"
-          breadcrumbs={[{ title: "API Integration", href: "/api-integration" }]}
-        />
+      <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Api Integration</h1>
 
         <div className="flex items-center space-x-2 pt-4">
           <div className="flex items-center space-x-1 text-sm text-muted-foreground">

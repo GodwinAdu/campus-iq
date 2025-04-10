@@ -98,7 +98,7 @@ export default function ScheduleDemoPage() {
               </p>
               <div className="flex flex-wrap gap-4">
                <ScheduleDemoDialog />
-                <Button size="lg" variant="outline" className="text-white border-white hover:bg-blue-700">
+                <Button  variant="secondary">
                   Watch Video Overview
                 </Button>
               </div>
@@ -319,7 +319,7 @@ export default function ScheduleDemoPage() {
               Schedule Your Demo
             </Button>
             <Link href="/support" passHref>
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-blue-700">
+              <Button size="lg" variant="outline" className="text-white bg-blue-500 border-white hover:bg-blue-700">
                 Contact Sales
               </Button>
             </Link>

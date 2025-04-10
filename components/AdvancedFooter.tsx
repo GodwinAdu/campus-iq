@@ -99,7 +99,7 @@ export default function AdvancedFooter() {
           </div>
         </div>
         <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} EduManage Pro. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Campus<span className="text-primary">IQ</span>. All rights reserved.</p>
         </div>
       </div>
     </footer>

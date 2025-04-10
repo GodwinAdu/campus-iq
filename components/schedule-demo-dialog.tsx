@@ -171,7 +171,7 @@ export function ScheduleDemoDialog() {
     return (
         <Dialog >
             <DialogTrigger asChild>
-                <Button variant="outline" className="flex items-center">
+                <Button  className="flex items-center bg-green-500 hover:bg-green-700">
                     Schedule Demo
                 </Button>
             </DialogTrigger>

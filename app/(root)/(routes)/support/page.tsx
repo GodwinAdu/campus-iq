@@ -43,7 +43,6 @@ import { ScheduleDemoDialog } from "@/components/schedule-demo-dialog"
 export default function SupportPage() {
     const [activeTab, setActiveTab] = useState("help")
     const [showContactDialog, setShowContactDialog] = useState(false)
-    const [showDemoDialog, setShowDemoDialog] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [isSearching, setIsSearching] = useState(false)
     const [searchResults, setSearchResults] = useState<any[]>([])
@@ -460,7 +459,7 @@ export default function SupportPage() {
                                     <CardContent className="space-y-4">
                                         <div className="border-b pb-2">
                                             <Link href="#" className="text-blue-600 hover:underline font-medium">
-                                                How do I reset a student's password?
+                                                How do I reset a student&#39;s password?
                                             </Link>
                                             <p className="text-sm text-gray-600 mt-1">
                                                 Learn how to reset passwords for individual students or in bulk.
@@ -671,7 +670,7 @@ export default function SupportPage() {
                                                     <Ticket className="h-8 w-8 text-gray-400" />
                                                 </div>
                                                 <h3 className="text-lg font-medium mb-2">No Active Tickets</h3>
-                                                <p className="text-gray-500 mb-4">You don't have any active support tickets at the moment.</p>
+                                                <p className="text-gray-500 mb-4">You don&#39;t have any active support tickets at the moment.</p>
                                                 <Button onClick={() => setShowContactDialog(true)}>Create a New Ticket</Button>
                                             </CardContent>
                                         </Card>

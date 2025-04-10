@@ -20,18 +20,13 @@ import {
   CheckCircle2,
 } from "lucide-react"
 import { DocsLayout } from "@/components/docs-layout"
-import { PageHeader } from "@/components/page-header"
 import { Callout } from "@/components/callout"
 
 export default function SupportResourcesPage() {
   return (
     <DocsLayout>
       <div className="space-y-8">
-        <PageHeader
-          title="Help & Support"
-          description="Resources to help you get the most out of SchoolSync"
-          breadcrumbs={[{ title: "Support Resources", href: "/support-resources" }]}
-        />
+      <h1 className="scroll-m-20 text-4xl font-bold tracking-tight">Help & Support</h1>
 
         <div className="flex items-center space-x-2 pt-4">
           <div className="flex items-center space-x-1 text-sm text-muted-foreground">
@@ -59,7 +54,7 @@ export default function SupportResourcesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Comprehensive guides and reference materials for all SchoolSync features.</p>
+                <p>Comprehensive guides and reference materials for all CampusIQ features.</p>
               </CardContent>
               <CardFooter>
                 <Button variant="outline" size="sm" className="w-full" asChild>
@@ -93,7 +88,7 @@ export default function SupportResourcesPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>Connect with other SchoolSync users to share tips and best practices.</p>
+                <p>Connect with other CampusIQ users to share tips and best practices.</p>
               </CardContent>
               <CardFooter>
                 <Button variant="outline" size="sm" className="w-full">
@@ -107,7 +102,7 @@ export default function SupportResourcesPage() {
             Contact Support
           </h2>
           <p>
-            Our dedicated support team is ready to assist you with any questions or issues you may have with SchoolSync.
+            Our dedicated support team is ready to assist you with any questions or issues you may have with CampusIQ.
           </p>
 
           <div className="not-prose my-6">
@@ -384,7 +379,7 @@ export default function SupportResourcesPage() {
                     <div>
                       <h4 className="font-medium">Browser Compatibility</h4>
                       <p className="text-sm text-muted-foreground">
-                        SchoolSync works best with the latest versions of Chrome, Firefox, Safari, and Edge. Update your
+                        CampusIQ works best with the latest versions of Chrome, Firefox, Safari, and Edge. Update your
                         browser to the latest version for optimal performance.
                       </p>
                     </div>
@@ -426,7 +421,7 @@ export default function SupportResourcesPage() {
                     <div>
                       <h4 className="font-medium">App Crashes</h4>
                       <p className="text-sm text-muted-foreground">
-                        Ensure you're using the latest version of the SchoolSync mobile app. Try force-closing the app
+                        Ensure you're using the latest version of the CampusIQ mobile app. Try force-closing the app
                         and restarting it, or reinstall the app if issues persist.
                       </p>
                     </div>
@@ -441,7 +436,7 @@ export default function SupportResourcesPage() {
                       <h4 className="font-medium">Notification Problems</h4>
                       <p className="text-sm text-muted-foreground">
                         Verify that notifications are enabled both in the app settings and in your device's system
-                        settings for the SchoolSync app.
+                        settings for the CampusIQ app.
                       </p>
                     </div>
                   </div>
@@ -453,7 +448,7 @@ export default function SupportResourcesPage() {
           <h2 id="faqs" className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
             Frequently Asked Questions
           </h2>
-          <p>Find quick answers to common questions about SchoolSync.</p>
+          <p>Find quick answers to common questions about CampusIQ.</p>
 
           <div className="not-prose my-6">
             <Accordion type="single" collapsible className="w-full">
@@ -468,12 +463,12 @@ export default function SupportResourcesPage() {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="faq-2">
-                <AccordionTrigger>Can I access SchoolSync on my mobile device?</AccordionTrigger>
+                <AccordionTrigger>Can I access CampusIQ on my mobile device?</AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-muted-foreground">Yes, SchoolSync is accessible on mobile devices in two ways:</p>
+                  <p className="text-muted-foreground">Yes, CampusIQ is accessible on mobile devices in two ways:</p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground">
-                    <li>Through any mobile web browser by visiting your school's SchoolSync URL</li>
-                    <li>Via the SchoolSync mobile app, available for iOS and Android devices</li>
+                    <li>Through any mobile web browser by visiting your school's CampusIQ URL</li>
+                    <li>Via the CampusIQ mobile app, available for iOS and Android devices</li>
                   </ul>
                   <p className="mt-2 text-muted-foreground">
                     The mobile app provides additional features like offline access and push notifications.
@@ -528,9 +523,9 @@ export default function SupportResourcesPage() {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="faq-6">
-                <AccordionTrigger>What browsers are supported by SchoolSync?</AccordionTrigger>
+                <AccordionTrigger>What browsers are supported by CampusIQ?</AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-muted-foreground">SchoolSync supports the following browsers:</p>
+                  <p className="text-muted-foreground">CampusIQ supports the following browsers:</p>
                   <ul className="list-disc list-inside mt-2 text-muted-foreground">
                     <li>Google Chrome (version 90 or later)</li>
                     <li>Mozilla Firefox (version 88 or later)</li>
@@ -549,7 +544,7 @@ export default function SupportResourcesPage() {
           <h2 id="training-resources" className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight">
             Training Resources
           </h2>
-          <p>Enhance your SchoolSync skills with our comprehensive training resources.</p>
+          <p>Enhance your CampusIQ skills with our comprehensive training resources.</p>
 
           <div className="not-prose my-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
@@ -565,7 +560,7 @@ export default function SupportResourcesPage() {
                   <li className="flex items-center">
                     <ExternalLink className="h-4 w-4 mr-2 text-muted-foreground" />
                     <a href="#" className="hover:underline">
-                      Getting Started with SchoolSync
+                      Getting Started with CampusIQ
                     </a>
                   </li>
                   <li className="flex items-center">
@@ -709,7 +704,7 @@ export default function SupportResourcesPage() {
                   <div className="bg-muted p-4 rounded-md">
                     <h5 className="font-medium">Basic Administrator Certification</h5>
                     <p className="text-sm text-muted-foreground mt-1">
-                      A comprehensive introduction to SchoolSync administration covering user management, system
+                      A comprehensive introduction to CampusIQ administration covering user management, system
                       configuration, and basic troubleshooting.
                     </p>
                     <div className="mt-2 text-sm">
@@ -749,7 +744,7 @@ export default function SupportResourcesPage() {
                   <div className="bg-muted p-4 rounded-md">
                     <h5 className="font-medium">Teacher Essentials</h5>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Learn the fundamentals of SchoolSync for classroom management, including attendance, grading, and
+                      Learn the fundamentals of CampusIQ for classroom management, including attendance, grading, and
                       communication with students and parents.
                     </p>
                     <div className="mt-2 text-sm">
